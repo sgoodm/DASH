@@ -1,0 +1,285 @@
+body{
+    /*padding:50px 10%;*/
+    font-family: 'Open Sans', sans-serif;
+    min-width: 1200px;
+    background:  rgb(88,108,128);
+    color: white;
+}
+#map_options {
+    width:350px;
+    height: 300px;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+    background: white;
+    position:absolute;
+    top:0;
+    right:0;
+    z-index: 555;
+}
+
+    #boundary_options{
+        height:50px;
+        margin-bottom: 40px;
+    }
+
+        #boundary_options>div{
+            display: inline-block;
+            width:50%;
+            float:left;
+            text-align: center;
+        }
+
+        #boundary_options select{
+            color:black;
+            text-align: center;
+            width:150px;
+        }
+
+#map{ 
+    height: 700px; 
+    width: 100%;
+    display:inline-block;
+}
+
+    .legend {
+        width: 100px;
+        line-height: 20px;
+        color: #555;
+    }
+    .legend i {
+        width: 20px;
+        height: 15px;
+        float: left;
+        margin-right: 8px;
+        opacity: 0.7;
+    }
+
+    .info {
+        padding: 6px 8px;
+        font: 14px/16px Arial, Helvetica, sans-serif;
+        background: white;
+        background: rgba(255,255,255,0.8);
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        border-radius: 5px;
+    }
+    .info h4 {
+        margin: 0 0 5px;
+        color: #777;
+    }
+
+    .geocode-cluster{
+        background: #9FE5F8;background:rgba(159, 229, 248, 0.5);border:1px solid black;border:1px solid rgba(0, 0, 0, 0.5);border-radius:50%;
+    }
+    .geocode-cluster div{
+        text-align:center;line-height:0%;position:relative;top:50%;
+    }
+
+    #map_table{
+        margin: 5px;
+    }
+
+        #map_table tr{
+            text-align: center;
+            padding: 5px;
+        }
+
+        #map_table td{
+            padding: 3px;
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+
+
+
+#build_toggle{
+    display: none;
+    background:white;
+    width:100%;
+    height: 50px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    color: black;
+    line-height: 50px;
+}
+
+#build_options{
+    margin-top: 40px;
+    margin-bottom: 60px;
+    padding-top: 20px;
+    padding-left:10px;
+    padding-right:10px;
+    border: 1px solid white;
+    border-top: 0;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    width:100%;
+}
+
+
+
+    #raster_options{
+        height: 250px;
+        /*padding-top: 50px;*/
+    }
+
+        #raster_available, #raster_buttons, #raster_selected{
+            display: inline-block;
+            width: 33.3%;
+            height: 100%;
+            float:left;
+        }
+
+            #raster_available>div, #raster_selected>div{
+                text-align: center;
+            }
+
+            #raster_options select{
+                width: 100%;
+                color:black;
+                padding: 10px;
+            }
+
+        #raster_buttons{
+        }
+        
+            #raster_buttons button{
+                width: 20%;
+                height: 50px;
+                display: block;
+                position: relative;
+                left:40%;
+                text-align: center;
+                color: black;
+            }
+
+            #raster_add{
+                top:20%;
+            }
+
+            #raster_remove{
+                top: 30%;
+            }
+
+        #raster_selected_list{
+            height: 222px;
+            background: white;
+            color:black;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+             #raster_selected_list tr{
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+
+                 #raster_selected_list td{
+                    float: left;
+                    text-align: center;
+                    overflow: hidden;
+                }
+                 #raster_selected_list td:nth-child(1){
+                    width:5%;
+                }
+                     #raster_selected_list td:nth-child(1) *{
+                        width:100%;
+                    }
+                 #raster_selected_list td:nth-child(2){
+                    width:80%;
+                }
+                     #raster_selected_list td:nth-child(2) *{
+                        width:100%;
+                    }
+                 #raster_selected_list td:nth-child(3){
+                    width:15%;
+                }
+                     #raster_selected_list td:nth-child(3) *{
+                        width:100%;
+                    }
+
+        #build{
+            clear:both;
+            display: block;
+        }
+
+            #submit{
+                height: 50px;
+                width:20%;
+                position: relative;
+                left:40%;
+                top:25px;
+                color:black;
+            }
+
+#data_options{
+    display: block;
+    clear:both;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    border: 1px solid white;
+    border-bottom: 0;
+    border-top-left-radius:10px;
+    border-top-right-radius: 10px;
+}
+
+    #data_type{
+        padding-bottom: 20px;
+    }
+
+        #data_type ul{
+            width: 80%;
+            margin-left: 10%;
+            padding: 0;
+        }
+
+            .menu_item {
+                display: inline-block;
+                text-decoration: none;
+                padding:5px;
+                width: 25%;
+                text-align: center;
+                border: solid 1px black;
+                border-collapse: collapse;
+            }
+
+            .menu_item:hover{
+                cursor:pointer;
+                background-color: rgba(120,150,170,0.5);
+            }
+
+            .active_menu{
+                background-color: rgba(120,150,170,1);
+            }
+
+            .menu_item>div{
+                padding-top: 15px;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none; 
+                -khtml-user-select: none; 
+                -moz-user-select: none; 
+                -ms-user-select: none;
+                -o-user-select: none; 
+                user-select: none; 
+            }
+
+    #slider_container{
+        /*width: 75%;*/
+        height: 50px;
+        position: relative;
+        text-align: center;
+    }
+
+        .slider_sub{
+            width:75%;
+            margin: auto;
+        }
+
+        #slider{}
+
+        #slider_bot span{ width:33%; position:relative; top: 10px; }
+        #slider_min { right: 45%; }
+        #slider_max { left: 45%;}
+        #slider_value { }
+
