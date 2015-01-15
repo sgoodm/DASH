@@ -45,6 +45,7 @@
 <body>
 
     <div id="map_options">
+
         <div id="map_options_content" style="display:none;">      
             <div id="boundary_options"> 
                 <div id="country_options">
@@ -76,7 +77,7 @@
                 <li id="method_overunder"><a tabindex="0">Overunder</a></li>
             </ul> 
 
-            <div id="weights">
+            <div id="weights" class="method" >
                 <div id="raster_option_1">
                     <select id="ro1" class="ro" ></select>
                 </div>
@@ -98,7 +99,7 @@
                 </div>
             </div>
 
-            <div id="overunder" style="display:none;">
+            <div id="overunder"  class="method" style="display:none;">
                 <div id="overunder_option_1">
                     <select id="ou1" class="ou" ></select>
                 </div>
@@ -107,6 +108,8 @@
                     <select id="ou2" class="ou" ></select>
                 </div> 
             </div>  
+
+            <div id="map_options_submit"><button>Build</button></div>
 
         </div>
 

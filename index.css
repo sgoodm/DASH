@@ -64,6 +64,19 @@ a, a:hover, a:active, a:focus, a:visited{
             padding: 0 5px
         }
 
+    #map_options_submit {
+        width:100%;
+        position: absolute;
+        bottom:10px;
+        text-align: center;
+        color: black;
+    }
+
+        #map_options_submit button {
+            width:100px;
+            height: 30px;
+        }
+
     #map_options_toggle {
         height: 25px;
         width: 100%;

@@ -1,5 +1,5 @@
 // ++
-// ++ js for Map Analysis Tool
+// ++ js for DASH
 // ++
 
 $(document).ready(function () {
@@ -41,6 +41,9 @@ $(document).ready(function () {
 	$('#method li').click(function(){
 		$('#method li').removeClass("active");
 		$(this).addClass("active");
+		var method = $(this).attr("id").split("_")[1];
+		$('.method').hide();
+		$('#'+method).show();
 	})
 
 	$('#country').val('-----')
