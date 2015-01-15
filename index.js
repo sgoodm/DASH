@@ -32,6 +32,16 @@ $(document).ready(function () {
 	// --------------------------------------------------
 	// build options
 
+	$('#map_options_content').slideDown(1000);
+
+	$('#map_options_toggle').click(function(){
+		$('#map_options_content').slideToggle();
+	})
+
+	$('#method li').click(function(){
+		$('#method li').removeClass("active");
+		$(this).addClass("active");
+	})
 
 	$('#country').val('-----')
 	$('#adm').val('-----')

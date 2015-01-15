@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <title>AidData - - DASH - -</title> 
 
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
 
@@ -43,29 +45,72 @@
 <body>
 
     <div id="map_options">
-        
-        <div id="boundary_options"> 
-            <div id="country_options">
-                <span> Select a Country: </span>
-                <select id="country" >
-                    <option id="blank_country_option" value="-----">Country</option>
-                    <option value="Nepal">Nepal</option>
-                    <option value="Uganda">Uganda</option>
-                    <option value="Malawi">Malawi</option>  
-                </select>
-            </div>       
+        <div id="map_options_content" style="display:none;">      
+            <div id="boundary_options"> 
+                <div id="country_options">
+                    <span> Select a Country: </span>
+                    <select id="country" >
+                        <option id="blank_country_option" value="-----">Country</option>
+                        <option value="Nepal">Nepal</option>
+                        <option value="Uganda">Uganda</option>
+                        <option value="Malawi">Malawi</option>  
+                    </select>
+                </div>       
 
-            <div id="adm_options">
-                <span> Select an ADM: </span>
-                <select id="adm" >
-                    <option id="blank_adm_option" value="-----">ADM</option>
-                    <option value="ADM1">ADM1</option>
-                    <option value="ADM2">ADM2</option>
-                    <option value="ADM3">ADM3</option>
+                <div id="adm_options">
+                    <span> Select an ADM: </span>
+                    <select id="adm" >
+                        <option id="blank_adm_option" value="-----">ADM</option>
+                        <option value="ADM1">ADM1</option>
+                        <option value="ADM2">ADM2</option>
+                        <option value="ADM3">ADM3</option>
+                    </select>
+                </div>   
 
-                </select>
-            </div>     
+            </div>
+
+            <div class="divider"></div>
+
+            <ul id="method" class="nav nav-tabs nav-justified">
+                <li id="method_weights" class="active"><a tabindex="0">Weights</a></li>
+                <li id="method_overunder"><a tabindex="0">Overunder</a></li>
+            </ul> 
+
+            <div id="weights">
+                <div id="raster_option_1">
+                    <select id="ro1" class="ro" ></select>
+                </div>
+
+                <div id="raster_option_2">
+                    <select id="ro2" class="ro" ></select>
+                </div>    
+
+                <div id="raster_option_3">
+                    <select id="ro3" class="ro" ></select>
+                </div> 
+
+                <div id="raster_option_1">
+                    <select id="ro4" class="ro" ></select>
+                </div>    
+
+                <div id="raster_option_1">
+                    <select id="ro5" class="ro" ></select>
+                </div>
+            </div>
+
+            <div id="overunder" style="display:none;">
+                <div id="overunder_option_1">
+                    <select id="ou1" class="ou" ></select>
+                </div>
+
+                <div id="overunder_option_2">
+                    <select id="ou2" class="ou" ></select>
+                </div> 
+            </div>  
+
         </div>
+
+        <div id="map_options_toggle"><span class="ui-icon ui-icon-carat-2-n-s"></span></div>
 
     </div>
 

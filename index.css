@@ -1,39 +1,92 @@
 body{
-    /*padding:50px 10%;*/
     font-family: 'Open Sans', sans-serif;
-    min-width: 1200px;
+    /*min-width: 1200px;*/
     background:  rgb(88,108,128);
     color: white;
 }
+a, a:hover, a:active, a:focus, a:visited{
+    outline: 0;
+    outline: none;
+    outline-style: none;
+    text-decoration: none;
+    /*color: black;*/
+}
+.divider {
+    height: 1px;
+    border-bottom: 1px solid rgba(0,0,0,0.25);
+    margin: 1px 2.5%;
+}
+
 #map_options {
     width:350px;
-    height: 300px;
-    border-left: 1px solid black;
-    border-bottom: 1px solid black;
+    border-top: 0;
     background: white;
     position:absolute;
-    top:0;
-    right:0;
+    top:50;
+    right:20px;
     z-index: 555;
 }
 
-    #boundary_options{
-        height:50px;
-        margin-bottom: 40px;
+    #map_options_content {
+        height: 300px;
+        width: 100%;
+        display: block;
+        border: 1px solid black;
+        border-top: 0;
+        border-bottom: 0;
+
     }
 
-        #boundary_options>div{
-            display: inline-block;
-            width:50%;
-            float:left;
-            text-align: center;
+        #boundary_options{
+            height:50px;
+            font-size: 12px;
         }
 
-        #boundary_options select{
-            color:black;
-            text-align: center;
-            width:150px;
+            #boundary_options>div{
+                display: inline-block;
+                width:50%;
+                float:left;
+                text-align: center;
+            }
+
+            #boundary_options select{
+                color:black;
+                text-align: center;
+                width:150px;
+            }
+
+    #method {
+        padding: 10px;
+        font-size: 10px;
+    }
+
+        #method li {
+            padding: 0 5px
         }
+
+    #map_options_toggle {
+        height: 25px;
+        width: 100%;
+        display: block;
+        position: absolute;
+        bottom:-25;
+        background: rgba(210,210,210,1);
+        border: 1px solid black;
+        border-top: 0;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+        #map_options_toggle span{
+            position: relative;
+            top:4px;
+            left: 167px;
+
+        }
+
+/*---------------------------------------------*/
 
 #map{ 
     height: 700px; 
@@ -89,8 +142,7 @@ body{
             border-collapse: collapse;
         }
 
-
-
+/*---------------------------------------------*/
 
 #build_toggle{
     display: none;
