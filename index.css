@@ -1,3 +1,6 @@
+html,body{
+    height: 100%;
+}
 body{
     font-family: 'Open Sans', sans-serif;
     /*min-width: 1200px;*/
@@ -18,27 +21,31 @@ a, a:hover, a:active, a:focus, a:visited{
 }
 
 #map_options {
-    width:350px;
+    width:400px;
     border-top: 0;
     background: white;
     position:absolute;
-    top:50;
+    top:0;
     right:20px;
     z-index: 555;
+    color: black;
 }
 
     #map_options_content {
-        height: 300px;
+        height: 350px;
         width: 100%;
         display: block;
         border: 1px solid black;
         border-top: 0;
         border-bottom: 0;
+        background: white;
 
     }
 
         #boundary_options{
-            height:50px;
+            padding-top: 10px;
+            margin-bottom: 20px;
+            height:25px;
             font-size: 12px;
         }
 
@@ -55,27 +62,180 @@ a, a:hover, a:active, a:focus, a:visited{
                 width:150px;
             }
 
-    #method {
-        padding: 10px;
-        font-size: 10px;
-    }
 
-        #method li {
-            padding: 0 5px
+
+        #method {
+            display:none;
+            padding: 10px;
+            font-size: 10px;
         }
 
-    #map_options_submit {
-        width:100%;
-        position: absolute;
-        bottom:10px;
-        text-align: center;
-        color: black;
-    }
+            #method li {
+                padding: 0 5px
+            }
 
-        #map_options_submit button {
-            width:100px;
-            height: 30px;
+            .nav-tabs > li.active > a,
+            .nav-tabs > li.active > a:hover,
+            .nav-tabs > li.active > a:focus {
+              color: white;
+              cursor: default;
+              background-color: rgba(66,139,202,1);
+              border: 1px solid #dddddd;
+              border-bottom-color: transparent;
+            }
+
+        .method {
+            display: none;
+            width:90%;
+            margin:10px 5%;
         }
+            #weights{}
+
+                .ro {
+                    margin: 1% 0;
+                    display: block;
+                }
+                    #weights select {
+                        width: 80%;
+                        float: left;
+                    }
+                    #weights input {
+                        width: 15%;
+                        text-align: center;
+                        float: right;
+                        margin-top: 1%;
+                    }
+
+            #points {
+            /*#data_options{*/
+                /*display: block;*/
+                clear:both;
+                padding-top: 40px;
+                padding-bottom: 40px;
+                position: relative;
+            }
+
+                #clear_points {
+                    width:50px;
+                    height: 50px;
+                    position: absolute;
+                    top:0;
+                    right:10%;
+                    font-size: 10px;
+                }
+
+                    #clear_points button {
+                        background: rgba(0,255,255,1);
+                        border: 1px solid rgba(0,0,0,0);
+                        border-radius: 10px;
+                    }
+                    #clear_points button:hover {
+                        -moz-box-shadow:    inset 0 0 5px rgba(0,0,255,1);
+                        -webkit-box-shadow: inset 0 0 5px rgba(0,0,255,1);
+                        box-shadow:         inset 0 0 5px rgba(0,0,255,1);
+                    }
+                    #clear_points button:active {
+                        -moz-box-shadow:    inset 0 0 5px rgba(0,255,0,1);
+                        -webkit-box-shadow: inset 0 0 5px rgba(0,255,0,1);
+                        box-shadow:         inset 0 0 5px rgba(0,255,0,1);
+                    }
+
+                #data_type{
+                    padding-bottom: 20px;
+                }
+
+                    #data_type ul{
+                        width: 100%;
+                        /*margin-left: 10%;*/
+                        padding: 0;
+                    }
+
+                        .menu_item {
+                            display: inline-block;
+                            text-decoration: none;
+                            padding:5px;
+                            width: 25%;
+                            text-align: center;
+                            border: solid 1px black;
+                            border-collapse: collapse;
+                        }
+
+                        .menu_item:hover{
+                            cursor:pointer;
+                            background-color: rgba(120,150,170,0.5);
+                        }
+
+                        .active_menu{
+                            background-color: rgba(120,150,170,1);
+                        }
+
+                        .menu_item>div{
+                            padding-top: 15px;
+                            -webkit-touch-callout: none;
+                            -webkit-user-select: none; 
+                            -khtml-user-select: none; 
+                            -moz-user-select: none; 
+                            -ms-user-select: none;
+                            -o-user-select: none; 
+                            user-select: none; 
+                        }
+
+                #slider_container{
+                    /*width: 75%;*/
+                    height: 50px;
+                    position: relative;
+                    text-align: center;
+                }
+
+                    .slider_sub{
+                        width:100%;
+                        margin: auto;
+                    }
+
+                    #slider{}
+
+                    #slider_bot span{ width:33%; position:relative; top: 10px; }
+                    #slider_min { right: 30%; }
+                    #slider_max { left: 30%;}
+                    #slider_value { }
+
+
+        #map_options_submit {
+            width:100%;
+            position: absolute;
+            bottom:10px;
+            text-align: center;
+            display: none;
+        }
+
+            #map_options_submit button {
+                width:100px;
+                height: 30px;
+            }
+
+        #map_options_message {
+            padding: 10px;
+            text-align:center;
+        }
+
+    #map_options_popover {
+        width:225px;
+        height:100px;
+        position:absolute;
+        left:-5px;
+        bottom:125px;
+        background: rgba(200,200,200,1);
+        border: 1px solid black;
+        border-right: 0;
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+        cursor:pointer;
+        z-index: -122;
+        padding:10px;
+        color:black;
+        font-size: 12px;
+        overflow-y:auto; 
+    }
 
     #map_options_toggle {
         height: 25px;
@@ -95,14 +255,13 @@ a, a:hover, a:active, a:focus, a:visited{
         #map_options_toggle span{
             position: relative;
             top:4px;
-            left: 167px;
+            left: 192px;
 
         }
 
-/*---------------------------------------------*/
 
 #map{ 
-    height: 700px; 
+    height: 100%; 
     width: 100%;
     display:inline-block;
 }
@@ -154,197 +313,4 @@ a, a:hover, a:active, a:focus, a:visited{
             border: 1px solid black;
             border-collapse: collapse;
         }
-
-/*---------------------------------------------*/
-
-#build_toggle{
-    display: none;
-    background:white;
-    width:100%;
-    height: 50px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    text-align: center;
-    color: black;
-    line-height: 50px;
-}
-
-#build_options{
-    margin-top: 40px;
-    margin-bottom: 60px;
-    padding-top: 20px;
-    padding-left:10px;
-    padding-right:10px;
-    border: 1px solid white;
-    border-top: 0;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    width:100%;
-}
-
-
-
-    #raster_options{
-        height: 250px;
-        /*padding-top: 50px;*/
-    }
-
-        #raster_available, #raster_buttons, #raster_selected{
-            display: inline-block;
-            width: 33.3%;
-            height: 100%;
-            float:left;
-        }
-
-            #raster_available>div, #raster_selected>div{
-                text-align: center;
-            }
-
-            #raster_options select{
-                width: 100%;
-                color:black;
-                padding: 10px;
-            }
-
-        #raster_buttons{
-        }
-        
-            #raster_buttons button{
-                width: 20%;
-                height: 50px;
-                display: block;
-                position: relative;
-                left:40%;
-                text-align: center;
-                color: black;
-            }
-
-            #raster_add{
-                top:20%;
-            }
-
-            #raster_remove{
-                top: 30%;
-            }
-
-        #raster_selected_list{
-            height: 222px;
-            background: white;
-            color:black;
-            padding: 10px;
-            overflow-y: auto;
-        }
-
-             #raster_selected_list tr{
-                margin-top: 10px;
-                margin-bottom: 10px;
-            }
-
-                 #raster_selected_list td{
-                    float: left;
-                    text-align: center;
-                    overflow: hidden;
-                }
-                 #raster_selected_list td:nth-child(1){
-                    width:5%;
-                }
-                     #raster_selected_list td:nth-child(1) *{
-                        width:100%;
-                    }
-                 #raster_selected_list td:nth-child(2){
-                    width:80%;
-                }
-                     #raster_selected_list td:nth-child(2) *{
-                        width:100%;
-                    }
-                 #raster_selected_list td:nth-child(3){
-                    width:15%;
-                }
-                     #raster_selected_list td:nth-child(3) *{
-                        width:100%;
-                    }
-
-        #build{
-            clear:both;
-            display: block;
-        }
-
-            #submit{
-                height: 50px;
-                width:20%;
-                position: relative;
-                left:40%;
-                top:25px;
-                color:black;
-            }
-
-#data_options{
-    display: block;
-    clear:both;
-    padding-top: 40px;
-    padding-bottom: 40px;
-    border: 1px solid white;
-    border-bottom: 0;
-    border-top-left-radius:10px;
-    border-top-right-radius: 10px;
-}
-
-    #data_type{
-        padding-bottom: 20px;
-    }
-
-        #data_type ul{
-            width: 80%;
-            margin-left: 10%;
-            padding: 0;
-        }
-
-            .menu_item {
-                display: inline-block;
-                text-decoration: none;
-                padding:5px;
-                width: 25%;
-                text-align: center;
-                border: solid 1px black;
-                border-collapse: collapse;
-            }
-
-            .menu_item:hover{
-                cursor:pointer;
-                background-color: rgba(120,150,170,0.5);
-            }
-
-            .active_menu{
-                background-color: rgba(120,150,170,1);
-            }
-
-            .menu_item>div{
-                padding-top: 15px;
-                -webkit-touch-callout: none;
-                -webkit-user-select: none; 
-                -khtml-user-select: none; 
-                -moz-user-select: none; 
-                -ms-user-select: none;
-                -o-user-select: none; 
-                user-select: none; 
-            }
-
-    #slider_container{
-        /*width: 75%;*/
-        height: 50px;
-        position: relative;
-        text-align: center;
-    }
-
-        .slider_sub{
-            width:75%;
-            margin: auto;
-        }
-
-        #slider{}
-
-        #slider_bot span{ width:33%; position:relative; top: 10px; }
-        #slider_min { right: 45%; }
-        #slider_max { left: 45%;}
-        #slider_value { }
 

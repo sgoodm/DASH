@@ -49,7 +49,6 @@
         <div id="map_options_content" style="display:none;">      
             <div id="boundary_options"> 
                 <div id="country_options">
-                    <span> Select a Country: </span>
                     <select id="country" >
                         <option id="blank_country_option" value="-----">Country</option>
                         <option value="Nepal">Nepal</option>
@@ -59,9 +58,8 @@
                 </div>       
 
                 <div id="adm_options">
-                    <span> Select an ADM: </span>
-                    <select id="adm" >
-                        <option id="blank_adm_option" value="-----">ADM</option>
+                    <select id="adm" disabled>
+                        <option id="blank_adm_option" value="-----">Level</option>
                         <option value="ADM1">ADM1</option>
                         <option value="ADM2">ADM2</option>
                         <option value="ADM3">ADM3</option>
@@ -73,33 +71,39 @@
             <div class="divider"></div>
 
             <ul id="method" class="nav nav-tabs nav-justified">
-                <li id="method_weights" class="active"><a tabindex="0">Weights</a></li>
+                <li id="method_weights"><a tabindex="0">Weights</a></li>
                 <li id="method_overunder"><a tabindex="0">Overunder</a></li>
+                <li id="method_points"><a tabindex="0">Point Data</a></li>
             </ul> 
 
-            <div id="weights" class="method" >
+            <div id="weights" class="method">
                 <div id="raster_option_1">
                     <select id="ro1" class="ro" ></select>
+                    <input type="number" min="1" max="10" step="1" value="1" disabled>
                 </div>
 
                 <div id="raster_option_2">
                     <select id="ro2" class="ro" ></select>
+                    <input type="number" min="1" max="10" step="1" value="1" disabled>
                 </div>    
 
                 <div id="raster_option_3">
                     <select id="ro3" class="ro" ></select>
+                    <input type="number" min="1" max="10" step="1" value="1" disabled>
                 </div> 
 
-                <div id="raster_option_1">
+                <div id="raster_option_4">
                     <select id="ro4" class="ro" ></select>
+                    <input type="number" min="1" max="10" step="1" value="1" disabled>
                 </div>    
 
-                <div id="raster_option_1">
+                <div id="raster_option_5">
                     <select id="ro5" class="ro" ></select>
+                    <input type="number" min="1" max="10" step="1" value="1" disabled>
                 </div>
             </div>
 
-            <div id="overunder"  class="method" style="display:none;">
+            <div id="overunder"  class="method">
                 <div id="overunder_option_1">
                     <select id="ou1" class="ou" ></select>
                 </div>
@@ -109,73 +113,49 @@
                 </div> 
             </div>  
 
-            <div id="map_options_submit"><button>Build</button></div>
+            <div id="points" class="method">   
+
+                <div id="clear_points"><button>Clear</button></div>
+
+                <div id="data_type">
+                    <ul>
+                        <li id="Agriculture" class="menu_item">Agriculture</li><!--
+                     --><li id="Health" class="menu_item">Health</li><!--
+                     --><li id="Education" class="menu_item">Education</li><!--
+                     --><li id="Industry" class="menu_item">Industry</li>      
+                    </ul>
+                </div>
+
+                <div id="slider_container">
+                    <div id="slider_top" class="slider_sub">
+                        <div id="slider"></div>
+                    </div> 
+                    <div id="slider_bot" class="slider_sub">  
+                        <span id="slider_min"></span>
+                        <span id="slider_value"></span>
+                        <span id="slider_max"></span>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div id="map_options_submit"><button id="submit">Build</button></div>
+
+            <div id="map_options_message"></div>
 
         </div>
 
+        <div id="map_options_popover" data-collapsed="true"></div>
         <div id="map_options_toggle"><span class="ui-icon ui-icon-carat-2-n-s"></span></div>
 
     </div>
 
     <div id="map"></div> 
 
-    <div id="build_toggle">Build Options</div>
-
-    <div id="build_options">
 
 
-        <div id="raster_options">
-            <div id="raster_available">
-                <div>Available Rasters</div>
-                <select id="raster_available_list" size="10" multiple>
-
-                </select>
-            </div>
-            <div id="raster_buttons">
-                <button id="raster_add"> >> </button>
-                <button id="raster_remove"> << </button>
-            </div>
-            <div id="raster_selected">
-                <div>Selected Rasters</div>
-                <div id="raster_selected_list">
-                    <table>
-                        <tbody>
-                            
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>  
-        <div id="build">
-            <button id="submit">Build</button>
-        </div>
-    </div>
-
-    <div id="data_options">   
-        <div id="data_type">
-            <ul>
-                <li id="Agriculture" class="menu_item">Agriculture</li><!--
-             --><li id="Health" class="menu_item">Health</li><!--
-             --><li id="Education" class="menu_item">Education</li><!--
-             --><li id="Industry" class="menu_item">Industry</li>      
-            </ul>
-        </div>
-
-        <div id="slider_container">
-            <div id="slider_top" class="slider_sub">
-                <div id="slider"></div>
-            </div> 
-            <div id="slider_bot" class="slider_sub">  
-                <span id="slider_min"></span>
-                <span id="slider_value"></span>
-                <span id="slider_max"></span>
-                
-            </div>
-        </div>
-    </div>
-
-
-    <div id="navbar_spacer"></div>
+    <!-- <div id="navbar_spacer"></div> -->
     <?php include("/var/www/html/aiddata/home/nav.php"); ?>  
 
 </body>

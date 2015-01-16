@@ -16,58 +16,77 @@ $(document).ready(function () {
 		files_obj:{},
 		files:[],
 		id:""
-	}
+	};
 
 	//dynamic point info data
 	var d = {
 		type:"",
 		start_year:2005,
 		end_year:2010
-	}
+	};
 
-	// used to store info about rasters available for selected country / adm
-	var options_log = {}
+	// file paths for rasters available for selected country / adm
+	var options_log = {};
+	// stores currently selected rasters for each select
+	var raster_list = {};
+
+	var continent_list = {
+		"Nepal":"Asia",
+		"Uganda":"Africa",
+		"Malawi":"Africa"
+	};
+
+	// messages
+	var m = {
+		init:"<p>Welcome to AidData - - DASH - -</p><p>To start, please select the country and the administrative level you would like to explore.</p><p>(You can change these later.)</p>",
+		method:"<p>Choose a method for visualizing data.</p>",
+		weights:"<p>Select rasters from the drop down menus and assign weights.</p>",
+		overunder:"",
+		points:"<p>Overlay project point data on the map.</p>",
+		toggle:"<p>You can toggle this tab by clicking anywhere on the tab.</p>"
+	}
 
 
 	// --------------------------------------------------
 	// build options
 
-	$('#map_options_content').slideDown(1000);
+
+	$('#country').val('-----')
+	$('#adm').val('-----')
+	$('#adm').prop('disabled', true);
+	message(m.init, "static");
+	$('#map_options_content').slideDown(500);
 
 	$('#map_options_toggle').click(function(){
 		$('#map_options_content').slideToggle();
 	})
 
-	$('#method li').click(function(){
-		$('#method li').removeClass("active");
-		$(this).addClass("active");
-		var method = $(this).attr("id").split("_")[1];
-		$('.method').hide();
-		$('#'+method).show();
+	$('#map_options_popover').click(function(){
+		if ( $(this).data('collapsed') == true ) {
+		    $(this).animate({
+		      left: -225
+		    });
+		    $(this).data('collapsed', false)
+		} else {
+		    $(this).animate({
+		      left: -5
+		    });
+		    $(this).data('collapsed', true)
+		}
 	})
-
-	$('#country').val('-----')
-	$('#adm').val('-----')
 
 	$('#country').on('change', function () {
 		
 		var $blank = $('#blank_country_option')
 		if ($blank.length) { 
 			$blank.remove() 
+			$('#adm').prop('disabled', false);
 		}
 
 		p.country = $(this).val()
 
 		// continent needed to access data using current DET file structure
-		switch (p.country) {
-			case "Nepal":
-				p.continent = "Asia"
-				break
-			case "Uganda":
-			case "Malawi":
-				p.continent = "Africa"
-				break
-		}
+		p.continent = continent_list[p.country];
 
 		// add country polygon to map
 		addCountry()
@@ -80,14 +99,15 @@ $(document).ready(function () {
 		// create list of rasters available for the selected country / adm
 		buildRasterList()
 
-
 	})
 
 	$('#adm').on('change', function () {
 
 		var $blank = $('#blank_adm_option')
 		if ($blank.length) { 
-			$blank.remove() 
+			$blank.remove()
+			$('#method').show(); 
+			message(m.method, "static");
 		}
 
 		p.adm = $(this).val()
@@ -100,74 +120,93 @@ $(document).ready(function () {
 		buildRasterList()
 	})
 
-	$('#raster_add').click(function () {
-		var vals=$('#raster_available_list').val()
-		
-		if (vals == null) { return }
-
-		for (var i=0, ix=vals.length; i<ix; i++) {
-			p.rasters.push(vals[i])
-			p.weights_obj[vals[i]] = 1
-			p.files_obj[vals[i]] = $('#'+vals[i]).attr("data-file")
-			newHTML = "<tr><td><input type='checkbox'></input></td><td><span>"+vals[i]+"</span></td><td><input class='weight'type='number' value=1></input></td></tr>"
-			$('#raster_selected_list tbody').append(newHTML)
-			$('#'+vals[i]).remove()
+	$('#method li').click(function(){
+		$('#method li').removeClass("active");
+		$(this).addClass("active");
+		var method = $(this).attr("id").split("_")[1];
+		$('.method').hide();
+		$('#'+method).show();
+		$('#map_options_submit').show();
+		message("", "static");
+		message(m[method]+m.toggle);
+		if ( $('#map_options_popover').data('collapsed') == true ) {
+			$('#map_options_popover').click();
 		}
 	})
 
-	$('#raster_remove').click(function () {
-		$('tr').each(function () {
-			if ( $(this).children(':nth-child(1)').children(':nth-child(1)').prop("checked") ) {
-				var item = $(this).children(':nth-child(2)').text()
-				var index = p.rasters.indexOf(item)
-				p.rasters.splice(index,1)
-				delete p.weights_obj[item]
-				delete p.files_obj[item]
-				$(this).remove()
-				addOptionToGroup(item)
-			}
+	$('.ro').on('change', function () {
+		console.log(raster_list)
+		var item = $(this).val()
+		var id = $(this).attr('id');
+		if ( item == "-----"  ) {
+			$(this).next().prop('disabled', true);
+			raster_list[id] = "";		
+		} else {
+			$(this).next().prop('disabled', false);	
+			raster_list[id] = item;
+		}
+
+		$('.ro').each(function(){
+			var sub_item = $(this).val();
+			var sub_id = $(this).attr('id');
+
+			$(this).find('option').each(function(){
+				console.log($(this).val(), sub_id, raster_list[sub_id])
+				$(this).prop("disabled",false);	
+				if ( raster_list[sub_id] != $(this).val() && _.values(raster_list).indexOf( $(this).val() ) > -1 ) {
+					console.log("in")
+					$(this).prop("disabled",true);
+				}
+			})
+
 		})
+
 	})
+
 
 	$('#submit').click(function () {
-		$('#build_options').slideUp("slow", function () {
-			$('#build_toggle').slideDown()
-			setTimeout(function () { 
 
-				// sort rasters list to preserve naming system
-				// prevents identical calls creating different files due to naming system
-				p.rasters.sort()
-				p.weights = []
-				p.files = []
+		p.rasters = []
+		p.weights = []
+		p.files = []
+		p.weights_obj = {}
+		p.files_obj = {}
 
-				// get raster name for each weight item and update weight object
-				$('.weight').each(function () {
-					var weight = $(this).val()
-					var option = $(this).parent().prev().children(':nth-child(1)').text()
-					p.weights_obj[option] = weight
-				})
+		// get raster name for each weight item and update weight object
+		$('.ro').each(function () {
+			var option = $(this).val()
+			if ( option != "-----") {
 
-				// generate unique id
-				p.id = p.country +"_"+ p.adm
-				for (var i=0, ix=p.rasters.length; i<ix; i++) {
-					p.weights[i] = p.weights_obj[p.rasters[i]]
-					p.files[i] = p.files_obj[p.rasters[i]]
-					p.id += "_" + p.rasters[i] +"_"+ p.weights[i]
-				}
-
-				// copy pending data object to submission data object
-				s = p
-
-				// build weighted geojson
-				prepExtract()
-		 	
-		 	}, 500)
- 
+				p.rasters.push(option)
+				var weight = $(this).next().val()
+				p.weights_obj[option] = weight
+				p.files_obj[option] = options_log[option]
+			}
 		})
-	})
 
-	$('#build_toggle').click(function () {
-		$('#build_options').slideToggle()
+		if ( p.rasters.length == 0 ) {
+			console.log("weights: no data selected")
+			return;
+		}
+
+		// sort rasters list to preserve naming system
+		// prevents identical calls creating different files due to naming system
+		p.rasters.sort()
+
+		// generate unique id
+		p.id = p.country +"_"+ p.adm
+		for (var i=0, ix=p.rasters.length; i<ix; i++) {
+			p.weights[i] = p.weights_obj[p.rasters[i]]
+			p.files[i] = p.files_obj[p.rasters[i]]
+			p.id += "_" + p.rasters[i] +"_"+ p.weights[i]
+		}
+
+		// copy pending data object to submission data object
+		s = p
+		console.log(s)
+		// build weighted geojson
+		prepExtract()
+
 	})
 
 
@@ -175,8 +214,9 @@ $(document).ready(function () {
 		if (p.continent != "" && p.country != "" && p.adm != "") {
 
 			// init
-			$('#raster_available_list').empty()
-			$('#raster_selected_list tbody').empty()
+			$('.ro').each(function(){
+				$(this).empty()
+			})
 			p.rasters = []
 			p.weights = []
 			p.files = []
@@ -186,23 +226,46 @@ $(document).ready(function () {
 
 			// build
 			process({ type: "scan", path: "/"+p.continent.toLowerCase().toLowerCase()+"/"+p.country.toLowerCase()+"/cache" }, function (options) {
-					var op_count = 0
+					var op_count = 0;
 				    for (var op in options) {
 				    	if (options[op].indexOf(p.adm) != -1 || options[op].indexOf(p.adm_alt) != -1){
-				    			var option = filterOptionName(options[op], "__", 4, 4)
-				    			options_log[option] = options[op]
-				    			addOptionToGroup(option)
-				    			op_count ++
+				    			var option = filterOptionName(options[op], "__", 4, 4);
+				    			options_log[option] = options[op];
+				    			addOptionToGroup(option);
+				    			op_count ++;
 				    	}
 				    }
 				    if (op_count == 0) {
-   						$('#raster_available_list').append('<option class="no-data">No Data Available</option>')
-   						$('#raster_available_list').prop('disabled', true)
+   						$('.ro').each(function(){
+   							$(this).prepend('<option class="no-data">No Data Available</option>');
+   							$(this).prop('disabled', true);
+   						})
+
 				    } else {
-				    	$('#raster_available_list').prop('disabled', false)
+   						$('.ro').each(function(){
+   							$(this).prepend('<option selected value="-----">-----</option>');
+							$(this).next().prop('disabled', true);		
+				    		$(this).prop('disabled', false);
+				    	})
 				    }
 		    })
 		}
+	}
+
+	// add raster of format 'type__sub__year' to lists of available rasters
+	// raster file location stored in options_log object
+	function addOptionToGroup(option) {
+    	var type = option.substr(0,option.indexOf("__"))
+
+    	if ( !$(".optgroup_"+type).length ) {
+    		$(".ro").each(function(){
+    			$(this).append('<optgroup class="optgroup_'+type+'" label="'+type+'"></optgroup>')
+    		})
+    	}
+	        
+        $(".optgroup_"+type).each(function(){
+        	$(this).append('<option class="'+option+'" value="' + option + '">' + filterOptionName(option,"__",1,0) + '</option>')   
+        })
 	}
 
 	// option = string, m = search char, n = nth occurence, p = offset from end of string
@@ -224,18 +287,12 @@ $(document).ready(function () {
 		return option.substr(index+offset, end)
 	}
 
-	// add raster of format 'type__sub__year' to list of available rasters
-	// raster file location stored in options_log object
-	function addOptionToGroup(option) {
-    	var type = option.substr(0,option.indexOf("__"))
-
-    	if ( !$("#optgroup_"+type).length ) {
-    		$("#raster_available_list").append('<optgroup id="optgroup_'+type+'" label="'+type+'"></optgroup>')
-    	}
-	        
-        $("#optgroup_"+type).append('<option id="'+option+'" value="' + option + '" data-file="'+options_log[option]+'">' + option + '</option>')   
-	}
-
+ 	function message(html, option) {
+ 		if ( option && option == "static") {
+ 			$('#map_options_message').html(html);
+ 		}
+ 		$('#map_options_popover').html(html);
+ 	}
 
 	// --------------------------------------------------
 	// point data options
@@ -294,6 +351,13 @@ $(document).ready(function () {
 	
 	})
 
+	$('#clear_points button').click(function(){
+		cleanMap("point");
+		onPoint = false;
+		$('.menu_item').each(function(){
+			$(this).removeClass("active_menu");
+		})
+	})
 
 	// --------------------------------------------------
 	// map
@@ -653,7 +717,10 @@ $(document).ready(function () {
 	function readHash() {
 		var h;
 		h = window.location.hash.substring(1);
-		
+		if ( h == "" ) { 
+			return 
+		}
+
 		process({type:"exists", name:h}, function(result){
 			if (result == true) {
 				console.log(h);
