@@ -105,8 +105,19 @@ a, a:hover, a:active, a:focus, a:visited{
                         float: right;
                         margin-top: 1%;
                     }
+            #gapanalysis {
 
-            #points {
+            }
+                #gapanalysis div {
+                    margin: 1% 0;
+                }   
+                    #gapanalysis span {
+                        display: block;
+                    }
+                    #gapanalysis select {
+                        width:100%;
+                    }
+            #pointdata {
             /*#data_options{*/
                 /*display: block;*/
                 clear:both;

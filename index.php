@@ -72,8 +72,8 @@
 
             <ul id="method" class="nav nav-tabs nav-justified">
                 <li id="method_weights"><a tabindex="0">Weights</a></li>
-                <li id="method_overunder"><a tabindex="0">Overunder</a></li>
-                <li id="method_points"><a tabindex="0">Point Data</a></li>
+                <li id="method_gapanalysis"><a tabindex="0">Gap Analysis</a></li>
+                <li id="method_pointdata"><a tabindex="0">Point Data</a></li>
             </ul> 
 
             <div id="weights" class="method">
@@ -103,17 +103,18 @@
                 </div>
             </div>
 
-            <div id="overunder"  class="method">
-                <div id="overunder_option_1">
-                    <select id="ou1" class="ou" ></select>
+            <div id="gapanalysis"  class="method">
+                <div id="gapanalysis_option_1">
+                    <span>Primary Data</span>
+                    <select id="ga1" class="ga" ></select>
                 </div>
-
-                <div id="overunder_option_2">
-                    <select id="ou2" class="ou" ></select>
+                <div id="gapanalysis_option_2">
+                    <span>Secondary Data</span>
+                    <select id="ga2" class="ga" ></select>
                 </div> 
             </div>  
 
-            <div id="points" class="method">   
+            <div id="point_data" class="method">   
 
                 <div id="clear_points"><button>Clear</button></div>
 
