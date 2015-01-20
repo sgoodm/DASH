@@ -78,43 +78,48 @@
 
             <div id="weights" class="method">
                 <div id="raster_option_1">
-                    <select id="ro1" class="ro" ></select>
+                    <select id="ro1" class="ro method_select" ></select>
                     <input type="number" min="1" max="10" step="1" value="1" disabled>
                 </div>
 
                 <div id="raster_option_2">
-                    <select id="ro2" class="ro" ></select>
+                    <select id="ro2" class="ro method_select" ></select>
                     <input type="number" min="1" max="10" step="1" value="1" disabled>
                 </div>    
 
                 <div id="raster_option_3">
-                    <select id="ro3" class="ro" ></select>
+                    <select id="ro3" class="ro method_select" ></select>
                     <input type="number" min="1" max="10" step="1" value="1" disabled>
                 </div> 
 
                 <div id="raster_option_4">
-                    <select id="ro4" class="ro" ></select>
+                    <select id="ro4" class="ro method_select" ></select>
                     <input type="number" min="1" max="10" step="1" value="1" disabled>
                 </div>    
 
                 <div id="raster_option_5">
-                    <select id="ro5" class="ro" ></select>
+                    <select id="ro5" class="ro method_select" ></select>
                     <input type="number" min="1" max="10" step="1" value="1" disabled>
                 </div>
+
+                <div id="weights_submit" class="map_options_submit"><button>Build</button></div>
+
             </div>
 
             <div id="gapanalysis"  class="method">
                 <div id="gapanalysis_option_1">
                     <span>Primary Data</span>
-                    <select id="ga1" class="ga" ></select>
+                    <select id="ga1" class="ga method_select" ></select>
                 </div>
                 <div id="gapanalysis_option_2">
                     <span>Secondary Data</span>
-                    <select id="ga2" class="ga" ></select>
+                    <select id="ga2" class="ga method_select" ></select>
                 </div> 
+                <div id="gapanalysis_submit" class="map_options_submit"><button>Build</button></div>
+
             </div>  
 
-            <div id="point_data" class="method">   
+            <div id="pointdata" class="method">   
 
                 <div id="clear_points"><button>Clear</button></div>
 
@@ -140,8 +145,6 @@
 
             </div>
 
-
-            <div id="map_options_submit"><button id="submit">Build</button></div>
 
             <div id="map_options_message"></div>
 

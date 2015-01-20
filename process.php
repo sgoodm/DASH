@@ -4,7 +4,7 @@ switch ($_POST['type']) {
 
 	case 'exists':
 		$name = $_POST['name'];
-		if ( file_exists("/var/www/html/aiddata/MAT/data/".$name.".geojson") ) {
+		if ( file_exists("/var/www/html/aiddata/data/weights/".$name.".geojson") ) {
 			echo "true";
 		} else {
 			echo "false";
@@ -22,7 +22,7 @@ switch ($_POST['type']) {
 		break;
 
 	// create / get point geojson from csv data (ogr2ogr call)
-	case 'addPointData':
+	case 'pointdata':
 		$country = $_POST["country"];
 		$type = $_POST["pointType"];
 		$min = $_POST["start_year"];
@@ -69,7 +69,7 @@ switch ($_POST['type']) {
 		break;
 
 	// send variables to Rscript to create geojson with weighted data
-	case 'buildPolyData':
+	case 'weights':
 
 		$continent = $_POST["continent"];
 		$country = $_POST["country"];
@@ -94,11 +94,43 @@ switch ($_POST['type']) {
 			$vars .= " " . $rasters[$i] ." ". $weights[$i] ." ". $files[$i];
 		}
 
-		if ( file_exists("/var/www/html/aiddata/MAT/data/".$name.".geojson") ){
+		if ( file_exists("/var/www/html/aiddata/data/weights/".$name.".geojson") ){
 			echo $name;
 
 		} else {
-			exec("/usr/bin/Rscript /var/www/html/aiddata/MAT/build.R $vars"); 
+			exec("/usr/bin/Rscript /var/www/html/aiddata/DASH/weights.R $vars"); 
+			echo $name;
+		}
+		break;
+
+	case 'gapanalysis':
+		$continent = $_POST["continent"];
+		$country = $_POST["country"];
+		$adm = $_POST["adm"];
+		// $name = $country ."_". $adm ."_". md5($_POST["name"]);
+		$rasters = $_POST["rasters"];
+		$files = $_POST["files"];
+		$count = count($rasters);
+
+		// generate unique name
+		$raw = $country ."_". $adm; 
+		for ($i=0; $i<$count; $i++){
+			$raw .= "_" . $rasters[$i];
+		}
+		$name = $country ."_". $adm ."_". md5($raw);
+
+		// build variable string for Rscript
+		$vars = strtolower($continent) ." ". strtolower($country) ." ". $adm ." ". $name ." ". $count;
+
+		for ($i=0; $i<$count; $i++){
+			$vars .= " " . $rasters[$i] ." ". $files[$i];
+		}
+
+		if ( file_exists("/var/www/html/aiddata/data/gapanalysis/".$name.".geojson") ){
+			echo $name;
+
+		} else {
+			exec("/usr/bin/Rscript /var/www/html/aiddata/DASH/gapanalysis.R $vars"); 
 			echo $name;
 		}
 		break;

@@ -54,20 +54,23 @@ $(document).ready(function () {
 		toggle:"<p>You can toggle this tab by clicking anywhere on the tab.</p>"
 	}
 
-	// --------------------------------------------------
-	// build options
-
-
+	// init ui
 	$('#country').val('-----')
 	$('#adm').val('-----')
 	$('#adm').prop('disabled', true);
 	message(m.init, "static");
 	$('#map_options_content').slideDown(500);
 
+
+	// --------------------------------------------------
+	// build options
+
+	// toggle options
 	$('#map_options_toggle').click(function () {
 		$('#map_options_content').slideToggle();
 	})
 
+	// toggle tooltip popver
 	$('#map_options_popover').click(function () {
 		if ( $(this).data('collapsed') == true ) {
 		    $(this).animate({
@@ -82,6 +85,7 @@ $(document).ready(function () {
 		}
 	})
 
+	// change country
 	$('#country').on('change', function () {
 		
 		var $blank = $('#blank_country_option')
@@ -107,6 +111,7 @@ $(document).ready(function () {
 
 	})
 
+	// change adm
 	$('#adm').on('change', function () {
 
 		var $blank = $('#blank_adm_option')
@@ -126,6 +131,7 @@ $(document).ready(function () {
 
 	})
 
+	// change methods
 	$('#method li').click(function () {
 		$('#method li').removeClass("active");
 		$(this).addClass("active");
@@ -133,7 +139,9 @@ $(document).ready(function () {
 		p.method = method;
 		$('.method').hide();
 		$('#'+method).show();
-		$('#map_options_submit').show();
+		if ( $('#'+method+'_submit').length ) {
+			$('#'+method+'_submit').show();
+		}
 		message("", "static");
 		message(m[method]+m.toggle);
 		if ( $('#map_options_popover').data('collapsed') == true ) {
@@ -141,31 +149,32 @@ $(document).ready(function () {
 		}
 
 		buildRasterList()
-
 	})
 
 	// selectors for weights and gapanalysis methods
 	$('.ro, .ga').on('change', function () {
-		console.log(raster_list)
 		var item = $(this).val()
 		var id = $(this).attr('id');
-		if ( item == "-----"  ) {
+
+		// disable weights number input if nothing is selected
+		if ( p.method == "weights" && item == "-----" ) {
 			$(this).next().prop('disabled', true);
-			raster_list[id] = "";		
-		} else {
+			item = "";		
+		} else if ( p.method == "weights" && item != "-----" ) {
 			$(this).next().prop('disabled', false);	
-			raster_list[id] = item;
 		}
 
+		// update raster list
+		raster_list[id] = item;
+
+		// disable select options if they are already selected somewhere else 
 		$('.'+selectors[p.method]).each(function () {
 			var sub_item = $(this).val();
 			var sub_id = $(this).attr('id');
 
 			$(this).find('option').each(function () {
-				console.log($(this).val(), sub_id, raster_list[sub_id])
 				$(this).prop("disabled",false);	
 				if ( raster_list[sub_id] != $(this).val() && _.values(raster_list).indexOf( $(this).val() ) > -1 ) {
-					console.log("in")
 					$(this).prop("disabled",true);
 				}
 			})
@@ -174,15 +183,11 @@ $(document).ready(function () {
 
 	})
 
-	$('#submit').click(function () {
+	$('.map_options_submit button').click(function () {
 
-		p.rasters = []
-		p.weights = []
-		p.files = []
-		p.weights_obj = {}
-		p.files_obj = {}
+		cleanObjects(2)
 
-		// call method specific prep function
+		// compile option data for submission
 		$('.'+selectors[p.method]).each(function () {
 			var option = $(this).val()
 			if ( option != "-----") {
@@ -202,38 +207,47 @@ $(document).ready(function () {
 
 		// sort rasters list to preserve naming system
 		// prevents identical calls creating different files due to naming system
-		p.rasters.sort()
+		if (p.method == "weights"){
+			p.rasters.sort()
+		}
 
 		// generate unique id
 		p.id = p.country +"_"+ p.adm
 		for (var i=0, ix=p.rasters.length; i<ix; i++) {
-			p.weights[i] = p.weights_obj[p.rasters[i]]
 			p.files[i] = p.files_obj[p.rasters[i]]
-			p.id += "_" + p.rasters[i] +"_"+ p.weights[i]
+			if ( p.method == "weights" ) {
+				p.weights[i] = p.weights_obj[p.rasters[i]]
+				p.id += "_" + p.rasters[i] +"_"+ p.weights[i]
+			} else {
+				p.id += "_" + p.rasters[i]
+			}
 		}
 
 		// copy pending data object to submission data object
-		s = p
+		s = (JSON.parse(JSON.stringify(p)));
 		console.log(s)
 
-		// build weighted geojson
-		prepExtract()
+		if ( p.method == "weights" ) {
+			// build weighted geojson
+			prepWeights()
+		} else if ( p.method == "gapanalysis" ) {
+			prepGapAnalysis()
+		}
+
 
 	})
 
 
 	function buildRasterList() {
 		if (p.continent != "" && p.country != "" && p.adm != "" && p.method != "") {
-			// init
-			$('.'+selectors[p.method]).each(function () {
+			
+			// clear all selectors used by a method
+			$('.method_select').each(function () {
 				$(this).empty()
 			})
-			p.rasters = []
-			p.weights = []
-			p.files = []
-			p.weight_obj = {}
-			p.files_obj={}
-			options_log = {}
+
+			// clean all objects
+			cleanObjects(1)
 
 			// build
 			process({ type: "scan", path: "/"+p.continent.toLowerCase().toLowerCase()+"/"+p.country.toLowerCase()+"/cache" }, function (options) {
@@ -262,7 +276,6 @@ $(document).ready(function () {
 				    	})
 				    }
 		    })
-			console.log(options_log)
 		}
 	}
 
@@ -270,14 +283,13 @@ $(document).ready(function () {
 	// raster file location stored in options_log object
 	function addOptionToGroup(option) {
     	var type = option.substr(0,option.indexOf("__"))
-    	console.log(option)
-    	if ( !$(".optgroup_"+type).length ) {
+    	if ( !$("#"+p.method+" .optgroup_"+type).length ) {
     		$('.'+selectors[p.method]).each(function () {
     			$(this).append('<optgroup class="optgroup_'+type+'" label="'+type+'"></optgroup>')
     		})
     	}
 	        
-        $(".optgroup_"+type).each(function () {
+        $("#"+p.method+" .optgroup_"+type).each(function () {
         	$(this).append('<option class="'+option+'" value="' + option + '">' + filterOptionName(option,"__",1,0) + '</option>')   
         })
 	}
@@ -301,11 +313,30 @@ $(document).ready(function () {
 		return option.substr(index+offset, end)
 	}
 
+	// update tooltip with message
  	function message(html, option) {
  		if ( option && option == "static") {
  			$('#map_options_message').html(html);
  		}
  		$('#map_options_popover').html(html);
+ 	}
+
+ 	// different methods for cleaning up
+ 	function cleanObjects(c) {
+		
+		if ( c == 1 || c == 2 ){
+
+			p.rasters = []
+			p.weights = []
+			p.files = []
+			p.weight_obj = {}
+			p.files_obj={}
+		}
+
+		if ( c == 1 || c == 3 ){
+			raster_list = {}
+			// options_log = {}
+ 		}
  	}
 
 	// --------------------------------------------------
@@ -365,6 +396,7 @@ $(document).ready(function () {
 	
 	})
 
+	// clear current point data / options / ui
 	$('#clear_points button').click(function () {
 		cleanMap("point");
 		onPoint = false;
@@ -441,7 +473,7 @@ $(document).ready(function () {
 		map.spin(true)
 		$.ajax ({
 	        url: "process.php",
-	        data: {type: "addPointData", country:p.country, pointType: d.type, start_year:d.start_year, end_year:d.end_year},
+	        data: {type: "pointdata", country:p.country, pointType: d.type, start_year:d.start_year, end_year:d.end_year},
 	        dataType: "json",
 	        type: "post",
 	        async: false,
@@ -506,21 +538,37 @@ $(document).ready(function () {
 
 	}
 
-	function prepExtract() {
+	// ajax to run Rscript which builds weighted geojson
+	function prepWeights() {
 		map.spin(true)
 		$.ajax ({
 	        url: "process.php",
-	        data: {type: "buildPolyData", continent: s.continent, country: s.country, adm: s.adm, name:s.id, rasters: s.rasters, weights: s.weights, files: s.files},
+	        data: {type: "weights", continent: s.continent, country: s.country, adm: s.adm, name:s.id, rasters: s.rasters, weights: s.weights, files: s.files},
 	        dataType: "text",
 	        type: "post",
 	        async: false,
 	        success: function (result) {
-	        	addGeoExtract("../MAT/data/"+result+".geojson")
+	        	addGeoExtract("../data/weights/"+result+".geojson")
        	       	map.spin(false)
 	        }
 	    })
 	}
 
+	// ajax to run Rscript which builds gapanalysis geojson
+	function prepGapAnalysis() {
+		map.spin(true)
+		$.ajax ({
+	        url: "process.php",
+	        data: {type: "gapanalysis", continent: s.continent, country: s.country, adm: s.adm, name:s.id, rasters: s.rasters, files: s.files},
+	        dataType: "text",
+	        type: "post",
+	        async: false,
+	        success: function (result) {
+	        	addGeoExtract("../data/gapanalysis/"+result+".geojson")
+       	       	map.spin(false)
+	        }
+	    })
+	}
 
 	function addGeoExtract(file) {
 
@@ -540,13 +588,27 @@ $(document).ready(function () {
 		}
 
 		function getColor(d) {
-		    return d <= 0.15 ? '#de2d26' :
-		           d <= 0.30 ? '#fc9272' :
-		           d <= 0.45 ? '#fee0d2' :
+			if (s.method == "weights") {
 
-		           d <= 0.60 ? '#fff7bc' :
-		           d <= 0.85 ? '#e5f5e0' :
-   		           			   '#a1d99b' ; 
+			    return d <= 0.15 ? '#de2d26' :
+			           d <= 0.30 ? '#fc9272' :
+			           d <= 0.45 ? '#fee0d2' :
+
+			           d <= 0.60 ? '#fff7bc' :
+			           d <= 0.85 ? '#e5f5e0' :
+	   		           			   '#a1d99b' ; 
+
+   		    } else if (s.method == "gapanalysis") {
+
+			    return d <= -1.5 ? '#de2d26' :
+			           d <= -1.0 ? '#fc9272' :
+			           d <= -0.5 ? '#fee0d2' :
+
+			           d <= 0.5 ? '#fff7bc' :
+			           d <= 1.0 ? '#e5f5e0' :
+	   		           d <= 1.5 ? '#a1d99b' :
+	   		           			  '#31a354';
+   		    }
 		}
 
 		function style(feature) {
@@ -615,54 +677,49 @@ $(document).ready(function () {
 		};
 
 		// method that we will use to update the control based on feature properties passed
-		info.update = function (props) {
-			var html =  '<h4>Weight Result</h4>'
-
-			if (props) {
-				html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />' 
-		        
-		        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Weighted</th></tr></thead><tbody>"
-		        for (var i=0, ix=s.rasters.length; i<ix; i++) {
-
-
-    			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundx( props[s.rasters[i]] ) + '</td><td>' + (props[s.rasters[i]+"_weighted"] ? roundx(props[s.rasters[i]+"_weighted"]) : "" ) + '</td></tr>'
-
-		        }
-		        html += "</tbody></table>"
-
-		        html += 'Result: ' + roundx(props.result) 
-			
-			} else {
-				html = 'Hover over an area'
-			}
-
-		    this._div.innerHTML = html
-		        
-		};
+		if (s.method == "weights") {
+			info.update = weightInfo
+		} else if (s.method == "gapanalysis") {
+			info.update = gapanalysisInfo
+		}
 
 		info.addTo(map);
-
-		function roundx(x) {
-			return Math.floor(x*1000)/(1000)
-		}
 
 		// manage legend
 		legend = L.control({position: 'bottomright'});
 
 		legend.onAdd = function (map) {
 
-		    var div = L.DomUtil.create('div', 'info legend'),
+		    var div = L.DomUtil.create('div', 'info legend');
+		    var labels = [];
+		    var grades;
 
-		        grades = [0.15, 0.30, 0.45, 0.60, 0.85, 1], // ### HERE ###
-		        labels = [];
+		    if (s.method == "weights") {
+		        grades = [0.15, 0.30, 0.45, 0.60, 0.85, 1]; // ### HERE ###
+			    // loop through our density intervals and generate a label with a colored square for each interval
+			    for (var i = 0, ix = grades.length; i < ix; i++) {
+			        div.innerHTML += '<i style="background:' + getColor(grades[i]) + '"></i> ';
 
-		    // loop through our density intervals and generate a label with a colored square for each interval
-		    for (var i = 0, ix = grades.length; i < ix; i++) {
-		        div.innerHTML += '<i style="background:' + getColor(grades[i]) + '"></i> ';
+			        div.innerHTML += "<= " + grades[i]  + '<br>';
+			        
+			    }
 
-		        div.innerHTML += "<= " + grades[i]  + '<br>';
-		        
+		    } else if (s.method == "gapanalysis") {
+		       	grades = [-1.5, -1.0, -0.5, 0.5, 1.0, 1.5, 2];
+
+
+				for (var i = 0, ix=grades.length; i < ix; i++) {
+			        div.innerHTML += '<i style="background:' + getColor(grades[i]) + '"></i> '
+			       
+			        if (!grades[i+1]){
+			        	div.innerHTML += grades[i-1]  + '+<br>'
+			        } else {
+			        	div.innerHTML += "<= " + grades[i]  + '<br>'
+			        }
+			    }
+
 		    }
+
 		    return div;
 		};
 
@@ -670,6 +727,54 @@ $(document).ready(function () {
 
 	}
 
+	function weightInfo(props) {
+		var html =  '<h4>Weight Result</h4>'
+
+		if (props) {
+			html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />' 
+	        
+	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Weighted</th></tr></thead><tbody>"
+	        for (var i=0, ix=s.rasters.length; i<ix; i++) {
+
+			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundx( props[s.rasters[i]] ) + '</td><td>' + (props[s.rasters[i]+"_weighted"] ? roundx(props[s.rasters[i]+"_weighted"]) : "" ) + '</td></tr>'
+
+	        }
+	        html += "</tbody></table>"
+
+	        html += 'Result: ' + roundx(props.result) 
+		
+		} else {
+			html = 'Hover over an area'
+		}
+
+	    this._div.innerHTML = html
+	}
+
+	function gapanalysisInfo(props) {
+		var html =  '<h4>Gap Analysis Result</h4>'
+
+		if (props) {
+			html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />' 
+	        
+	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Percent</th></tr></thead><tbody>"
+	        for (var i=0, ix=s.rasters.length; i<ix; i++) {
+
+			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundx( props[s.rasters[i]] ) + '</td><td>' + roundx( props[s.rasters[i]+"_percent"] )  + '</td></tr>'
+
+	        }
+	        html += "</tbody></table>"
+
+	        html += 'Ratio: ' + roundx(props.ratio) + '<br>' 
+	        html += 'Result: ' + roundx(props.result) 
+		
+		} else {
+			html = 'Hover over an area'
+		}
+
+	    this._div.innerHTML = html
+	}
+
+	// methods for cleaning up the map
 	function cleanMap(method) {
 
 		if (method == "point" || method == "all") {
@@ -695,6 +800,9 @@ $(document).ready(function () {
 	// --------------------------------------------------
 	// general functions
 
+	function roundx(x) {
+		return Math.floor(x*1000)/(1000)
+	}
 
 	// generic ajax call to process.php
 	function process(data, callback) {

@@ -211,7 +211,7 @@ a, a:hover, a:active, a:focus, a:visited{
                     #slider_value { }
 
 
-        #map_options_submit {
+        .map_options_submit {
             width:100%;
             position: absolute;
             bottom:10px;
@@ -219,7 +219,7 @@ a, a:hover, a:active, a:focus, a:visited{
             display: none;
         }
 
-            #map_options_submit button {
+            .map_options_submit button {
                 width:100px;
                 height: 30px;
             }
