@@ -325,3 +325,50 @@ a, a:hover, a:active, a:focus, a:visited{
             border-collapse: collapse;
         }
 
+#analysis_tab {
+    display: none;
+    height:40px;
+    width:150px;
+    background: rgba(0,0,200,1);
+    position: fixed;
+    bottom: 50px;
+    left:50%;
+    margin-left: -75px;
+    border: 0px solid white;
+    border-bottom: 0;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    cursor: pointer;
+}
+    #analysis_tab div {
+        width: 150px;
+        padding-top: 10px;
+        text-align: center;
+    }
+
+#analysis {
+    display: none;
+    width:100%;
+    min-height: 500px;
+    position: absolute;
+}
+
+    #analysis_title{
+        height:40px;
+        width:150px;
+        background: rgba(0,0,200,1);
+        position: absolute;
+        top: -5px;
+        left:50%;
+        margin-left: -75px;
+        border: 0px solid white;
+        border-top: 0;
+        border-bottom-left-radius: 30px;
+        border-bottom-right-radius: 30px;
+        cursor: pointer;
+    }
+        #analysis_title div {
+            width: 150px;
+            padding-top: 10px;
+            text-align: center;
+        }

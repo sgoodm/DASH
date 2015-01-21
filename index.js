@@ -676,6 +676,7 @@ $(document).ready(function () {
 	        success: function (result) {
 	        	addPolyData("../data/weights/"+result+".geojson")
        	       	map.spin(false)
+       	       	runAnalysis()
 	        }
 	    })
 	}
@@ -692,6 +693,7 @@ $(document).ready(function () {
 	        success: function (result) {
 	        	addPolyData("../data/gapanalysis/"+result+".geojson")
        	       	map.spin(false)
+        	    runAnalysis()
 	        }
 	    })
 	}
@@ -833,6 +835,46 @@ $(document).ready(function () {
 
 		legend.addTo(map);
 
+	}
+
+
+	// --------------------------------------------------
+	// results analysis
+
+
+	$('#analysis_tab').click(function () {
+    	// var pan = map.getCenter();
+
+		$('#analysis_tab').hide();
+
+		$('#map').animate({height:'75%'}, function () {
+			map.invalidateSize();
+		    map.invalidateSize();
+
+			map.fitBounds( allCountryBounds[p.country] );
+	      	// map.panTo(pan, {animate:true, duration:1.0});
+			$('#analysis').show();
+	    });
+	})
+
+
+	$('#analysis_title').click(function () {
+    	// var pan = map.getCenter();
+	
+		$('#analysis').hide();
+
+		$('#map').animate({height:'100%'}, function () {
+			map.invalidateSize();
+		    map.invalidateSize();
+
+			map.fitBounds( allCountryBounds[p.country] );
+	      	// map.panTo(pan, {animate:true, duration:1.0});
+			$('#analysis_tab').show();
+	    });
+	})
+
+	function runAnalysis() {
+		$('#analysis_tab').show()
 	}
 
 

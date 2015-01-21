@@ -157,7 +157,11 @@
 
     <div id="map"></div> 
 
-    <div id="analysis"></div> 
+    <div id="analysis_tab"><div>Results Analysis</div></div> 
+    <div id="analysis">
+        <div id="analysis_title"><div>Results Analysis</div></div>
+        <div id="analysis_results"></div>
+    </div> 
 
     <!-- <div id="navbar_spacer"></div> -->
     <?php include("/var/www/html/aiddata/home/nav.php"); ?>  
