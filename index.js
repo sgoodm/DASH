@@ -27,10 +27,16 @@ $(document).ready(function () {
 		end_year:2010
 	};
 
+	var temp = {};
 	// file paths for rasters available for selected country / adm
-	var options_log = {};
-	// stores currently selected rasters for each select
-	var raster_list = {};
+	temp.rasters = {};
+	// stores currently selected rasters for each select in each method
+	temp.weights = {};
+	temp.gapanalysis = {};
+	temp.valid = {
+		weights:false,
+		gapanalysis:false
+	};
 
 	// select element class names for each method
 	var selectors = {
@@ -139,33 +145,39 @@ $(document).ready(function () {
 		p.method = method;
 		$('.method').hide();
 		$('#'+method).show();
-		if ( $('#'+method+'_submit').length ) {
-			$('#'+method+'_submit').show();
-		}
+
 		message("", "static");
 		message(m[method]+m.toggle);
 		if ( $('#map_options_popover').data('collapsed') == true ) {
 			$('#map_options_popover').click();
 		}
 
-		buildRasterList()
+		// buildRasterList()
 	})
 
 	// selectors for weights and gapanalysis methods
-	$('.ro, .ga').on('change', function () {
-		var item = $(this).val()
+	$('.method_select').on('change', function () {
+		var item = ( $(this).val() == "-----" ? "" : $(this).val() );
 		var id = $(this).attr('id');
 
 		// disable weights number input if nothing is selected
-		if ( p.method == "weights" && item == "-----" ) {
+		if ( p.method == "weights" && item == "" ) {
 			$(this).next().prop('disabled', true);
 			item = "";		
-		} else if ( p.method == "weights" && item != "-----" ) {
+		} else if ( p.method == "weights" && item != "" ) {
 			$(this).next().prop('disabled', false);	
 		}
 
 		// update raster list
-		raster_list[id] = item;
+		var method = _.invert(selectors)[id.substr(0,2)]
+		if ( item == "" ) {
+			delete temp[method][id];
+		} else {
+			temp[method][id] = item;
+		}
+
+		validateOptions();
+
 
 		// disable select options if they are already selected somewhere else 
 		$('.'+selectors[p.method]).each(function () {
@@ -174,7 +186,7 @@ $(document).ready(function () {
 
 			$(this).find('option').each(function () {
 				$(this).prop("disabled",false);	
-				if ( raster_list[sub_id] != $(this).val() && _.values(raster_list).indexOf( $(this).val() ) > -1 ) {
+				if ( temp[method][sub_id] != $(this).val() && _.values(temp[method]).indexOf( $(this).val() ) > -1 ) {
 					$(this).prop("disabled",true);
 				}
 			})
@@ -183,16 +195,29 @@ $(document).ready(function () {
 
 	})
 
+	$('.wo').on('keyup change', function () {
+		validateOptions();
+	})
+
 	$('.map_options_submit button').click(function () {
 
-		cleanObjects(2)
+		console.log(temp)
+
+		validateOptions();
+
+		if ( temp.valid[p.method] == false ) {
+			console.log("invalid options selected")
+			return;
+		}
+
+		cleanOptions(2)
 
 		// compile option data for submission
 		$('.'+selectors[p.method]).each(function () {
 			var option = $(this).val()
 			if ( option != "-----") {
 				p.rasters.push(option)
-				p.files_obj[option] = options_log[option]
+				p.files_obj[option] = temp.rasters[option]
 				if (p.method == "weights") {
 					var weight = $(this).next().val()
 					p.weights_obj[option] = weight
@@ -200,10 +225,6 @@ $(document).ready(function () {
 			}
 		})
 
-		if ( p.rasters.length == 0 ) {
-			console.log("no data selected")
-			return;
-		}
 
 		// sort rasters list to preserve naming system
 		// prevents identical calls creating different files due to naming system
@@ -239,15 +260,17 @@ $(document).ready(function () {
 
 
 	function buildRasterList() {
-		if (p.continent != "" && p.country != "" && p.adm != "" && p.method != "") {
+		if (p.continent != "" && p.country != "" && p.adm != "") {
 			
 			// clear all selectors used by a method
 			$('.method_select').each(function () {
 				$(this).empty()
 			})
 
+			$('.map_options_submit').hide();
+
 			// clean all objects
-			cleanObjects(1)
+			cleanOptions(1)
 
 			// build
 			process({ type: "scan", path: "/"+p.continent.toLowerCase().toLowerCase()+"/"+p.country.toLowerCase()+"/cache" }, function (options) {
@@ -255,21 +278,21 @@ $(document).ready(function () {
 				    for (var op in options) {
 				    	if (options[op].indexOf(p.adm) != -1 || options[op].indexOf(p.adm_alt) != -1){
 				    			var option = filterOptionName(options[op], "__", 4, 4);
-				    			options_log[option] = options[op];
+				    			temp.rasters[option] = options[op];
 				    			addOptionToGroup(option);
 				    			op_count ++;
 				    	}
 				    }
 				    if (op_count == 0) {
-   						$('.'+selectors[p.method]).each(function () {
+   						$('.method_select').each(function () {
    							$(this).prepend('<option class="no-data">No Data Available</option>');
    							$(this).prop('disabled', true);
    						})
 
 				    } else {
-   						$('.'+selectors[p.method]).each(function () {
+   						$('.method_select').each(function () {
    							$(this).prepend('<option selected value="-----">-----</option>');
-							if (p.method == "weights") {
+							if ( $(this).hasClass('ro') ) {
 								$(this).next().prop('disabled', true);		
 				    		}
 				    		$(this).prop('disabled', false);
@@ -280,16 +303,19 @@ $(document).ready(function () {
 	}
 
 	// add raster of format 'type__sub__year' to lists of available rasters
-	// raster file location stored in options_log object
+	// raster file location stored in temp.rasters object
 	function addOptionToGroup(option) {
     	var type = option.substr(0,option.indexOf("__"))
-    	if ( !$("#"+p.method+" .optgroup_"+type).length ) {
-    		$('.'+selectors[p.method]).each(function () {
+    	$('.method_select').each(function () {
+    		if ( !$(this).find(".optgroup_"+type).length ) {
+    
     			$(this).append('<optgroup class="optgroup_'+type+'" label="'+type+'"></optgroup>')
-    		})
-    	}
-	        
-        $("#"+p.method+" .optgroup_"+type).each(function () {
+    
+    		}
+
+		})
+
+        $('.method_select').find(".optgroup_"+type).each(function () {
         	$(this).append('<option class="'+option+'" value="' + option + '">' + filterOptionName(option,"__",1,0) + '</option>')   
         })
 	}
@@ -322,7 +348,7 @@ $(document).ready(function () {
  	}
 
  	// different methods for cleaning up
- 	function cleanObjects(c) {
+ 	function cleanOptions(c) {
 		
 		if ( c == 1 || c == 2 ){
 
@@ -334,9 +360,34 @@ $(document).ready(function () {
 		}
 
 		if ( c == 1 || c == 3 ){
-			raster_list = {}
-			// options_log = {}
+			temp.weights = {};
+			temp.gapanalysis = {};
+			temp.valid = {
+				weights:false,
+				gapanalysis:false
+			};
  		}
+ 	}
+
+ 	function validateOptions() {
+
+		temp.valid.weights = ( _.size(temp.weights) > 0 );
+
+		$('.wo').each(function () {
+			var val = parseInt( $(this).val() );
+			if ( val < -10 || val > 10 || isNaN(val) ) {
+				temp.valid.weights = false;
+			}
+		})
+
+		temp.valid.gapanalysis = ( _.size(temp.gapanalysis) == 2 );
+
+		if ( $('#'+p.method+'_submit').length && temp.valid[p.method] == true ) {
+			$('#'+p.method+'_submit').show();
+		} else {
+			$('#'+p.method+'_submit').hide();
+		}
+
  	}
 
 	// --------------------------------------------------
@@ -711,7 +762,7 @@ $(document).ready(function () {
 				for (var i = 0, ix=grades.length; i < ix; i++) {
 			        div.innerHTML += '<i style="background:' + getColor(grades[i]) + '"></i> '
 			       
-			        if (!grades[i+1]){
+			        if ( !grades[i+1] ) {
 			        	div.innerHTML += grades[i-1]  + '+<br>'
 			        } else {
 			        	div.innerHTML += "<= " + grades[i]  + '<br>'
@@ -736,12 +787,12 @@ $(document).ready(function () {
 	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Weighted</th></tr></thead><tbody>"
 	        for (var i=0, ix=s.rasters.length; i<ix; i++) {
 
-			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundx( props[s.rasters[i]] ) + '</td><td>' + (props[s.rasters[i]+"_weighted"] ? roundx(props[s.rasters[i]+"_weighted"]) : "" ) + '</td></tr>'
+			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundxy( props[s.rasters[i]] ) + '</td><td>' + (props[s.rasters[i]+"_weighted"] ? roundxy(props[s.rasters[i]+"_weighted"]) : "" ) + '</td></tr>'
 
 	        }
 	        html += "</tbody></table>"
 
-	        html += 'Result: ' + roundx(props.result) 
+	        html += 'Result: ' + roundxy(props.result) 
 		
 		} else {
 			html = 'Hover over an area'
@@ -759,13 +810,13 @@ $(document).ready(function () {
 	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Percent</th></tr></thead><tbody>"
 	        for (var i=0, ix=s.rasters.length; i<ix; i++) {
 
-			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundx( props[s.rasters[i]] ) + '</td><td>' + roundx( props[s.rasters[i]+"_percent"] )  + '</td></tr>'
+			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundxy( props[s.rasters[i]] ) + '</td><td>' + roundxy( props[s.rasters[i]+"_percent"] )  + '</td></tr>'
 
 	        }
 	        html += "</tbody></table>"
 
-	        html += 'Ratio: ' + roundx(props.ratio) + '<br>' 
-	        html += 'Result: ' + roundx(props.result) 
+	        html += 'Ratio: ' + roundxy(props.ratio) + '<br>' 
+	        html += 'Result: ' + roundxy(props.result) 
 		
 		} else {
 			html = 'Hover over an area'
@@ -800,8 +851,10 @@ $(document).ready(function () {
 	// --------------------------------------------------
 	// general functions
 
-	function roundx(x) {
-		return Math.floor(x*1000)/(1000)
+	function roundxy(x,y) {
+		y = ( y == undefined ? 3 : y );
+		var pow = Math.pow(10,y);
+		return Math.floor(x*pow)/(pow);
 	}
 
 	// generic ajax call to process.php

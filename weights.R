@@ -26,7 +26,11 @@ geojson <- readOGR(paste("shapefiles",in_adm,"Leaflet.geojson",sep="/"), "OGRGeo
 
 for (i in 1:in_count){
 	csv <-  read.csv(paste("cache",in_files[i], sep="/"))
-	weight <- in_weights[i] / sum(in_weights)
+	n <- 1
+	if (in_weights[i] < 0) {
+		n <- -1
+	}
+	weight <- abs(in_weights[i]) / sum(abs(in_weights))
 	extract <- csv[,length(csv)]
 	
 	max <- max(extract)
@@ -38,12 +42,12 @@ for (i in 1:in_count){
 	}
 
 	if (i==1){
-		result <- calc
+		result <- calc * n
 	} else {
-		result <- result + calc
+		result <- result + calc * n
 	}
 	geojson@data[in_rasters[i]] <- extract
-	geojson@data[paste(in_rasters[i],"_weighted",sep="")] <- calc
+	geojson@data[paste(in_rasters[i],"_weighted",sep="")] <- calc * n
 }
 
 geojson@data["result"] <- result
