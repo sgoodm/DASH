@@ -4,7 +4,7 @@
 
 $(document).ready(function () {
 
-	//submission data and pending data objects
+	//	pending and submission data objects
 	var s, p = {
 		method:"",
 		country:"",
@@ -19,7 +19,6 @@ $(document).ready(function () {
 		id:""
 	};
 
-
 	//dynamic point info data
 	var d = {
 		type:"",
@@ -27,15 +26,15 @@ $(document).ready(function () {
 		end_year:2010
 	};
 
-	var temp = {};
-	// file paths for rasters available for selected country / adm
-	temp.rasters = {};
-	// stores currently selected rasters for each select in each method
-	temp.weights = {};
-	temp.gapanalysis = {};
-	temp.valid = {
-		weights:false,
-		gapanalysis:false
+	// stores info on current options loaded in ui (raster file paths, selected options, valid selections)
+	var temp = {
+		rasters: {},
+		weights: {},
+		gapanalysis: {},
+		valid: {
+			weights:false,
+			gapanalysis:false
+		}
 	};
 
 	// select element class names for each method
@@ -70,6 +69,7 @@ $(document).ready(function () {
 
 	// --------------------------------------------------
 	// build options
+
 
 	// toggle options
 	$('#map_options_toggle').click(function () {
@@ -390,6 +390,7 @@ $(document).ready(function () {
 
  	}
 
+
 	// --------------------------------------------------
 	// point data options
 
@@ -456,6 +457,7 @@ $(document).ready(function () {
 		})
 	})
 
+
 	// --------------------------------------------------
 	// map
 
@@ -479,8 +481,116 @@ $(document).ready(function () {
 
 	// addCountry vars: countryLayer
 	// addPointData vars: markers, geojsonPoints
-	// addGeoExtract vars: geojson, info, legend
-	var countryLayer, markers, geojsonPoints, geojson, info, legend 
+	// addPolyData vars: geojson, info, legend
+	var countryLayer, markers, geojsonPoints, geojson, info, legend; 
+
+	var mapinfo = {}
+	
+	mapinfo.pointdata =  function(feature, layer) {
+		var a = feature.properties
+
+		var html = ""
+		html += "<b>Location Info</b>" 
+		html += "<br>Geoname: " + a.geoname
+		html += "<br>ADM1: " + a.ADM1_NAME
+		if (a.ADM2_NAME) { html += "<br>ADM2: " + a.ADM2_NAME }
+		if (a.ADM3_NAME) { html += "<br>ADM3: " + a.ADM3_NAME }
+
+		html += "<br><br><b>Project Info</b>"
+		html += "<br>Date of Agreement: " + a.date_of_agreement
+		html += "<br>Donors: " + a.donor
+		html += "<br>Project Sites: " + a.count
+
+		html += "<br>Years: "
+		var c = 0
+		for (var y = d.start_year; y<=d.end_year; y++) {
+			if ( parseFloat(a["d_"+y]) > 0 ) {
+				if (c>0) { html += ", "}
+				html += y
+				c++							
+			}
+		}
+		html += "<br>USD: "
+		c = 0
+		for (var y = d.start_year; y<=d.end_year; y++) {
+			if ( parseInt(a["d_"+y]) > 0 ) {
+				if (c>0) { html += ", "}
+				html += ( parseInt(a["d_"+y]) ).toLocaleString()
+				c++							
+			}
+		}
+
+		layer.bindPopup(html);
+	}
+
+	mapinfo.weights = function(props) {
+		var html =  '<h4>Weight Result</h4>'
+
+		if (props) {
+			html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />' 
+	        
+	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Weighted</th></tr></thead><tbody>"
+	        for (var i=0, ix=s.rasters.length; i<ix; i++) {
+
+			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundxy( props[s.rasters[i]] ) + '</td><td>' + (props[s.rasters[i]+"_weighted"] ? roundxy(props[s.rasters[i]+"_weighted"]) : "" ) + '</td></tr>'
+
+	        }
+	        html += "</tbody></table>"
+
+	        html += 'Result: ' + roundxy(props.result) 
+		
+		} else {
+			html = 'Hover over an area'
+		}
+
+	    this._div.innerHTML = html
+	}
+
+	mapinfo.gapanalysis = function(props) {
+		var html =  '<h4>Gap Analysis Result</h4>'
+
+		if (props) {
+			html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />' 
+	        
+	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Percent</th></tr></thead><tbody>"
+	        for (var i=0, ix=s.rasters.length; i<ix; i++) {
+
+			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundxy( props[s.rasters[i]] ) + '</td><td>' + roundxy( props[s.rasters[i]+"_percent"] )  + '</td></tr>'
+
+	        }
+	        html += "</tbody></table>"
+
+	        html += 'Ratio: ' + roundxy(props.ratio) + '<br>' 
+	        html += 'Result: ' + roundxy(props.result) 
+		
+		} else {
+			html = 'Hover over an area'
+		}
+
+	    this._div.innerHTML = html
+	}
+
+	// methods for cleaning up the map
+	function cleanMap(method) {
+
+		if (method == "point" || method == "all") {
+			if (map.hasLayer(markers)){
+				map.removeLayer(markers);
+			}
+		}
+
+		if (method == "poly" || method == "all") {
+			if (map.hasLayer(countryLayer)) {
+				map.removeLayer(countryLayer);
+			}
+
+			if (map.hasLayer(geojson)) {
+				map.removeLayer(geojson);
+				info.removeFrom(map);
+				legend.removeFrom(map);		
+			}
+		}
+	}
 
 	function addCountry() {
 		var file = "/aiddata/DET/resources/"+p.continent.toLowerCase()+"/"+p.country.toLowerCase()+"/shapefiles/Leaflet.geojson"
@@ -537,42 +647,7 @@ $(document).ready(function () {
 				});
 
 				var geojsonLayer = L.geoJson(geojsonContents, {
-					onEachFeature: function (feature, layer) {
-						var a = feature.properties
-
-						var popup = ""
-						popup += "<b>Location Info</b>" 
-						popup += "<br>Geoname: " + a.geoname
-						popup += "<br>ADM1: " + a.ADM1_NAME
-						if (a.ADM2_NAME) { popup += "<br>ADM2: " + a.ADM2_NAME }
-						if (a.ADM3_NAME) { popup += "<br>ADM3: " + a.ADM3_NAME }
-
-						popup += "<br><br><b>Project Info</b>"
-						popup += "<br>Date of Agreement: " + a.date_of_agreement
-						popup += "<br>Donors: " + a.donor
-						popup += "<br>Project Sites: " + a.count
-
-						popup += "<br>Years: "
-						var c = 0
-						for (var y = d.start_year; y<=d.end_year; y++) {
-							if ( parseFloat(a["d_"+y]) > 0 ) {
-								if (c>0) { popup += ", "}
-								popup += y
-								c++							
-							}
-						}
-						popup += "<br>USD: "
-						c = 0
-						for (var y = d.start_year; y<=d.end_year; y++) {
-							if ( parseInt(a["d_"+y]) > 0 ) {
-								if (c>0) { popup += ", "}
-								popup += ( parseInt(a["d_"+y]) ).toLocaleString()
-								c++							
-							}
-						}
-
-						layer.bindPopup(popup);
-					},
+					onEachFeature: mapinfo.pointdata,
 					pointToLayer: function (feature, latlng) {
 				        return L.marker(latlng, {
 				            // radius: 5
@@ -599,7 +674,7 @@ $(document).ready(function () {
 	        type: "post",
 	        async: false,
 	        success: function (result) {
-	        	addGeoExtract("../data/weights/"+result+".geojson")
+	        	addPolyData("../data/weights/"+result+".geojson")
        	       	map.spin(false)
 	        }
 	    })
@@ -615,17 +690,15 @@ $(document).ready(function () {
 	        type: "post",
 	        async: false,
 	        success: function (result) {
-	        	addGeoExtract("../data/gapanalysis/"+result+".geojson")
+	        	addPolyData("../data/gapanalysis/"+result+".geojson")
        	       	map.spin(false)
 	        }
 	    })
 	}
 
-	function addGeoExtract(file) {
+	function addPolyData(file) {
 
 		cleanMap("poly")
-
-		// var geojsonFeature = readJSON(file)
 		
 		var geojsonFeature, error
 		readJSON(file, function (request, status, e) {
@@ -637,6 +710,11 @@ $(document).ready(function () {
 			console.log(error)
 			return 1
 		}
+
+	    var grades = {
+	    	weights: [0.15, 0.30, 0.45, 0.60, 0.85, 1],
+	    	gapanalysis: [-1.5, -1.0, -0.5, 0.5, 1.0, 1.5, 2]
+	    };
 
 		function getColor(d) {
 			if (s.method == "weights") {
@@ -728,11 +806,7 @@ $(document).ready(function () {
 		};
 
 		// method that we will use to update the control based on feature properties passed
-		if (s.method == "weights") {
-			info.update = weightInfo
-		} else if (s.method == "gapanalysis") {
-			info.update = gapanalysisInfo
-		}
+		info.update = mapinfo[s.method]  
 
 		info.addTo(map);
 
@@ -742,33 +816,16 @@ $(document).ready(function () {
 		legend.onAdd = function (map) {
 
 		    var div = L.DomUtil.create('div', 'info legend');
-		    var labels = [];
-		    var grades;
 
-		    if (s.method == "weights") {
-		        grades = [0.15, 0.30, 0.45, 0.60, 0.85, 1]; // ### HERE ###
-			    // loop through our density intervals and generate a label with a colored square for each interval
-			    for (var i = 0, ix = grades.length; i < ix; i++) {
-			        div.innerHTML += '<i style="background:' + getColor(grades[i]) + '"></i> ';
-
-			        div.innerHTML += "<= " + grades[i]  + '<br>';
-			        
-			    }
-
-		    } else if (s.method == "gapanalysis") {
-		       	grades = [-1.5, -1.0, -0.5, 0.5, 1.0, 1.5, 2];
-
-
-				for (var i = 0, ix=grades.length; i < ix; i++) {
-			        div.innerHTML += '<i style="background:' + getColor(grades[i]) + '"></i> '
-			       
-			        if ( !grades[i+1] ) {
-			        	div.innerHTML += grades[i-1]  + '+<br>'
-			        } else {
-			        	div.innerHTML += "<= " + grades[i]  + '<br>'
-			        }
-			    }
-
+		    // loop through grades and generate a label with a colored square for each interval
+			for (var i = 0, ix=grades[s.method].length; i < ix; i++) {
+		        div.innerHTML += '<i style="background:' + getColor(grades[s.method][i]) + '"></i> '
+		       
+		        if ( s.method == "gapanalysis" && !grades[s.method][i+1] ) {
+		        	div.innerHTML += grades[s.method][i-1]  + '+<br>'
+		        } else {
+		        	div.innerHTML += "<= " + grades[s.method][i]  + '<br>'
+		        }
 		    }
 
 		    return div;
@@ -778,78 +835,10 @@ $(document).ready(function () {
 
 	}
 
-	function weightInfo(props) {
-		var html =  '<h4>Weight Result</h4>'
-
-		if (props) {
-			html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />' 
-	        
-	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Weighted</th></tr></thead><tbody>"
-	        for (var i=0, ix=s.rasters.length; i<ix; i++) {
-
-			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundxy( props[s.rasters[i]] ) + '</td><td>' + (props[s.rasters[i]+"_weighted"] ? roundxy(props[s.rasters[i]+"_weighted"]) : "" ) + '</td></tr>'
-
-	        }
-	        html += "</tbody></table>"
-
-	        html += 'Result: ' + roundxy(props.result) 
-		
-		} else {
-			html = 'Hover over an area'
-		}
-
-	    this._div.innerHTML = html
-	}
-
-	function gapanalysisInfo(props) {
-		var html =  '<h4>Gap Analysis Result</h4>'
-
-		if (props) {
-			html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />' 
-	        
-	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Percent</th></tr></thead><tbody>"
-	        for (var i=0, ix=s.rasters.length; i<ix; i++) {
-
-			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundxy( props[s.rasters[i]] ) + '</td><td>' + roundxy( props[s.rasters[i]+"_percent"] )  + '</td></tr>'
-
-	        }
-	        html += "</tbody></table>"
-
-	        html += 'Ratio: ' + roundxy(props.ratio) + '<br>' 
-	        html += 'Result: ' + roundxy(props.result) 
-		
-		} else {
-			html = 'Hover over an area'
-		}
-
-	    this._div.innerHTML = html
-	}
-
-	// methods for cleaning up the map
-	function cleanMap(method) {
-
-		if (method == "point" || method == "all") {
-			if (map.hasLayer(markers)){
-				map.removeLayer(markers);
-			}
-		}
-
-		if (method == "poly" || method == "all") {
-			if (map.hasLayer(countryLayer)) {
-				map.removeLayer(countryLayer);
-			}
-
-			if (map.hasLayer(geojson)) {
-				map.removeLayer(geojson);
-				info.removeFrom(map);
-				legend.removeFrom(map);		
-			}
-		}
-	}
-
 
 	// --------------------------------------------------
 	// general functions
+
 
 	function roundxy(x,y) {
 		y = ( y == undefined ? 3 : y );
@@ -901,7 +890,7 @@ $(document).ready(function () {
 				console.log(h);
 				$('#build_toggle').slideDown()
 				$("#build_toggle").click();
-				addGeoExtract("data/"+h+".geojson");
+				addPolyData("data/"+h+".geojson");
 			} else {
 				console.log("bad hash");
 			}
