@@ -481,8 +481,8 @@ $(document).ready(function () {
 
 	// addCountry vars: countryLayer
 	// addPointData vars: markers, geojsonPoints
-	// addPolyData vars: geojson, info, legend
-	var countryLayer, markers, geojsonPoints, geojson, info, legend; 
+	// addPolyData vars: geojsonPolyData, geojson, info, legend
+	var countryLayer, markers, geojsonPoints, geojsonPolyData, geojson, info, legend; 
 
 	var mapinfo = {}
 	
@@ -702,9 +702,9 @@ $(document).ready(function () {
 
 		cleanMap("poly")
 		
-		var geojsonFeature, error
+		var error
 		readJSON(file, function (request, status, e) {
-			geojsonFeature = request
+			geojsonPolyData = request
 			error = e
 		})
 
@@ -787,7 +787,7 @@ $(document).ready(function () {
 		    });
 		}
 
-		geojson = L.geoJson(geojsonFeature, {
+		geojson = L.geoJson(geojsonPolyData, {
 		    style: style,
 		    onEachFeature: onEachFeature
 		})
