@@ -55,3 +55,7 @@ geojson@data["result"] <- result
 setwd("/var/www/html/aiddata/data/weights")
 
 toGeoJSON(data=geojson, name=in_name)
+
+setwd("/var/www/html/aiddata/data/weights_csv")
+
+write.table(geojson@data, paste(in_name,".csv",sep=""), quote=T, row.names=F, sep=",")

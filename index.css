@@ -349,8 +349,10 @@ a, a:hover, a:active, a:focus, a:visited{
 #analysis {
     display: none;
     width:100%;
-    min-height: 500px;
-    position: absolute;
+    /*min-height: 500px;*/
+    position: relative;
+    top: -5px;
+    /*background: rgba(122,122,122,1);*/
 }
 
     #analysis_title{
@@ -358,7 +360,6 @@ a, a:hover, a:active, a:focus, a:visited{
         width:150px;
         background: rgba(0,0,200,1);
         position: absolute;
-        top: -5px;
         left:50%;
         margin-left: -75px;
         border: 0px solid white;
@@ -371,4 +372,16 @@ a, a:hover, a:active, a:focus, a:visited{
             width: 150px;
             padding-top: 10px;
             text-align: center;
+        }
+
+    #analysis_results {
+        width:100%;
+        min-height: 500px;
+        position: absolute;
+        top:70px;
+    }
+        #chart1 {
+            width: 90%;
+            height: 400px;
+            margin-left: 5%;
         }

@@ -19,27 +19,6 @@
     <link rel="stylesheet" href="/aiddata/libs/MarkerCluster/MarkerCluster.Default.css" />
 
     <link rel="stylesheet" href="index.css?<?php echo filectime('index.css') ?>" />    
-
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-
-    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js"></script>
-
-    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.2/mapbox.js'></script>
-
-    <script src="/aiddata/libs/MarkerCluster/leaflet.markercluster-src.js"></script>
-
-    <script src="/aiddata/libs/leaflet.spin.js"></script>
-
-    <script src="/aiddata/libs/spin.min.js"></script>    
-
-    <script src="/aiddata/libs/dragslider.js"></script>
-
-    <script src="/aiddata/libs/underscoremin.js"></script>
-
-    <script src="index.js"></script>
-
 </head>
 
 <body>
@@ -108,11 +87,11 @@
 
             <div id="gapanalysis"  class="method">
                 <div id="gapanalysis_option_1">
-                    <span>Primary Data</span>
+                    <span>Aid Layer</span>
                     <select id="ga1" class="ga method_select" ></select>
                 </div>
                 <div id="gapanalysis_option_2">
-                    <span>Secondary Data</span>
+                    <span>Data Layer</span>
                     <select id="ga2" class="ga method_select" ></select>
                 </div> 
                 <div id="gapanalysis_submit" class="map_options_submit"><button>Build</button></div>
@@ -165,6 +144,23 @@
 
     <!-- <div id="navbar_spacer"></div> -->
     <?php include("/var/www/html/aiddata/home/nav.php"); ?>  
+
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.2/mapbox.js'></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+    <script src="/aiddata/libs/MarkerCluster/leaflet.markercluster-src.js"></script>
+    <script src="/aiddata/libs/leaflet.spin.js"></script>
+    <script src="/aiddata/libs/spin.min.js"></script>    
+    <script src="/aiddata/libs/dragslider.js"></script>
+    <script src="/aiddata/libs/underscoremin.js"></script>
+    <script src="/aiddata/libs/simple_statistics.js"></script>
+
+    <script src="index.js"></script>
 
 </body>
 

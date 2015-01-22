@@ -94,13 +94,11 @@ switch ($_POST['type']) {
 			$vars .= " " . $rasters[$i] ." ". $weights[$i] ." ". $files[$i];
 		}
 
-		if ( file_exists("/var/www/html/aiddata/data/weights/".$name.".geojson") ){
-			echo $name;
-
-		} else {
+		if ( !file_exists("/var/www/html/aiddata/data/weights/".$name.".geojson") ){
 			exec("/usr/bin/Rscript /var/www/html/aiddata/DASH/weights.R $vars"); 
-			echo $name;
-		}
+		}	
+		echo $name;
+		
 		break;
 
 	case 'gapanalysis':
@@ -111,6 +109,7 @@ switch ($_POST['type']) {
 		$rasters = $_POST["rasters"];
 		$files = $_POST["files"];
 		$count = count($rasters);
+		$custom = $_POST["custom"];
 
 		// generate unique name
 		$raw = $country ."_". $adm; 
@@ -120,19 +119,16 @@ switch ($_POST['type']) {
 		$name = $country ."_". $adm ."_". md5($raw);
 
 		// build variable string for Rscript
-		$vars = strtolower($continent) ." ". strtolower($country) ." ". $adm ." ". $name ." ". $count;
+		$vars = strtolower($continent) ." ". strtolower($country) ." ". $adm ." ". $name ." ". $count ." ". $custom;
 
 		for ($i=0; $i<$count; $i++){
 			$vars .= " " . $rasters[$i] ." ". $files[$i];
 		}
 
-		if ( file_exists("/var/www/html/aiddata/data/gapanalysis/".$name.".geojson") ){
-			echo $name;
-
-		} else {
+		if ( !file_exists("/var/www/html/aiddata/data/gapanalysis/".$name.".geojson") ){
 			exec("/usr/bin/Rscript /var/www/html/aiddata/DASH/gapanalysis.R $vars"); 
-			echo $name;
 		}
+		echo $name;
 		break;
 }
 

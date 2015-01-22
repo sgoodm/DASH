@@ -16,7 +16,9 @@ $(document).ready(function () {
 		weights:[],
 		files_obj:{},
 		files:[],
-		id:""
+		name:"",
+		hash:"",
+		custom:"FALSE"
 	};
 
 	//dynamic point info data
@@ -41,7 +43,7 @@ $(document).ready(function () {
 	var selectors = {
 		weights:"ro",
 		gapanalysis:"ga"
-	}
+	};
 
 	var continent_list = {
 		"Nepal":"Asia",
@@ -57,11 +59,11 @@ $(document).ready(function () {
 		gapanalysis:"<p>Create a gap analysis using 2 data layers.</p>",
 		pointdata:"<p>Overlay project point data on the map.</p>",
 		toggle:"<p>You can toggle this tab by clicking anywhere on the tab.</p>"
-	}
+	};
 
 	// init ui
-	$('#country').val('-----')
-	$('#adm').val('-----')
+	$('#country').val('-----');
+	$('#adm').val('-----');
 	$('#adm').prop('disabled', true);
 	message(m.init, "static");
 	$('#map_options_content').slideDown(500);
@@ -82,58 +84,58 @@ $(document).ready(function () {
 		    $(this).animate({
 		      left: -225
 		    });
-		    $(this).data('collapsed', false)
+		    $(this).data('collapsed', false);
 		} else {
 		    $(this).animate({
 		      left: -5
 		    });
-		    $(this).data('collapsed', true)
+		    $(this).data('collapsed', true);
 		}
 	})
 
 	// change country
 	$('#country').on('change', function () {
 		
-		var $blank = $('#blank_country_option')
+		var $blank = $('#blank_country_option');
 		if ($blank.length) { 
-			$blank.remove() 
+			$blank.remove() ;
 			$('#adm').prop('disabled', false);
 		}
 
-		p.country = $(this).val()
+		p.country = $(this).val();
 
 		// continent needed to access data using current DET file structure
 		p.continent = continent_list[p.country];
 
 		// add country polygon to map
-		addCountry()
+		addCountry();
 
 		// build point layer if a point layer was being viewed for previous country
 		if (d.type != "") {
-			addPointData()
+			addPointData();
 		}
 
-		buildRasterList()
+		buildRasterList();
 
 	})
 
 	// change adm
 	$('#adm').on('change', function () {
 
-		var $blank = $('#blank_adm_option')
+		var $blank = $('#blank_adm_option');
 		if ($blank.length) { 
-			$blank.remove()
+			$blank.remove();
 			$('#method').show(); 
 			message(m.method, "static");
 		}
 
-		p.adm = $(this).val()
+		p.adm = $(this).val();
 
 		// alternate method for identifying the adm of data in the DET tool
 		// needed to access old DET data that has not been recreated using new adm naming system
-		p.adm_alt = "__"+p.adm.substr(3) +"_"
+		p.adm_alt = "__"+p.adm.substr(3) +"_";
 
-		buildRasterList()
+		buildRasterList();
 
 	})
 
@@ -169,7 +171,7 @@ $(document).ready(function () {
 		}
 
 		// update raster list
-		var method = _.invert(selectors)[id.substr(0,2)]
+		var method = _.invert(selectors)[id.substr(0,2)];
 		if ( item == "" ) {
 			delete temp[method][id];
 		} else {
@@ -201,26 +203,25 @@ $(document).ready(function () {
 
 	$('.map_options_submit button').click(function () {
 
-		console.log(temp)
 
 		validateOptions();
 
 		if ( temp.valid[p.method] == false ) {
-			console.log("invalid options selected")
+			console.log("invalid options selected");
 			return;
 		}
 
-		cleanOptions(2)
+		cleanOptions(2);
 
 		// compile option data for submission
 		$('.'+selectors[p.method]).each(function () {
-			var option = $(this).val()
+			var option = $(this).val();
 			if ( option != "-----") {
-				p.rasters.push(option)
-				p.files_obj[option] = temp.rasters[option]
+				p.rasters.push(option);
+				p.files_obj[option] = temp.rasters[option];
 				if (p.method == "weights") {
-					var weight = $(this).next().val()
-					p.weights_obj[option] = weight
+					var weight = $(this).next().val();
+					p.weights_obj[option] = weight;
 				}
 			}
 		})
@@ -229,31 +230,40 @@ $(document).ready(function () {
 		// sort rasters list to preserve naming system
 		// prevents identical calls creating different files due to naming system
 		if (p.method == "weights"){
-			p.rasters.sort()
+			p.rasters.sort();
 		}
 
+		p.custom = ( $('#ga2').val().indexOf("weighted") > -1 ? "TRUE" : "FALSE" );
+		
+
 		// generate unique id
-		p.id = p.country +"_"+ p.adm
+		p.name = p.country +"_"+ p.adm;
 		for (var i=0, ix=p.rasters.length; i<ix; i++) {
-			p.files[i] = p.files_obj[p.rasters[i]]
+			p.files[i] = p.files_obj[p.rasters[i]];
 			if ( p.method == "weights" ) {
-				p.weights[i] = p.weights_obj[p.rasters[i]]
-				p.id += "_" + p.rasters[i] +"_"+ p.weights[i]
+				p.weights[i] = p.weights_obj[p.rasters[i]];
+				p.name += "_" + p.rasters[i] +"_"+ p.weights[i];
 			} else {
-				p.id += "_" + p.rasters[i]
+				p.name += "_" + p.rasters[i];
 			}
 		}
 
 		// copy pending data object to submission data object
 		s = (JSON.parse(JSON.stringify(p)));
-		console.log(s)
+		
+		// console.log(s);
+		// console.log(temp);
 
 		if ( p.method == "weights" ) {
 			// build weighted geojson
-			prepWeights()
+			prepWeights();
+
 		} else if ( p.method == "gapanalysis" ) {
-			prepGapAnalysis()
+			prepGapAnalysis();
+
 		}
+
+		$('#analysis_title').click();
 
 
 	})
@@ -305,38 +315,51 @@ $(document).ready(function () {
 	// add raster of format 'type__sub__year' to lists of available rasters
 	// raster file location stored in temp.rasters object
 	function addOptionToGroup(option) {
-    	var type = option.substr(0,option.indexOf("__"))
+   		
+   		var aid_option = ( option.indexOf("aid") > -1 );
+  
+    	var type = option.substr(0,option.indexOf("__"));
+  
     	$('.method_select').each(function () {
+
+    		if ( ($(this).attr('id') == "ga1" && !aid_option) || ($(this).attr('id') != "ga1" && aid_option) ) {
+    			return;
+    		}
+
     		if ( !$(this).find(".optgroup_"+type).length ) {
     
-    			$(this).append('<optgroup class="optgroup_'+type+'" label="'+type+'"></optgroup>')
+    			$(this).append('<optgroup class="optgroup_'+type+'" label="'+type+'"></optgroup>');
     
     		}
 
+	        $(this).find(".optgroup_"+type).each(function () {
+	        	$(this).append('<option class="'+option+'" value="' + option + '">' + filterOptionName(option,"__",1,0) + '</option>');
+	        })
+
 		})
 
-        $('.method_select').find(".optgroup_"+type).each(function () {
-        	$(this).append('<option class="'+option+'" value="' + option + '">' + filterOptionName(option,"__",1,0) + '</option>')   
-        })
+        // $('.method_select').find(".optgroup_"+type).each(function () {
+        // 	$(this).append('<option class="'+option+'" value="' + option + '">' + filterOptionName(option,"__",1,0) + '</option>');
+        // })
 	}
 
 	// option = string, m = search char, n = nth occurence, p = offset from end of string
 	function filterOptionName(option, m, n, p) {
 		if (!p){p = 0}
-		var i = 0, index = null, offset = 0
+		var i = 0, index = null, offset = 0;
 
 		while (i < n && index != -1) {
-			index = option.indexOf(m, index+m.length)
-			i++
+			index = option.indexOf(m, index+m.length);
+			i++;
 		}
 
 		if (index == -1) {
-			return option
+			return option;
 		}
 		
 		if (m.length > 0){ offset = m.length }
-		var end = option.substr(index+offset).length - p
-		return option.substr(index+offset, end)
+		var end = option.substr(index+offset).length - p;
+		return option.substr(index+offset, end);
 	}
 
 	// update tooltip with message
@@ -352,11 +375,11 @@ $(document).ready(function () {
 		
 		if ( c == 1 || c == 2 ){
 
-			p.rasters = []
-			p.weights = []
-			p.files = []
-			p.weight_obj = {}
-			p.files_obj={}
+			p.rasters = [];
+			p.weights = [];
+			p.files = [];
+			p.weights_obj = {};
+			p.files_obj={};
 		}
 
 		if ( c == 1 || c == 3 ){
@@ -407,10 +430,10 @@ $(document).ready(function () {
 	}); 
  	
  	// init slider years ui
-    var v = $("#slider").dragslider("values")
+    var v = $("#slider").dragslider("values");
     $('#slider_value').text(v[0]+" - "+v[1]);
-    var min = $('#slider').dragslider('option', 'min')
-    var max = $('#slider').dragslider('option', 'max')
+    var min = $('#slider').dragslider('option', 'min');
+    var max = $('#slider').dragslider('option', 'max');
     $('#slider_min').text(min);
     $('#slider_max').text(max);
 
@@ -418,33 +441,39 @@ $(document).ready(function () {
     var onPoint = false
     $('#slider').dragslider({
     	slide: function (event, ui) {
-	    	v = ui.values
+	    	v = ui.values;
 	        $('#slider_value').text(v[0]+" - "+v[1]);
 	   	},
     	change: function (event, ui) {
-	        d.start_year = $("#slider").dragslider("values")[0]
-	    	d.end_year = $("#slider").dragslider("values")[1]
+	        d.start_year = $("#slider").dragslider("values")[0];
+	    	d.end_year = $("#slider").dragslider("values")[1];
 
 	    	// prevents attempt to build points if no type has been selected
-	        if (onPoint){ addPointData() }
+	        if (onPoint){ 
+	        	addPointData(); 
+	        }
     	}
     });
 
 	// manage menu display
 	$(".menu_item").click(function () {
-		if (p.country == ""){return}
+		if (p.country == ""){
+			return;
+		}
 		
-		$(this).siblings().removeClass("active_menu")
-		$(this).addClass("active_menu")
+		$(this).siblings().removeClass("active_menu");
+		$(this).addClass("active_menu");
 	})
 
 	// point type selection
 	$("#data_type ul li").on("click", function () {
-		if (p.country == ""){ return }
+		if (p.country == ""){ 
+			return; 
+		}
 
-		onPoint = true
-		d.type = $(this).attr("id")
-		addPointData()
+		onPoint = true;
+		d.type = $(this).attr("id");
+		addPointData();
 	
 	})
 
@@ -463,60 +492,62 @@ $(document).ready(function () {
 
 
 	// init
-	L.mapbox.accessToken = 'pk.eyJ1Ijoic2dvb2RtIiwiYSI6InotZ3EzZFkifQ.s306QpxfiAngAwxzRi2gWg'
+	L.mapbox.accessToken = 'pk.eyJ1Ijoic2dvb2RtIiwiYSI6InotZ3EzZFkifQ.s306QpxfiAngAwxzRi2gWg';
 
-	var map = L.mapbox.map('map', {})
+	var map = L.mapbox.map('map', {});
 
 	var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 				attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap contributors</a>'
-			}).addTo(map)
+			}).addTo(map);
 
 	map.setView([0,0], 3);
 
-	map.options.maxZoom = 11
-	map.options.minZoom = 2
+	map.options.maxZoom = 11;
+	map.options.minZoom = 2;
 
 	// bounds objects
-	var allCountryBounds = { global:{_northEast:{lat:90, lng:180}, _southWest:{lat:-90, lng:-180}} }
+	var allCountryBounds = { global:{_northEast:{lat:90, lng:180}, _southWest:{lat:-90, lng:-180}} };
 
 	// addCountry vars: countryLayer
 	// addPointData vars: markers, geojsonPoints
 	// addPolyData vars: geojsonPolyData, geojson, info, legend
 	var countryLayer, markers, geojsonPoints, geojsonPolyData, geojson, info, legend; 
 
-	var mapinfo = {}
+	var mapinfo = {};
 	
 	mapinfo.pointdata =  function(feature, layer) {
-		var a = feature.properties
+		var a = feature.properties;
 
-		var html = ""
-		html += "<b>Location Info</b>" 
-		html += "<br>Geoname: " + a.geoname
-		html += "<br>ADM1: " + a.ADM1_NAME
-		if (a.ADM2_NAME) { html += "<br>ADM2: " + a.ADM2_NAME }
-		if (a.ADM3_NAME) { html += "<br>ADM3: " + a.ADM3_NAME }
+		var html = "";
+		html += "<b>Location Info</b>"; 
+		html += "<br>Geoname: " + a.geoname;
+		html += "<br>ADM1: " + a.ADM1_NAME;
 
-		html += "<br><br><b>Project Info</b>"
-		html += "<br>Date of Agreement: " + a.date_of_agreement
-		html += "<br>Donors: " + a.donor
-		html += "<br>Project Sites: " + a.count
+		html += ( a.ADM2_NAME ? "<br>ADM2: " + a.ADM2_NAME : "" );
+		html += ( a.ADM3_NAME ? "<br>ADM3: " + a.ADM3_NAME : "" );
 
-		html += "<br>Years: "
-		var c = 0
+
+		html += "<br><br><b>Project Info</b>";
+		html += "<br>Date of Agreement: " + a.date_of_agreement;
+		html += "<br>Donors: " + a.donor;
+		html += "<br>Project Sites: " + a.count;
+
+		html += "<br>Years: ";
+		var c = 0;
 		for (var y = d.start_year; y<=d.end_year; y++) {
 			if ( parseFloat(a["d_"+y]) > 0 ) {
-				if (c>0) { html += ", "}
-				html += y
-				c++							
+				html += ( c > 0 ? ", " : "" );
+				html += y;
+				c++;				
 			}
 		}
-		html += "<br>USD: "
-		c = 0
+		html += "<br>USD: ";
+		c = 0;
 		for (var y = d.start_year; y<=d.end_year; y++) {
 			if ( parseInt(a["d_"+y]) > 0 ) {
-				if (c>0) { html += ", "}
-				html += ( parseInt(a["d_"+y]) ).toLocaleString()
-				c++							
+				html += ( c > 0 ? ", " : "" );
+				html += ( parseInt(a["d_"+y]) ).toLocaleString();
+				c++;							
 			}
 		}
 
@@ -524,50 +555,50 @@ $(document).ready(function () {
 	}
 
 	mapinfo.weights = function(props) {
-		var html =  '<h4>Weight Result</h4>'
+		var html =  '<h4>Weight Result</h4>';
 
 		if (props) {
-			html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />' 
+			html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />';
 	        
-	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Weighted</th></tr></thead><tbody>"
+	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Weighted</th></tr></thead><tbody>";
 	        for (var i=0, ix=s.rasters.length; i<ix; i++) {
 
-			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundxy( props[s.rasters[i]] ) + '</td><td>' + (props[s.rasters[i]+"_weighted"] ? roundxy(props[s.rasters[i]+"_weighted"]) : "" ) + '</td></tr>'
+			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundxy( props[s.rasters[i]] ) + '</td><td>' + (props[s.rasters[i]+"_weighted"] ? roundxy(props[s.rasters[i]+"_weighted"]) : "" ) + '</td></tr>';
 
 	        }
-	        html += "</tbody></table>"
+	        html += "</tbody></table>";
 
-	        html += 'Result: ' + roundxy(props.result) 
+	        html += 'Result: ' + roundxy(props.result); 
 		
 		} else {
-			html = 'Hover over an area'
+			html = 'Hover over an area';
 		}
 
-	    this._div.innerHTML = html
+	    this._div.innerHTML = html;
 	}
 
 	mapinfo.gapanalysis = function(props) {
-		var html =  '<h4>Gap Analysis Result</h4>'
+		var html =  '<h4>Gap Analysis Result</h4>';
 
 		if (props) {
-			html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />' 
+			html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />'; 
 	        
-	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Percent</th></tr></thead><tbody>"
+	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Percent</th></tr></thead><tbody>";
 	        for (var i=0, ix=s.rasters.length; i<ix; i++) {
 
-			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundxy( props[s.rasters[i]] ) + '</td><td>' + roundxy( props[s.rasters[i]+"_percent"] )  + '</td></tr>'
+			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundxy( props[s.rasters[i]] ) + '</td><td>' + roundxy( props[s.rasters[i]+"_percent"] )  + '</td></tr>';
 
 	        }
-	        html += "</tbody></table>"
+	        html += "</tbody></table>";
 
-	        html += 'Ratio: ' + roundxy(props.ratio) + '<br>' 
-	        html += 'Result: ' + roundxy(props.result) 
+	        html += 'Ratio: ' + roundxy(props.ratio) + '<br>';
+	        html += 'Result: ' + roundxy(props.result);
 		
 		} else {
-			html = 'Hover over an area'
+			html = 'Hover over an area';
 		}
 
-	    this._div.innerHTML = html
+	    this._div.innerHTML = html;
 	}
 
 	// methods for cleaning up the map
@@ -593,28 +624,28 @@ $(document).ready(function () {
 	}
 
 	function addCountry() {
-		var file = "/aiddata/DET/resources/"+p.continent.toLowerCase()+"/"+p.country.toLowerCase()+"/shapefiles/Leaflet.geojson"
+		var file = "/aiddata/DET/resources/"+p.continent.toLowerCase()+"/"+p.country.toLowerCase()+"/shapefiles/Leaflet.geojson";
 
 		var geojsonFeature, error
 		readJSON(file, function (request, status, e) {
-			geojsonFeature = request
-			error = e
+			geojsonFeature = request;
+			error = e;
 		})
 
 		if (error) {
-			console.log(error)
-			return 1
+			console.log(error);
+			return 1;
 		}
 
-		cleanMap("poly")
+		cleanMap("poly");
 
-		countryLayer = L.geoJson(geojsonFeature, {style: style})
-		countryLayer.addTo(map)
+		countryLayer = L.geoJson(geojsonFeature, {style: style});
+		countryLayer.addTo(map);
 
-		var countryBounds = countryLayer.getBounds()
-		map.fitBounds( countryBounds )
+		var countryBounds = countryLayer.getBounds();
+		map.fitBounds( countryBounds );
 
-		allCountryBounds[p.country] = countryBounds
+		allCountryBounds[p.country] = countryBounds;
 		
 		function style(feature) {
 		    return {
@@ -629,9 +660,9 @@ $(document).ready(function () {
 
 	function addPointData() {
 
-		cleanMap("point")
+		cleanMap("point");
 
-		map.spin(true)
+		map.spin(true);
 		$.ajax ({
 	        url: "process.php",
 	        data: {type: "pointdata", country:p.country, pointType: d.type, start_year:d.start_year, end_year:d.end_year},
@@ -657,10 +688,10 @@ $(document).ready(function () {
 
 				markers.addLayer(geojsonLayer);
 				map.addLayer(markers);
-				map.spin(false)
+				map.spin(false);
 
 	        }
-	    })
+	    });
 
 	}
 
@@ -669,16 +700,17 @@ $(document).ready(function () {
 		map.spin(true)
 		$.ajax ({
 	        url: "process.php",
-	        data: {type: "weights", continent: s.continent, country: s.country, adm: s.adm, name:s.id, rasters: s.rasters, weights: s.weights, files: s.files},
+	        data: {type: "weights", continent: s.continent, country: s.country, adm: s.adm, name:s.name, rasters: s.rasters, weights: s.weights, files: s.files},
 	        dataType: "text",
 	        type: "post",
 	        async: false,
 	        success: function (result) {
-	        	addPolyData("../data/weights/"+result+".geojson")
-       	       	map.spin(false)
-       	       	runAnalysis()
+	        	s.hash = result
+	        	addPolyData("../data/weights/" + result + ".geojson");
+       	       	map.spin(false);
+       	       	// runAnalysis();
 	        }
-	    })
+	    });
 	}
 
 	// ajax to run Rscript which builds gapanalysis geojson
@@ -686,31 +718,44 @@ $(document).ready(function () {
 		map.spin(true)
 		$.ajax ({
 	        url: "process.php",
-	        data: {type: "gapanalysis", continent: s.continent, country: s.country, adm: s.adm, name:s.id, rasters: s.rasters, files: s.files},
+	        data: {type: "gapanalysis", continent: s.continent, country: s.country, adm: s.adm, name: s.name, custom: s.custom, rasters: s.rasters, files: s.files},
 	        dataType: "text",
 	        type: "post",
 	        async: false,
 	        success: function (result) {
-	        	addPolyData("../data/gapanalysis/"+result+".geojson")
-       	       	map.spin(false)
-        	    runAnalysis()
+	        	addPolyData("../data/gapanalysis/" + result + ".geojson");
+       	       	map.spin(false);
+        	    runAnalysis();
 	        }
-	    })
+	    });
 	}
 
 	function addPolyData(file) {
 
-		cleanMap("poly")
+		cleanMap("poly");
 		
 		var error
 		readJSON(file, function (request, status, e) {
-			geojsonPolyData = request
-			error = e
+			geojsonPolyData = request;
+			error = e;
 		})
 
 		if (error) {
-			console.log(error)
-			return 1
+			console.log(error);
+			return 1;
+		}
+
+		if (s.method == "weights") {
+   	       	// add weighted layer to gapanalysis data option (ga2)
+    		if ( !$('#ga2').find(".optgroup_custom").length ) {
+    			$('#ga2 option[value="-----"]').after('<optgroup class="optgroup_custom" label="custom"></optgroup>');
+    		}
+
+	        $('#ga2').find(".optgroup_custom").each(function () {
+	        	$(this).append('<option class="weighted" value="weighted_'+s.hash+'">' + 'custom weighted layer' + '</option>');
+	        })
+
+	        temp.rasters["weighted_"+s.hash] = s.hash + ".csv";
 		}
 
 	    var grades = {
@@ -794,7 +839,7 @@ $(document).ready(function () {
 
 		map.addLayer(geojson, true);
 
-		map.fitBounds( geojson.getBounds() )
+		map.fitBounds( geojson.getBounds() );
 
 
 		info = L.control({
@@ -808,7 +853,7 @@ $(document).ready(function () {
 		};
 
 		// method that we will use to update the control based on feature properties passed
-		info.update = mapinfo[s.method]  
+		info.update = mapinfo[s.method];
 
 		info.addTo(map);
 
@@ -874,7 +919,138 @@ $(document).ready(function () {
 	})
 
 	function runAnalysis() {
-		$('#analysis_tab').show()
+		$('#analysis_tab').show();
+
+		console.log(geojsonPolyData);
+
+		var data = {
+			raw: geojsonPolyData.features,
+			keys: _.keys(geojsonPolyData.features),
+			size: _.size(geojsonPolyData.features),
+			props: {},
+			results: {},
+			data3a: [],
+			data3b: [],
+			data3c: []
+		};
+
+		for ( var i = 0, ix = data.size; i < ix; i++ ) {
+			data.props[i] = data.raw[data.keys[i]].properties;
+			data.results[i] = parseFloat(data.props[i].result);
+		}
+
+		data.max = ss.max( _.values(data.results) );
+		// data.quantile = ss.quantile( _.values(data.results), 0.25 );
+		data.bot5 = _.values(data.results).sort( function(a, b) { return a-b } )[4];
+		data.top5 = _.values(data.results).sort( function(a, b) { return b-a } )[4];
+
+
+
+		for ( var i = 0, ix = data.size; i < ix; i++ ) {
+			var item = data.props[data.keys[i]]; 
+			if ( data.size <= 10 ) {
+				data.data3a.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
+				data.data3b.push( roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
+				data.data3c.push(item["NAME_" + s.adm.substr(3,1)]);
+			}
+			if ( data.size > 10 && parseFloat(item.result) <= data.bot5 ) {
+				data.data3a.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
+				data.data3b.push( roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
+				data.data3c.push(item["NAME_" + s.adm.substr(3,1)]);
+			}
+			if ( data.size > 10 && parseFloat(item.result) >= data.top5 ) {
+				data.data3a.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
+				data.data3b.push( roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
+				data.data3c.push(item["NAME_" + s.adm.substr(3,1)]);
+			}
+		}
+
+		console.log(data);
+
+		data.chart_options = {
+	        chart: {
+	        	type: 'column'
+	        	// // width:500,
+	            // zoomType: '',
+	            // // height: 700,
+	            // spacingLeft: 10,
+	            // marginRight: 100,
+	            // backgroundColor: '#ffc425'
+
+	        },
+	        title: {
+	            text: 'Gap Analysis'
+	        },
+	        subtitle: {
+	            text: 'Bottom 5 / Top 5'
+	        },
+	        xAxis: {
+	            categories: data.data3c//,
+	        	// labels:{
+		        //   	rotation: -45,
+		        // 	// style: {
+	         //  //       	width: '100%'
+	         //  //   	}
+	         //        formatter: function(){
+	         //            if (this.value.length > 20){
+	         //                return this.value.substr(0,20) + "...";
+	         //            }else{
+	         //                 return this.value;   
+	         //            }                        
+	         //        }
+	            
+		        // }
+	        },
+	        yAxis: [{ 
+	            title: {
+	                text: 'Standarized Values',
+	                style: {
+	                    color: Highcharts.getOptions().colors[1]
+	                }
+	            },
+	            labels: {
+	                format: '{value}',
+	                style: {
+	                    color: Highcharts.getOptions().colors[1]
+	                }
+	            },
+	        }],
+	        tooltip: {
+	            shared: true
+	        },
+	        legend: {
+	            layout: 'horizontal',
+	            align: 'left',
+	            x: -5,
+	            verticalAlign: 'top',
+	            y: -5,
+	            floating: true,
+	            backgroundColor: 'rgba(255,255,255,0)' //(Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+	        },
+	        credits:{
+	        	enabled:false
+	        },
+	        series: [{
+	            name: 'Aid',
+	            // type: 'column',
+	            yAxis: 0,
+	            data: data.data3a//,
+	            // tooltip: {
+	            //     valueSuffix: ''
+	            // }
+
+	        }, {
+	            name: 'Data',
+	        //     type: 'column',
+	            data: data.data3b//,
+	        //     // tooltip: {
+	        //     //     valueSuffix: ''
+	            // }
+	        }]
+	    };
+
+		$('#analysis_results').append('<div id="chart1"></div>');
+		$('#chart1').highcharts(data.chart_options);
 	}
 
 
@@ -899,7 +1075,7 @@ $(document).ready(function () {
 	        success: function (result) {
 			    callback(result);
 			}
-	    })
+	    });
 	}
 
 	// read in a json file and return object
@@ -915,10 +1091,8 @@ $(document).ready(function () {
 	    	error: function (request, status, error) {
         		callback(request, status, error);
     		}
-	    })
-	    
-	};
-
+	    });
+	}
 
 	function readHash() {
 		var h;
@@ -939,7 +1113,7 @@ $(document).ready(function () {
 
 		})
 
-	};
+	}
 
 	readHash();
 	
