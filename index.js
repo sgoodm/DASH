@@ -77,6 +77,9 @@ $(document).ready(function () {
 	$('#map_options_toggle').click(function () {
 		$('#map_options_content').slideToggle();
 	})
+	$('#map_chart_toggle').click(function () {
+		$('#map_chart').animate({width:'toggle'});
+	})
 
 	// toggle tooltip popver
 	$('#map_options_popover').click(function () {
@@ -259,11 +262,12 @@ $(document).ready(function () {
 			prepWeights();
 
 		} else if ( p.method == "gapanalysis" ) {
+			$('#analysis_results').empty()
 			prepGapAnalysis();
 
 		}
 
-		$('#analysis_title').click();
+		// $('#analysis_title').click();
 
 
 	})
@@ -510,8 +514,8 @@ $(document).ready(function () {
 
 	// addCountry vars: countryLayer
 	// addPointData vars: markers, geojsonPoints
-	// addPolyData vars: geojsonPolyData, geojson, info, legend
-	var countryLayer, markers, geojsonPoints, geojsonPolyData, geojson, info, legend; 
+	// addPolyData vars: geojsonPolyData, geojson, info, legend, featureList
+	var countryLayer, markers, geojsonPoints, geojsonPolyData, geojson, info, legend, featureList; 
 
 	var mapinfo = {};
 	
@@ -621,6 +625,11 @@ $(document).ready(function () {
 				legend.removeFrom(map);		
 			}
 		}
+
+		if (method == "chart" || method == "all") {
+    		$('#map_chart').empty();
+    		$('#map_chart').hide();
+		}
 	}
 
 	function addCountry() {
@@ -637,7 +646,7 @@ $(document).ready(function () {
 			return 1;
 		}
 
-		cleanMap("poly");
+		cleanMap("all");
 
 		countryLayer = L.geoJson(geojsonFeature, {style: style});
 		countryLayer.addTo(map);
@@ -732,7 +741,11 @@ $(document).ready(function () {
 
 	function addPolyData(file) {
 
+		featureList = {};
+
 		cleanMap("poly");
+   		cleanMap("chart");
+
 		
 		var error
 		readJSON(file, function (request, status, e) {
@@ -752,10 +765,15 @@ $(document).ready(function () {
     		}
 
 	        $('#ga2').find(".optgroup_custom").each(function () {
+	        	$(this).empty();
 	        	$(this).append('<option class="weighted" value="weighted_'+s.hash+'">' + 'custom weighted layer' + '</option>');
 	        })
 
 	        temp.rasters["weighted_"+s.hash] = s.hash + ".csv";
+
+	        delete temp.gapanalysis.ga2;
+	        temp.valid.gapanalysis = false;
+	        $('#gapanalysis_submit').hide();
 		}
 
 	    var grades = {
@@ -797,7 +815,7 @@ $(document).ready(function () {
 		    };
 		}
 
-		function highlightFeature(e) {
+		function mouseoverFeature(e) {
 		    var layer = e.target;
 
 		    layer.setStyle({
@@ -815,21 +833,109 @@ $(document).ready(function () {
 
 		}
 
-		function resetHighlight(e) {
+		function mouseoutFeature(e) {
 		    geojson.resetStyle(e.target);
 		    info.update();
 		}
 
-		function zoomToFeature(e) {
+		function clickFeature(e) {
+			// console.log(e)
+
+			// zoom to feature
 	    	// map.fitBounds(e.target.getBounds());
+
+	    	if (s.method == "weights") {
+	    		// add message
+	    		return;
+	    	}
+
+	    	$('#map_chart').show();
+
+	    	var map_chart_options = {
+		        chart: {
+		        	type: 'bar'
+		        },
+		        title: {
+		            text: e.target.feature.properties["NAME_"+s.adm.substr(3)]
+		        },
+		        subtitle: {
+		            text: ''
+		        },
+		        xAxis: {
+		            categories: ['']
+		        },
+		        yAxis: [{ 
+		            title: {
+		                text: 'Standarized Values (0-1)',
+		                style: {
+		                    color: Highcharts.getOptions().colors[1]
+		                }
+		            },
+		            labels: {
+		                format: '{value}',
+		                style: {
+		                    color: Highcharts.getOptions().colors[1]
+		                }
+		            },
+		        }],
+		        tooltip: {
+		        	enabled:false,
+		        	positioner: function () {
+		                return { x: 0, y: -10 };
+		            },
+		            shadow: false,
+		            borderWidth: 0,
+		            shared: true
+		        },
+		         plotOptions: {
+		            series: {
+		                dataLabels: {
+		                    enabled: true,
+		                    align:'right',
+		                    color:'white'
+		                }
+		            }
+		        },
+		        legend: {
+		            layout: 'horizontal',
+		            align: 'left',
+		            x: 75,
+		            verticalAlign: 'top',
+		            y: 20,
+		            floating: true,
+		            backgroundColor: 'rgba(255,255,255,0)'
+		        },
+		        credits:{
+		        	enabled:false
+		        },
+		        series: [{
+		            name: 'Aid',
+		            // color:'blue',
+		            data: [ roundxy(parseFloat(e.target.feature.properties[s.rasters[0]+"_percent"])) ]
+
+		        }, {
+		            name: 'Data',
+		            // color: 'black',
+		            data: [ roundxy(parseFloat(e.target.feature.properties[s.rasters[1]+"_percent"])) ]
+
+		        }]
+	    	 };
+
+	    	$('#map_chart').highcharts(map_chart_options);
+
 		}
 
 		function onEachFeature(feature, layer) {
 		    layer.on({
-		        mouseover: highlightFeature,
-		        mouseout: resetHighlight,
-		        click: zoomToFeature
+		        mouseover: mouseoverFeature,
+		        mouseout: mouseoutFeature,
+		        click: clickFeature
 		    });
+		    var poly_id = "polygon_" +  feature.properties.ID;
+		    layer._leaflet_id = poly_id;
+		    featureList[ feature.properties["NAME_"+s.adm.substr(3)] ] = poly_id; 
+		    // console.log(feature)
+		    // console.log(layer)
 		}
 
 		geojson = L.geoJson(geojsonPolyData, {
@@ -888,40 +994,76 @@ $(document).ready(function () {
 
 
 	$('#analysis_tab').click(function () {
-    	// var pan = map.getCenter();
+		$(this).hide();
+		$('#analysis_title').show()
 
-		$('#analysis_tab').hide();
+  //   	// var pan = map.getCenter();
 
-		$('#map').animate({height:'75%'}, function () {
-			map.invalidateSize();
-		    map.invalidateSize();
+		// $('#map').animate({height:'75%'}, function () {
+		//     map.invalidateSize();
 
-			map.fitBounds( allCountryBounds[p.country] );
-	      	// map.panTo(pan, {animate:true, duration:1.0});
-			$('#analysis').show();
-	    });
+		// 	map.fitBounds( allCountryBounds[p.country] );
+	 //      	// map.panTo(pan, {animate:true, duration:1.0});
+		// 	$('#analysis').show();
+		// 	if ( $('#gapanalysis_chart').length) {
+		// 		$('#gapanalysis_chart').redraw();
+		// 	}
+	 //    });
+
+	    $('html, body').animate({
+	        scrollTop: $("#analysis").offset().top
+	    }, 1000);
+
+	    console.log(map._layers)
 	})
 
 
 	$('#analysis_title').click(function () {
-    	// var pan = map.getCenter();
+ 		$(this).hide();
+		$('#analysis_tab').show()
+  //   	// var pan = map.getCenter();
 	
-		$('#analysis').hide();
+		// $('#analysis').hide();
 
-		$('#map').animate({height:'100%'}, function () {
-			map.invalidateSize();
-		    map.invalidateSize();
+		// $('#map').animate({height:'100%'}, function () {
+		//     map.invalidateSize();
 
-			map.fitBounds( allCountryBounds[p.country] );
-	      	// map.panTo(pan, {animate:true, duration:1.0});
-			$('#analysis_tab').show();
-	    });
+		// 	map.fitBounds( allCountryBounds[p.country] );
+	 //      	// map.panTo(pan, {animate:true, duration:1.0});
+		// 	$('#analysis_tab').show();
+	 //    });
+
+	    $('html, body').animate({
+	        scrollTop: $("#map").offset().top
+	    }, 1000);
 	})
 
-	function runAnalysis() {
-		$('#analysis_tab').show();
+	$( window ).scroll(function() {
 
-		console.log(geojsonPolyData);
+		    var docViewTop = $(window).scrollTop();
+		    var docViewBottom = docViewTop + $(window).height();
+
+		    var analysisTop = $('#analysis').offset().top;
+		    // var analysisBottom = analysisTop + $('#analysis').height();
+
+		    if ( $('#analysis_tab').length && analysisTop <= docViewTop + 250 ) {
+		    	$('#analysis_tab').hide();
+		    	$('#analysis_title').show();
+
+		    } else if ( $('#analysis_title').length && analysisTop >= docViewBottom - 300 ) {
+		    	$('#analysis_title').hide();
+		    	$('#analysis_tab').show();
+
+		    }
+			
+			// console.log( docViewTop, docViewBottom, analysisTop, analysisBottom)
+	});
+
+	function runAnalysis() {
+		$('#analysis').show();
+		$('#analysis_tab').show()
+
+		// console.log(geojsonPolyData);
 
 		var data = {
 			raw: geojsonPolyData.features,
@@ -929,50 +1071,47 @@ $(document).ready(function () {
 			size: _.size(geojsonPolyData.features),
 			props: {},
 			results: {},
-			data3a: [],
-			data3b: [],
-			data3c: []
+			primary: [],
+			secondary: [],
+			categories: []
 		};
+
+		var subtitle = ( data.size <= 10 ? 'Top 5 Underfunded / Top 5 Overfunded' : '')
 
 		for ( var i = 0, ix = data.size; i < ix; i++ ) {
 			data.props[i] = data.raw[data.keys[i]].properties;
 			data.results[i] = parseFloat(data.props[i].result);
 		}
 
-		data.max = ss.max( _.values(data.results) );
-		// data.quantile = ss.quantile( _.values(data.results), 0.25 );
 		data.bot5 = _.values(data.results).sort( function(a, b) { return a-b } )[4];
 		data.top5 = _.values(data.results).sort( function(a, b) { return b-a } )[4];
-
-
 
 		for ( var i = 0, ix = data.size; i < ix; i++ ) {
 			var item = data.props[data.keys[i]]; 
 			if ( data.size <= 10 ) {
-				data.data3a.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
-				data.data3b.push( roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
-				data.data3c.push(item["NAME_" + s.adm.substr(3,1)]);
+				data.primary.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
+				data.secondary.push( roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
+				data.categories.push(item["NAME_" + s.adm.substr(3,1)]);
 			}
 			if ( data.size > 10 && parseFloat(item.result) <= data.bot5 ) {
-				data.data3a.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
-				data.data3b.push( roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
-				data.data3c.push(item["NAME_" + s.adm.substr(3,1)]);
+				data.primary.unshift( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
+				data.secondary.unshift( roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
+				data.categories.unshift(item["NAME_" + s.adm.substr(3,1)]);
 			}
 			if ( data.size > 10 && parseFloat(item.result) >= data.top5 ) {
-				data.data3a.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
-				data.data3b.push( roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
-				data.data3c.push(item["NAME_" + s.adm.substr(3,1)]);
+				data.primary.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
+				data.secondary.push( roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
+				data.categories.push(item["NAME_" + s.adm.substr(3,1)]);
 			}
 		}
 
-		console.log(data);
+		// console.log(data);
+		// console.log(featureList)
 
 		data.chart_options = {
 	        chart: {
 	        	type: 'column'
-	        	// // width:500,
 	            // zoomType: '',
-	            // // height: 700,
 	            // spacingLeft: 10,
 	            // marginRight: 100,
 	            // backgroundColor: '#ffc425'
@@ -982,28 +1121,37 @@ $(document).ready(function () {
 	            text: 'Gap Analysis'
 	        },
 	        subtitle: {
-	            text: 'Bottom 5 / Top 5'
+	            text: subtitle
+	        },
+          	plotOptions: {
+            	series: {
+            		cursor: 'pointer',
+	                point: {
+	                    events: {
+	                    	click: function () {
+	                    		_.each( map._layers, function(lay) {
+	                    			lay.fire('mouseout');
+	                    		})
+	   
+	                    		map._layers[ featureList[data.categories[this.x]] ].fire('mouseover');
+	                    	}
+	                     //    mouseOver: function () {
+	                     //       console.log( data.categories[this.x], featureList[data.categories[this.x]] );
+	                     //       map._layers[ featureList[data.categories[this.x]] ].fire('mouseover');
+	                     //    },
+	                     //    mouseOut: function () {
+		                    //     map._layers[ featureList[data.categories[this.x]] ].fire('mouseout');
+		                    // }
+	                    }
+	                }
+	            }
 	        },
 	        xAxis: {
-	            categories: data.data3c//,
-	        	// labels:{
-		        //   	rotation: -45,
-		        // 	// style: {
-	         //  //       	width: '100%'
-	         //  //   	}
-	         //        formatter: function(){
-	         //            if (this.value.length > 20){
-	         //                return this.value.substr(0,20) + "...";
-	         //            }else{
-	         //                 return this.value;   
-	         //            }                        
-	         //        }
-	            
-		        // }
+	            categories: data.categories
 	        },
 	        yAxis: [{ 
 	            title: {
-	                text: 'Standarized Values',
+	                text: 'Standarized Values (0-1)',
 	                style: {
 	                    color: Highcharts.getOptions().colors[1]
 	                }
@@ -1032,25 +1180,23 @@ $(document).ready(function () {
 	        },
 	        series: [{
 	            name: 'Aid',
-	            // type: 'column',
-	            yAxis: 0,
-	            data: data.data3a//,
+	            data: data.primary//,
 	            // tooltip: {
 	            //     valueSuffix: ''
 	            // }
 
 	        }, {
 	            name: 'Data',
-	        //     type: 'column',
-	            data: data.data3b//,
+	            data: data.secondary//,
 	        //     // tooltip: {
 	        //     //     valueSuffix: ''
 	            // }
 	        }]
 	    };
+		$('#analysis_results').append('<div id="gapanalysis_chart"></div>');
+		$('#gapanalysis_chart').highcharts(data.chart_options);
+        $('html, body').animate({ scrollTop: 0 }, 0);
 
-		$('#analysis_results').append('<div id="chart1"></div>');
-		$('#chart1').highcharts(data.chart_options);
 	}
 
 
@@ -1104,8 +1250,6 @@ $(document).ready(function () {
 		process({type:"exists", name:h}, function (result) {
 			if (result == true) {
 				console.log(h);
-				$('#build_toggle').slideDown()
-				$("#build_toggle").click();
 				addPolyData("data/"+h+".geojson");
 			} else {
 				console.log("bad hash");

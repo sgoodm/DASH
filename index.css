@@ -270,6 +270,10 @@ a, a:hover, a:active, a:focus, a:visited{
 
         }
 
+#map_container {
+    height: 100%; 
+    width: 100%;
+}
 
 #map{ 
     height: 100%; 
@@ -304,10 +308,16 @@ a, a:hover, a:active, a:focus, a:visited{
     }
 
     .geocode-cluster{
-        background: #9FE5F8;background:rgba(159, 229, 248, 0.5);border:1px solid black;border:1px solid rgba(0, 0, 0, 0.5);border-radius:50%;
+        background: #9FE5F8;
+        background:rgba(159, 229, 248, 0.5);
+        border:1px solid black;
+        border:1px solid rgba(0, 0, 0, 0.5);
+        border-radius:50%;
     }
     .geocode-cluster div{
-        text-align:center;line-height:0%;position:relative;top:50%;
+        text-align:center;
+        line-height:0%;
+        position:relative;top:50%;
     }
 
     #map_table{
@@ -325,12 +335,53 @@ a, a:hover, a:active, a:focus, a:visited{
             border-collapse: collapse;
         }
 
+#map_chart_container {
+    height: 200px;
+    position: absolute;
+    left: 0px;
+    top:100px;
+    /*top:50%;*/
+    /*margin-top: -100px;*/
+}
+    #map_chart {    
+        display:none;
+        width:300px;
+        height: 100%;
+        background: white;
+        border: 1px solid black;
+        border-left:0;
+        border-right: 0;    
+        padding-top: 5px;    
+    }
+    #map_chart_toggle {
+        height: 100%;
+        width: 25px;
+        display: block;
+        position: absolute;
+        top:0;
+        right:-25px;
+        background: rgba(210,210,210,1);
+        border: 1px solid black;
+        border-left: 0;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+        #map_chart_toggle span{
+            position: relative;
+            left:4px;
+            top: 96px;
+
+        }
+
 #analysis_tab {
     display: none;
     height:40px;
     width:150px;
-    background: rgba(0,0,200,1);
-    position: fixed;
+    background: rgba(66,139,202,1);
+    position: absolute;
     bottom: 50px;
     left:50%;
     margin-left: -75px;
@@ -349,16 +400,17 @@ a, a:hover, a:active, a:focus, a:visited{
 #analysis {
     display: none;
     width:100%;
-    /*min-height: 500px;*/
+    min-height: 1500px;
     position: relative;
-    top: -5px;
+    /*top: -5px;*/
     /*background: rgba(122,122,122,1);*/
 }
 
     #analysis_title{
+        display: none;
         height:40px;
         width:150px;
-        background: rgba(0,0,200,1);
+        background: rgba(66,139,202,1);
         position: absolute;
         left:50%;
         margin-left: -75px;
@@ -380,7 +432,7 @@ a, a:hover, a:active, a:focus, a:visited{
         position: absolute;
         top:70px;
     }
-        #chart1 {
+        #gapanalysis_chart {
             width: 90%;
             height: 400px;
             margin-left: 5%;

@@ -134,9 +134,15 @@
 
     </div>
 
-    <div id="map"></div> 
+    <div id="map_container">
+        <div id="map"></div> 
+        <div id="map_chart_container">
+            <div id="map_chart"></div>  
+            <div id="map_chart_toggle"><span class="ui-icon ui-icon-carat-2-e-w"></span></div>
+        </div>
+        <div id="analysis_tab"><div>Results Analysis</div></div> 
+    </div>
 
-    <div id="analysis_tab"><div>Results Analysis</div></div> 
     <div id="analysis">
         <div id="analysis_title"><div>Results Analysis</div></div>
         <div id="analysis_results"></div>
