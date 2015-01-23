@@ -19,393 +19,382 @@ a, a:hover, a:active, a:focus, a:visited{
     border-bottom: 1px solid rgba(0,0,0,0.25);
     margin: 1px 2.5%;
 }
-
-#map_options {
-    width:400px;
-    border-top: 0;
-    background: white;
-    position:absolute;
-    top:0;
-    right:20px;
-    z-index: 555;
-    color: black;
-}
-
-    #map_options_content {
-        height: 350px;
-        width: 100%;
-        display: block;
-        border: 1px solid black;
-        border-top: 0;
-        border-bottom: 0;
-        background: white;
-
-    }
-
-        #boundary_options{
-            padding-top: 10px;
-            margin-bottom: 20px;
-            height:25px;
-            font-size: 12px;
-        }
-
-            #boundary_options>div{
-                display: inline-block;
-                width:50%;
-                float:left;
-                text-align: center;
-            }
-
-            #boundary_options select{
-                color:black;
-                text-align: center;
-                width:150px;
-            }
-
-
-
-        #method {
-            display:none;
-            padding: 10px;
-            font-size: 10px;
-        }
-
-            #method li {
-                padding: 0 5px
-            }
-
-            .nav-tabs > li.active > a,
-            .nav-tabs > li.active > a:hover,
-            .nav-tabs > li.active > a:focus {
-              color: white;
-              cursor: default;
-              background-color: rgba(66,139,202,1);
-              border: 1px solid #dddddd;
-              border-bottom-color: transparent;
-            }
-
-        .method {
-            display: none;
-            width:90%;
-            margin:10px 5%;
-        }
-            #weights{}
-
-                .ro {
-                    margin: 1% 0;
-                    display: block;
-                }
-                    #weights select {
-                        width: 80%;
-                        float: left;
-                    }
-                    #weights input {
-                        width: 15%;
-                        text-align: center;
-                        float: right;
-                        margin-top: 1%;
-                    }
-            #gapanalysis {
-
-            }
-                #gapanalysis div {
-                    margin: 1% 0;
-                }   
-                    #gapanalysis span {
-                        display: block;
-                    }
-                    #gapanalysis select {
-                        width:100%;
-                    }
-            #pointdata {
-            /*#data_options{*/
-                /*display: block;*/
-                clear:both;
-                padding-top: 40px;
-                padding-bottom: 40px;
-                position: relative;
-            }
-
-                #clear_points {
-                    width:50px;
-                    height: 50px;
-                    position: absolute;
-                    top:0;
-                    right:10%;
-                    font-size: 10px;
-                }
-
-                    #clear_points button {
-                        background: rgba(0,255,255,1);
-                        border: 1px solid rgba(0,0,0,0);
-                        border-radius: 10px;
-                    }
-                    #clear_points button:hover {
-                        -moz-box-shadow:    inset 0 0 5px rgba(0,0,255,1);
-                        -webkit-box-shadow: inset 0 0 5px rgba(0,0,255,1);
-                        box-shadow:         inset 0 0 5px rgba(0,0,255,1);
-                    }
-                    #clear_points button:active {
-                        -moz-box-shadow:    inset 0 0 5px rgba(0,255,0,1);
-                        -webkit-box-shadow: inset 0 0 5px rgba(0,255,0,1);
-                        box-shadow:         inset 0 0 5px rgba(0,255,0,1);
-                    }
-
-                #data_type{
-                    padding-bottom: 20px;
-                }
-
-                    #data_type ul{
-                        width: 100%;
-                        /*margin-left: 10%;*/
-                        padding: 0;
-                    }
-
-                        .menu_item {
-                            display: inline-block;
-                            text-decoration: none;
-                            padding:5px;
-                            width: 25%;
-                            text-align: center;
-                            border: solid 1px black;
-                            border-collapse: collapse;
-                        }
-
-                        .menu_item:hover{
-                            cursor:pointer;
-                            background-color: rgba(120,150,170,0.5);
-                        }
-
-                        .active_menu{
-                            background-color: rgba(120,150,170,1);
-                        }
-
-                        .menu_item>div{
-                            padding-top: 15px;
-                            -webkit-touch-callout: none;
-                            -webkit-user-select: none; 
-                            -khtml-user-select: none; 
-                            -moz-user-select: none; 
-                            -ms-user-select: none;
-                            -o-user-select: none; 
-                            user-select: none; 
-                        }
-
-                #slider_container{
-                    /*width: 75%;*/
-                    height: 50px;
-                    position: relative;
-                    text-align: center;
-                }
-
-                    .slider_sub{
-                        width:100%;
-                        margin: auto;
-                    }
-
-                    #slider{}
-
-                    #slider_bot span{ width:33%; position:relative; top: 10px; }
-                    #slider_min { right: 30%; }
-                    #slider_max { left: 30%;}
-                    #slider_value { }
-
-
-        .map_options_submit {
-            width:90%;
-            position: absolute;
-            bottom:10px;
-            text-align: center;
-            display: none;
-        }
-
-            .map_options_submit button {
-                width:100px;
-                height: 30px;
-            }
-
-        #map_options_message {
-            padding: 10px;
-            text-align:center;
-        }
-
-    #map_options_popover {
-        width:225px;
-        height:100px;
-        position:absolute;
-        left:-5px;
-        bottom:125px;
-        background: rgba(200,200,200,1);
-        border: 1px solid black;
-        border-right: 0;
-        border-top-left-radius: 10px;
-        border-bottom-left-radius: 10px;
-        cursor:pointer;
-        z-index: -122;
-        padding:10px;
-        color:black;
-        font-size: 12px;
-        overflow-y:auto; 
-    }
-
-    #map_options_toggle {
-        height: 25px;
-        width: 100%;
-        display: block;
-        position: absolute;
-        bottom:-25;
-        background: rgba(210,210,210,1);
-        border: 1px solid black;
-        border-top: 0;
-        border-bottom-left-radius: 10px;
-        border-bottom-right-radius: 10px;
-        text-align: center;
-        cursor: pointer;
-    }
-
-        #map_options_toggle span{
-            position: relative;
-            top:4px;
-            left: 192px;
-
-        }
-
 #map_container {
     height: 100%; 
     width: 100%;
 }
-
-#map{ 
-    height: 100%; 
-    width: 100%;
-    display:inline-block;
-}
-
-    .legend {
-        width: 100px;
-        line-height: 20px;
-        color: #555;
-    }
-    .legend i {
-        width: 20px;
-        height: 15px;
-        float: left;
-        margin-right: 8px;
-        opacity: 0.7;
-    }
-
-    .info {
-        padding: 6px 8px;
-        font: 14px/16px Arial, Helvetica, sans-serif;
+    #map_options {
+        width:400px;
+        border-top: 0;
         background: white;
-        background: rgba(255,255,255,0.8);
-        box-shadow: 0 0 15px rgba(0,0,0,0.2);
-        border-radius: 5px;
-    }
-    .info h4 {
-        margin: 0 0 5px;
-        color: #777;
-    }
-
-    .geocode-cluster{
-        background: #9FE5F8;
-        background:rgba(159, 229, 248, 0.5);
-        border:1px solid black;
-        border:1px solid rgba(0, 0, 0, 0.5);
-        border-radius:50%;
-    }
-    .geocode-cluster div{
-        text-align:center;
-        line-height:0%;
-        position:relative;top:50%;
-    }
-
-    #map_table{
-        margin: 5px;
-    }
-
-        #map_table tr{
-            text-align: center;
-            padding: 5px;
-        }
-
-        #map_table td{
-            padding: 3px;
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-
-#map_chart_container {
-    height: 200px;
-    position: absolute;
-    left: 0px;
-    top:100px;
-    /*top:50%;*/
-    /*margin-top: -100px;*/
-}
-    #map_chart {    
-        display:none;
-        width:300px;
-        height: 100%;
-        background: white;
-        border: 1px solid black;
-        border-left:0;
-        border-right: 0;    
-        padding-top: 5px;    
-    }
-    #map_chart_toggle {
-        height: 100%;
-        width: 25px;
-        display: block;
-        position: absolute;
+        position:absolute;
         top:0;
-        right:-25px;
-        background: rgba(210,210,210,1);
-        border: 1px solid black;
-        border-left: 0;
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
-        text-align: center;
+        right:20px;
+        z-index: 555;
+        color: black;
+    }
+        #map_options_content {
+            height: 350px;
+            width: 100%;
+            display: block;
+            border: 1px solid black;
+            border-top: 0;
+            border-bottom: 0;
+            background: white;
+        }
+            #boundary_options{
+                padding-top: 10px;
+                margin-bottom: 20px;
+                height:25px;
+                font-size: 12px;
+            }
+                #boundary_options>div{
+                    display: inline-block;
+                    width:50%;
+                    float:left;
+                    text-align: center;
+                }
+                #boundary_options select{
+                    color:black;
+                    text-align: center;
+                    width:150px;
+                }
+
+            #method {
+                display:none;
+                padding: 10px;
+                font-size: 10px;
+            }
+                #method li {
+                    padding: 0 5px
+                }
+                .nav-tabs > li.active > a,
+                .nav-tabs > li.active > a:hover,
+                .nav-tabs > li.active > a:focus {
+                  color: white;
+                  cursor: default;
+                  background-color: rgba(66,139,202,1);
+                  border: 1px solid #dddddd;
+                  border-bottom-color: transparent;
+                }
+
+            .method {
+                display: none;
+                width:90%;
+                margin:10px 5%;
+            }
+                #weights{
+
+                }
+                    .ro {
+                        margin: 1% 0;
+                        display: block;
+                    }
+                        #weights select {
+                            width: 80%;
+                            float: left;
+                        }
+                        #weights input {
+                            width: 15%;
+                            text-align: center;
+                            float: right;
+                            margin-top: 1%;
+                        }
+
+                #gapanalysis {
+
+                }
+                    #gapanalysis div {
+                        margin: 1% 0;
+                    }   
+                        #gapanalysis span {
+                            display: block;
+                        }
+                        #gapanalysis select {
+                            width:100%;
+                        }
+
+                    #report_container {
+                        display: none;
+                        width: 90%;
+                        height: 50px;
+                        position: absolute;
+                        bottom:60px;
+                        left:;
+                        /*margin-top: 25px;*/
+                        /*margin-bottom: 100px;*/
+                    }
+                        #report {
+                            width: 200px;
+                            height: 50px;
+                            position: absolute;
+                            left: 50%;
+                            bottom: 0px;
+                            margin-left:-100px;
+                            /*margin-top: 100px;*/
+                            color: black;
+                        }
+
+                #pointdata {
+                /*#data_options{*/
+                    /*display: block;*/
+                    clear:both;
+                    padding-top: 40px;
+                    padding-bottom: 40px;
+                    position: relative;
+                }
+                    #clear_points {
+                        width:50px;
+                        height: 50px;
+                        position: absolute;
+                        top:0;
+                        right:10%;
+                        font-size: 10px;
+                    }
+                        #clear_points button {
+                            background: rgba(0,255,255,1);
+                            border: 1px solid rgba(0,0,0,0);
+                            border-radius: 10px;
+                        }
+                        #clear_points button:hover {
+                            -moz-box-shadow:    inset 0 0 5px rgba(0,0,255,1);
+                            -webkit-box-shadow: inset 0 0 5px rgba(0,0,255,1);
+                            box-shadow:         inset 0 0 5px rgba(0,0,255,1);
+                        }
+                        #clear_points button:active {
+                            -moz-box-shadow:    inset 0 0 5px rgba(0,255,0,1);
+                            -webkit-box-shadow: inset 0 0 5px rgba(0,255,0,1);
+                            box-shadow:         inset 0 0 5px rgba(0,255,0,1);
+                        }
+
+                    #data_type{
+                        padding-bottom: 20px;
+                    }
+                        #data_type ul{
+                            width: 100%;
+                            /*margin-left: 10%;*/
+                            padding: 0;
+                        }
+                            .menu_item {
+                                display: inline-block;
+                                text-decoration: none;
+                                padding:5px;
+                                width: 25%;
+                                text-align: center;
+                                border: solid 1px black;
+                                border-collapse: collapse;
+                            }
+                            .menu_item:hover{
+                                cursor:pointer;
+                                background-color: rgba(120,150,170,0.5);
+                            }
+                            .active_menu{
+                                background-color: rgba(120,150,170,1);
+                            }
+                            .menu_item>div{
+                                padding-top: 15px;
+                                -webkit-touch-callout: none;
+                                -webkit-user-select: none; 
+                                -khtml-user-select: none; 
+                                -moz-user-select: none; 
+                                -ms-user-select: none;
+                                -o-user-select: none; 
+                                user-select: none; 
+                            }
+
+                    #slider_container{
+                        /*width: 75%;*/
+                        height: 50px;
+                        position: relative;
+                        text-align: center;
+                    }
+                        .slider_sub{
+                            width:100%;
+                            margin: auto;
+                        }
+                        #slider{}
+                        #slider_bot span{ width:33%; position:relative; top: 10px; }
+                        #slider_min { right: 30%; }
+                        #slider_max { left: 30%;}
+                        #slider_value {}
+
+            .map_options_submit {
+                width:90%;
+                position: absolute;
+                bottom:10px;
+                text-align: center;
+                display: none;
+            }
+                .map_options_submit button {
+                    width:100px;
+                    height: 30px;
+                }
+
+            #map_options_message {
+                padding: 10px;
+                text-align:center;
+            }
+
+        #map_options_popover {
+            width:225px;
+            height:100px;
+            position:absolute;
+            left:-5px;
+            bottom:125px;
+            background: rgba(200,200,200,1);
+            border: 1px solid black;
+            border-right: 0;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+            cursor:pointer;
+            z-index: -122;
+            padding:10px;
+            color:black;
+            font-size: 12px;
+            overflow-y:auto; 
+        }
+        #map_options_toggle {
+            height: 25px;
+            width: 100%;
+            display: block;
+            position: absolute;
+            bottom:-25;
+            background: rgba(210,210,210,1);
+            border: 1px solid black;
+            border-top: 0;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+            #map_options_toggle span{
+                position: relative;
+                top:4px;
+                left: 192px;
+            }
+
+    #map{ 
+        height: 100%; 
+        width: 100%;
+        display:inline-block;
+    }
+        .legend {
+            width: 100px;
+            line-height: 20px;
+            color: #555;
+        }
+        .legend i {
+            width: 20px;
+            height: 15px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .info h4 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+        .geocode-cluster{
+            background: #9FE5F8;
+            background:rgba(159, 229, 248, 0.5);
+            border:1px solid black;
+            border:1px solid rgba(0, 0, 0, 0.5);
+            border-radius:50%;
+        }
+        .geocode-cluster div{
+            text-align:center;
+            line-height:0%;
+            position:relative;top:50%;
+        }
+        #map_table{
+            margin: 5px;
+        }
+            #map_table tr{
+                text-align: center;
+                padding: 5px;
+            }
+            #map_table td{
+                padding: 3px;
+                border: 1px solid black;
+                border-collapse: collapse;
+            }
+
+    #map_chart_container {
+        height: 200px;
+        position: absolute;
+        left: 0px;
+        top:100px;
+        /*top:50%;*/
+        /*margin-top: -100px;*/
+    }
+        #map_chart {    
+            display:none;
+            width:300px;
+            height: 100%;
+            background: white;
+            border: 1px solid black;
+            border-left:0;
+            border-right: 0;    
+            padding-top: 5px;    
+        }
+        #map_chart_toggle {
+            height: 100%;
+            width: 25px;
+            display: block;
+            position: absolute;
+            top:0;
+            right:-25px;
+            background: rgba(210,210,210,1);
+            border: 1px solid black;
+            border-left: 0;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+            #map_chart_toggle span{
+                position: relative;
+                left:4px;
+                top: 96px;
+            }
+
+    #analysis_tab {
+        display: none;
+        height:40px;
+        width:150px;
+        background: rgba(66,139,202,1);
+        position: absolute;
+        bottom: 50px;
+        left:50%;
+        margin-left: -75px;
+        border: 0px solid white;
+        border-bottom: 0;
+        border-top-left-radius: 30px;
+        border-top-right-radius: 30px;
         cursor: pointer;
     }
-
-        #map_chart_toggle span{
-            position: relative;
-            left:4px;
-            top: 96px;
-
+        #analysis_tab div {
+            width: 150px;
+            padding-top: 10px;
+            text-align: center;
         }
-
-#analysis_tab {
-    display: none;
-    height:40px;
-    width:150px;
-    background: rgba(66,139,202,1);
-    position: absolute;
-    bottom: 50px;
-    left:50%;
-    margin-left: -75px;
-    border: 0px solid white;
-    border-bottom: 0;
-    border-top-left-radius: 30px;
-    border-top-right-radius: 30px;
-    cursor: pointer;
-}
-    #analysis_tab div {
-        width: 150px;
-        padding-top: 10px;
-        text-align: center;
-    }
 
 #analysis {
     display: none;
     width:100%;
-    min-height: 1500px;
+    min-height: 100%;
     position: relative;
     /*top: -5px;*/
     /*background: rgba(122,122,122,1);*/
 }
-
     #analysis_title{
         display: none;
         height:40px;

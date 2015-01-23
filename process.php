@@ -70,7 +70,6 @@ switch ($_POST['call']) {
 
 	// send variables to Rscript to create geojson with weighted data
 	case 'weights':
-
 		$continent = $_POST["continent"];
 		$country = $_POST["country"];
 		$adm = $_POST["adm"];
@@ -132,15 +131,24 @@ switch ($_POST['call']) {
 		break;
 
 	case 'saveimg':
+		$base = '/var/www/html/aiddata/DASH/reports/';
+		$name = time();
+		if (!is_dir($base.$name)){
+			$old_mask = umask(0);
+			mkdir($base.$name,0775,true);
 
-		$filename = '/var/www/html/aiddata/DASH/test.png';
+			$filename = $base . $name .'/'. $_POST['name'].'.png';
 
-		$img = $_POST['img'];
-		$img = str_replace('data:image/png;base64,', '', $img);
-		$img = str_replace(' ', '+', $img);
-		$data = base64_decode($img);
-		$success = file_put_contents($filename, $data);
-		$out = 'done';
+			$img = $_POST['img'];
+			$img = str_replace('data:image/png;base64,', '', $img);
+			$img = str_replace(' ', '+', $img);
+			$data = base64_decode($img);
+			$success = file_put_contents($filename, $data);			
+
+			$out = $name;
+		} else {
+			$out = 'exists';
+		}
 
 		echo json_encode($out);
 		break;

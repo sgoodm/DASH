@@ -72,29 +72,6 @@ $(document).ready(function () {
 	// --------------------------------------------------
 	// build options
 
-    // $("#save_img").click(function(){
-    //     var svg = document.getElementById('gapanalysis_chart').children[0].innerHTML;
-    //     var canvas = document.getElementById('canvas');
-    //     canvg(canvas,svg);
-    //     var img = canvas.toDataURL("image/png"); //img is data:image/png;base64
-    //     var img_data = {call:'saveimg', img: img};
-    //     console.log(img_data)
-    //     $.ajax({
-    //       	url: "process.php",
-    //       	data: img_data,
-  	 //        dataType: "json",
-	   //      type: "post",
-	   //      async: false,
-    //       	success: function(result){
-    //         	console.log(result);
-    //       	},    
-	   //  	error: function (request, status, error) {
-    //     		// console.log(request) 
-    //     		// console.log(status) 
-    //     		console.log(error);
-    // 		}
-    //     });
-    // });
 
 	// toggle options
 	$('#map_options_toggle').click(function () {
@@ -1017,8 +994,8 @@ $(document).ready(function () {
 
 
 	$('#analysis_tab').click(function () {
-		$(this).hide();
-		$('#analysis_title').show()
+		// $('#analysis_tab').hide();
+		// $('#analysis_title').show()
 
   //   	// var pan = map.getCenter();
 
@@ -1042,8 +1019,9 @@ $(document).ready(function () {
 
 
 	$('#analysis_title').click(function () {
- 		$(this).hide();
-		$('#analysis_tab').show()
+ 	// 	$(this).hide();
+		// $('#analysis_tab').show()
+		
   //   	// var pan = map.getCenter();
 	
 		// $('#analysis').hide();
@@ -1084,8 +1062,8 @@ $(document).ready(function () {
 
 	function runAnalysis() {
 		$('#analysis').show();
-		$('#analysis_tab').show()
-
+		$('#analysis_tab').show();
+		$('#report_container').show();
 		// console.log(geojsonPolyData);
 
 		var data = {
@@ -1221,6 +1199,61 @@ $(document).ready(function () {
         $('html, body').animate({ scrollTop: 0 }, 0);
 
 	}
+
+
+	// --------------------------------------------------
+	// report generation
+
+
+    $("#report").click(function(){
+        saveChart('gapanalysis_chart', 'gapanalysis_chart_name');
+    });
+
+    // save a highchart to png
+    function saveChart(chart, name) {
+		var svg = document.getElementById(chart).children[0].innerHTML;
+        var canvas = document.getElementById('canvas');
+        canvg(canvas,svg);
+        var img = canvas.toDataURL("image/png"); //img is data:image/png;base64
+        var img_data = {call:'saveimg', img: img, name:name};
+        console.log(img_data)
+        $.ajax({
+          	url: "process.php",
+          	data: img_data,
+  	        dataType: "json",
+	        type: "post",
+	        async: false,
+          	success: function(result){
+            	console.log(result);
+          	},    
+	    	error: function (request, status, error) {
+        		// console.log(request) 
+        		// console.log(status) 
+        		console.log(error);
+    		}
+        });
+    }
+
+    // call report building php
+    function buildReport() {
+    	var report_data = {};
+
+        $.ajax({
+          	url: "report.php",
+          	data: report_data,
+  	        dataType: "json",
+	        type: "post",
+	        async: false,
+          	success: function(result){
+            	console.log(result);
+          	},    
+	    	error: function (request, status, error) {
+        		// console.log(request) 
+        		// console.log(status) 
+        		console.log(error);
+    		}
+        });
+    }
 
 
 	// --------------------------------------------------

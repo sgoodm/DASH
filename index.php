@@ -23,118 +23,118 @@
 
 <body>
 
-    <div id="map_options">
+    <div id="map_container">
+        <div id="map_options">
 
-        <div id="map_options_content" style="display:none;">      
-            <div id="boundary_options"> 
-                <div id="country_options">
-                    <select id="country" >
-                        <option id="blank_country_option" value="-----">Country</option>
-                        <option value="Nepal">Nepal</option>
-                        <option value="Uganda">Uganda</option>
-                        <option value="Malawi">Malawi</option>  
-                    </select>
-                </div>       
+            <div id="map_options_content" style="display:none;">      
+                <div id="boundary_options"> 
+                    <div id="country_options">
+                        <select id="country" >
+                            <option id="blank_country_option" value="-----">Country</option>
+                            <option value="Nepal">Nepal</option>
+                            <option value="Uganda">Uganda</option>
+                            <option value="Malawi">Malawi</option>  
+                        </select>
+                    </div>       
 
-                <div id="adm_options">
-                    <select id="adm" disabled>
-                        <option id="blank_adm_option" value="-----">Level</option>
-                        <option value="ADM1">ADM1</option>
-                        <option value="ADM2">ADM2</option>
-                        <option value="ADM3">ADM3</option>
-                    </select>
-                </div>   
+                    <div id="adm_options">
+                        <select id="adm" disabled>
+                            <option id="blank_adm_option" value="-----">Level</option>
+                            <option value="ADM1">ADM1</option>
+                            <option value="ADM2">ADM2</option>
+                            <option value="ADM3">ADM3</option>
+                        </select>
+                    </div>   
 
-            </div>
-
-            <div class="divider"></div>
-
-            <ul id="method" class="nav nav-tabs nav-justified">
-                <li id="method_weights"><a tabindex="0">Weights</a></li>
-                <li id="method_gapanalysis"><a tabindex="0">Gap Analysis</a></li>
-                <li id="method_pointdata"><a tabindex="0">Point Data</a></li>
-            </ul> 
-
-            <div id="weights" class="method">
-                <div id="raster_option_1">
-                    <select id="ro1" class="ro method_select" ></select>
-                    <input class="wo" type="number" min="-10" max="10" step="1" value="1" disabled>
                 </div>
 
-                <div id="raster_option_2">
-                    <select id="ro2" class="ro method_select" ></select>
-                    <input class="wo" type="number" min="-10" max="10" step="1" value="1" disabled>
-                </div>    
+                <div class="divider"></div>
 
-                <div id="raster_option_3">
-                    <select id="ro3" class="ro method_select" ></select>
-                    <input class="wo" type="number" min="-10" max="10" step="1" value="1" disabled>
-                </div> 
+                <ul id="method" class="nav nav-tabs nav-justified">
+                    <li id="method_weights"><a tabindex="0">Weights</a></li>
+                    <li id="method_gapanalysis"><a tabindex="0">Gap Analysis</a></li>
+                    <li id="method_pointdata"><a tabindex="0">Point Data</a></li>
+                </ul> 
 
-                <div id="raster_option_4">
-                    <select id="ro4" class="ro method_select" ></select>
-                    <input class="wo" type="number" min="-10" max="10" step="1" value="1" disabled>
-                </div>    
-
-                <div id="raster_option_5">
-                    <select id="ro5" class="ro method_select" ></select>
-                    <input class="wo" type="number" min="-10" max="10" step="1" value="1" disabled>
-                </div>
-
-                <div id="weights_submit" class="map_options_submit"><button>Build</button></div>
-
-            </div>
-
-            <div id="gapanalysis"  class="method">
-                <div id="gapanalysis_option_1">
-                    <span>Aid Layer</span>
-                    <select id="ga1" class="ga method_select" ></select>
-                </div>
-                <div id="gapanalysis_option_2">
-                    <span>Data Layer</span>
-                    <select id="ga2" class="ga method_select" ></select>
-                </div> 
-                <div id="gapanalysis_submit" class="map_options_submit"><button>Build</button></div>
-
-            </div>  
-
-            <div id="pointdata" class="method">   
-
-                <div id="clear_points"><button>Clear</button></div>
-
-                <div id="data_type">
-                    <ul>
-                        <li id="Agriculture" class="menu_item">Agriculture</li><!--
-                     --><li id="Health" class="menu_item">Health</li><!--
-                     --><li id="Education" class="menu_item">Education</li><!--
-                     --><li id="Industry" class="menu_item">Industry</li>      
-                    </ul>
-                </div>
-
-                <div id="slider_container">
-                    <div id="slider_top" class="slider_sub">
-                        <div id="slider"></div>
-                    </div> 
-                    <div id="slider_bot" class="slider_sub">  
-                        <span id="slider_min"></span>
-                        <span id="slider_value"></span>
-                        <span id="slider_max"></span>
+                <div id="weights" class="method">
+                    <div id="raster_option_1">
+                        <select id="ro1" class="ro method_select" ></select>
+                        <input class="wo" type="number" min="-10" max="10" step="1" value="1" disabled>
                     </div>
+
+                    <div id="raster_option_2">
+                        <select id="ro2" class="ro method_select" ></select>
+                        <input class="wo" type="number" min="-10" max="10" step="1" value="1" disabled>
+                    </div>    
+
+                    <div id="raster_option_3">
+                        <select id="ro3" class="ro method_select" ></select>
+                        <input class="wo" type="number" min="-10" max="10" step="1" value="1" disabled>
+                    </div> 
+
+                    <div id="raster_option_4">
+                        <select id="ro4" class="ro method_select" ></select>
+                        <input class="wo" type="number" min="-10" max="10" step="1" value="1" disabled>
+                    </div>    
+
+                    <div id="raster_option_5">
+                        <select id="ro5" class="ro method_select" ></select>
+                        <input class="wo" type="number" min="-10" max="10" step="1" value="1" disabled>
+                    </div>
+
+                    <div id="weights_submit" class="map_options_submit"><button>Build</button></div>
+
                 </div>
+
+                <div id="gapanalysis"  class="method">
+                    <div id="gapanalysis_option_1">
+                        <span>Aid Layer</span>
+                        <select id="ga1" class="ga method_select" ></select>
+                    </div>
+                    <div id="gapanalysis_option_2">
+                        <span>Data Layer</span>
+                        <select id="ga2" class="ga method_select" ></select>
+                    </div> 
+                    <div id="report_container"><button id="report">Download Report</button></div>
+                    <div id="gapanalysis_submit" class="map_options_submit"><button>Build</button></div>
+
+                </div>  
+
+                <div id="pointdata" class="method">   
+
+                    <div id="clear_points"><button>Clear</button></div>
+
+                    <div id="data_type">
+                        <ul>
+                            <li id="Agriculture" class="menu_item">Agriculture</li><!--
+                         --><li id="Health" class="menu_item">Health</li><!--
+                         --><li id="Education" class="menu_item">Education</li><!--
+                         --><li id="Industry" class="menu_item">Industry</li>      
+                        </ul>
+                    </div>
+
+                    <div id="slider_container">
+                        <div id="slider_top" class="slider_sub">
+                            <div id="slider"></div>
+                        </div> 
+                        <div id="slider_bot" class="slider_sub">  
+                            <span id="slider_min"></span>
+                            <span id="slider_value"></span>
+                            <span id="slider_max"></span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="map_options_message"></div>
 
             </div>
 
-
-            <div id="map_options_message"></div>
+            <div id="map_options_popover" data-collapsed="true"></div>
+            <div id="map_options_toggle"><span class="ui-icon ui-icon-carat-2-n-s"></span></div>
 
         </div>
 
-        <div id="map_options_popover" data-collapsed="true"></div>
-        <div id="map_options_toggle"><span class="ui-icon ui-icon-carat-2-n-s"></span></div>
-
-    </div>
-
-    <div id="map_container">
         <div id="map"></div> 
         <div id="map_chart_container">
             <div id="map_chart"></div>  
@@ -146,13 +146,9 @@
     <div id="analysis">
         <div id="analysis_title"><div>Results Analysis</div></div>
         <div id="analysis_results"></div>
-<!-- 
-        <input type="button" id="save_img" value="saveImage"/>
-        <canvas id="canvas" style="display:none;"></canvas> 
--->
-
     </div> 
 
+    <canvas id="canvas" style="display:none;"></canvas> 
 
 
     <!-- <div id="navbar_spacer"></div> -->
