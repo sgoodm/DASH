@@ -72,6 +72,29 @@ $(document).ready(function () {
 	// --------------------------------------------------
 	// build options
 
+    // $("#save_img").click(function(){
+    //     var svg = document.getElementById('gapanalysis_chart').children[0].innerHTML;
+    //     var canvas = document.getElementById('canvas');
+    //     canvg(canvas,svg);
+    //     var img = canvas.toDataURL("image/png"); //img is data:image/png;base64
+    //     var img_data = {call:'saveimg', img: img};
+    //     console.log(img_data)
+    //     $.ajax({
+    //       	url: "process.php",
+    //       	data: img_data,
+  	 //        dataType: "json",
+	   //      type: "post",
+	   //      async: false,
+    //       	success: function(result){
+    //         	console.log(result);
+    //       	},    
+	   //  	error: function (request, status, error) {
+    //     		// console.log(request) 
+    //     		// console.log(status) 
+    //     		console.log(error);
+    // 		}
+    //     });
+    // });
 
 	// toggle options
 	$('#map_options_toggle').click(function () {
@@ -287,7 +310,7 @@ $(document).ready(function () {
 			cleanOptions(1)
 
 			// build
-			process({ type: "scan", path: "/"+p.continent.toLowerCase().toLowerCase()+"/"+p.country.toLowerCase()+"/cache" }, function (options) {
+			process({ call: "scan", path: "/"+p.continent.toLowerCase().toLowerCase()+"/"+p.country.toLowerCase()+"/cache" }, function (options) {
 					var op_count = 0;
 				    for (var op in options) {
 				    	if (options[op].indexOf(p.adm) != -1 || options[op].indexOf(p.adm_alt) != -1){
@@ -674,7 +697,7 @@ $(document).ready(function () {
 		map.spin(true);
 		$.ajax ({
 	        url: "process.php",
-	        data: {type: "pointdata", country:p.country, pointType: d.type, start_year:d.start_year, end_year:d.end_year},
+	        data: {call: "pointdata", country:p.country, pointType: d.type, start_year:d.start_year, end_year:d.end_year},
 	        dataType: "json",
 	        type: "post",
 	        async: false,
@@ -709,7 +732,7 @@ $(document).ready(function () {
 		map.spin(true)
 		$.ajax ({
 	        url: "process.php",
-	        data: {type: "weights", continent: s.continent, country: s.country, adm: s.adm, name:s.name, rasters: s.rasters, weights: s.weights, files: s.files},
+	        data: {call: "weights", continent: s.continent, country: s.country, adm: s.adm, name:s.name, rasters: s.rasters, weights: s.weights, files: s.files},
 	        dataType: "text",
 	        type: "post",
 	        async: false,
@@ -727,7 +750,7 @@ $(document).ready(function () {
 		map.spin(true)
 		$.ajax ({
 	        url: "process.php",
-	        data: {type: "gapanalysis", continent: s.continent, country: s.country, adm: s.adm, name: s.name, custom: s.custom, rasters: s.rasters, files: s.files},
+	        data: {call: "gapanalysis", continent: s.continent, country: s.country, adm: s.adm, name: s.name, custom: s.custom, rasters: s.rasters, files: s.files},
 	        dataType: "text",
 	        type: "post",
 	        async: false,
@@ -1014,7 +1037,7 @@ $(document).ready(function () {
 	        scrollTop: $("#analysis").offset().top
 	    }, 1000);
 
-	    console.log(map._layers)
+	    // console.log(map._layers)
 	})
 
 
@@ -1247,7 +1270,7 @@ $(document).ready(function () {
 			return 
 		}
 
-		process({type:"exists", name:h}, function (result) {
+		process({call:"exists", name:h}, function (result) {
 			if (result == true) {
 				console.log(h);
 				addPolyData("data/"+h+".geojson");

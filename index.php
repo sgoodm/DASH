@@ -146,7 +146,14 @@
     <div id="analysis">
         <div id="analysis_title"><div>Results Analysis</div></div>
         <div id="analysis_results"></div>
+<!-- 
+        <input type="button" id="save_img" value="saveImage"/>
+        <canvas id="canvas" style="display:none;"></canvas> 
+-->
+
     </div> 
+
+
 
     <!-- <div id="navbar_spacer"></div> -->
     <?php include("/var/www/html/aiddata/home/nav.php"); ?>  
@@ -158,6 +165,10 @@
     <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.2/mapbox.js'></script>
     <script src="http://code.highcharts.com/highcharts.js"></script>
     <script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+    <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script>
+    <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/StackBlur.js"></script>
+    <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script>
 
     <script src="/aiddata/libs/MarkerCluster/leaflet.markercluster-src.js"></script>
     <script src="/aiddata/libs/leaflet.spin.js"></script>

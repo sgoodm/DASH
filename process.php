@@ -1,6 +1,6 @@
 <?php
 
-switch ($_POST['type']) {
+switch ($_POST['call']) {
 
 	case 'exists':
 		$name = $_POST['name'];
@@ -129,6 +129,20 @@ switch ($_POST['type']) {
 			exec("/usr/bin/Rscript /var/www/html/aiddata/DASH/gapanalysis.R $vars"); 
 		}
 		echo $name;
+		break;
+
+	case 'saveimg':
+
+		$filename = '/var/www/html/aiddata/DASH/test.png';
+
+		$img = $_POST['img'];
+		$img = str_replace('data:image/png;base64,', '', $img);
+		$img = str_replace(' ', '+', $img);
+		$data = base64_decode($img);
+		$success = file_put_contents($filename, $data);
+		$out = 'done';
+
+		echo json_encode($out);
 		break;
 }
 
