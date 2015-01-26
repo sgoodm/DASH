@@ -4,34 +4,35 @@
 
 $(document).ready(function () {
 
-	var state = "init";
+	// track state of user
+	var state = 'init';
 
 	//	pending and submission data objects
 	var s, p = {
-		method:"",
-		country:"",
-		continent:"",
-		adm:"",
-		adm_alt:"",
+		method:'',
+		country:'',
+		continent:'',
+		adm:'',
+		adm_alt:'',
 		rasters:[],
 		weights_obj:{},
 		weights:[],
 		files_obj:{},
 		files:[],
-		name:"",
-		hash:"",
-		custom:"FALSE"
+		name:'',
+		hash:''
 	};
 
-	//dynamic point info data
+	// dynamic point info data
 	var d = {
 		type:"",
 		start_year:2005,
 		end_year:2010
 	};
 
-	// stores info on current options loaded in ui (raster file paths, selected options, valid selections)
-	var temp = {
+	// stores info on options loaded in ui (raster file paths, selected options, valid selections)
+	// current is updated once options are used to generate 
+	var current, temp = {
 		rasters: {},
 		weights: {},
 		gapanalysis: {},
@@ -43,14 +44,14 @@ $(document).ready(function () {
 
 	// select element class names for each method
 	var selectors = {
-		weights:"ro",
-		gapanalysis:"ga"
+		weights:'ro',
+		gapanalysis:'ga'
 	};
 
 	var continent_list = {
-		"Nepal":"Asia",
-		"Uganda":"Africa",
-		"Malawi":"Africa"
+		'Nepal':'Asia',
+		'Uganda':'Africa',
+		'Malawi':'Africa'
 	};
 
 	// messages
@@ -102,7 +103,7 @@ $(document).ready(function () {
 
 	// change country
 	$('#country').on('change', function () {
-		state = "init"
+		state = 'init'
 
 		var $blank = $('#blank_country_option');
 		if ($blank.length) { 
@@ -119,6 +120,36 @@ $(document).ready(function () {
 		addCountry();
 
 		// build point layer if a point layer was being viewed for previous country
+		// if (d.type != "") {
+		// 	addPointData();
+		// }
+
+		buildRasterList();
+
+	})
+
+	// change adm
+	$('#adm').on('change', function () {
+		state = 'init'
+
+		// clean up any existing weight / gap analysis layer
+		cleanMap('all')
+		addCountry();
+
+		var $blank = $('#blank_adm_option');
+		if ($blank.length) { 
+			$blank.remove();
+			$('#method').show(); 
+			message(m.start, 'static');
+		}
+
+		p.adm = $(this).val();
+
+		// alternate method for identifying the adm of data in the DET tool
+		// needed to access old DET data that has not been recreated using new adm naming system
+		p.adm_alt = '__'+p.adm.substr(3) +'_';
+
+		// build point layer if a point layer was being viewed at previous adm
 		if (d.type != "") {
 			addPointData();
 		}
@@ -127,33 +158,12 @@ $(document).ready(function () {
 
 	})
 
-	// change adm
-	$('#adm').on('change', function () {
-		state = "init"
-
-		var $blank = $('#blank_adm_option');
-		if ($blank.length) { 
-			$blank.remove();
-			$('#method').show(); 
-			message(m.start, "static");
-		}
-
-		p.adm = $(this).val();
-
-		// alternate method for identifying the adm of data in the DET tool
-		// needed to access old DET data that has not been recreated using new adm naming system
-		p.adm_alt = "__"+p.adm.substr(3) +"_";
-
-		buildRasterList();
-
-	})
-
 	$('#start_submit').click(function () {
-		console.log("themed default");
+		console.log('themed default');
 	})
 
 	$('#start_advanced').click(function () {
-		state = "advanced";
+		state = 'advanced';
 		message(m[state]+m.weights)
 		$('#method_weights').click();
 	})
@@ -161,8 +171,8 @@ $(document).ready(function () {
 	// change methods
 	$('#method li').click(function () {
 
-		console.log(state)
-		if ( state == "default") {
+		// console.log(state)
+		if ( state == 'default') {
 			return;
 		}
 		
@@ -193,6 +203,8 @@ $(document).ready(function () {
 		      left: -225
 		    });
 		}
+
+		validateOptions();
 
 	})
 
@@ -282,7 +294,6 @@ $(document).ready(function () {
 
 		$('#map_chart_toggle').hide();
 		prepWeights();
-
 	})
 
 	$('#gapanalysis_submit').click(function () {
@@ -316,10 +327,10 @@ $(document).ready(function () {
 			p.name += "_" + p.rasters[i];
 		}
 
-		p.custom = "TRUE"
-
 		// copy pending data object to submission data object
 		s = (JSON.parse(JSON.stringify(p)));
+		// update list of options used to generate current gap analysis
+		current = (JSON.parse(JSON.stringify(temp)));
 
 		$('#analysis_results').empty()
 		$('#map_chart_toggle').show();
@@ -329,6 +340,7 @@ $(document).ready(function () {
 	function buildRasterList() {
 		if (p.continent != "" && p.country != "" && p.adm != "") {
 
+			// go to start menu
 			$('#method_start').click();
 			
 			// clear all selectors used by a method
@@ -336,6 +348,7 @@ $(document).ready(function () {
 				$(this).empty()
 			})
 
+			// hide all submit buttons
 			$('.map_options_submit').hide();
 
 			// clean all objects
@@ -396,10 +409,6 @@ $(document).ready(function () {
 	        })
 
 		})
-
-        // $('.method_select').find(".optgroup_"+type).each(function () {
-        // 	$(this).append('<option class="'+option+'" value="' + option + '">' + filterOptionName(option,"__",1,0) + '</option>');
-        // })
 	}
 
 	// option = string, m = search char, n = nth occurence, p = offset from end of string
@@ -448,6 +457,7 @@ $(document).ready(function () {
 		}
 
 		if ( c == 1 || c == 3 ){
+			temp.rasters = {};
 			temp.weights = {};
 			temp.gapanalysis = {};
 			temp.valid = {
@@ -788,7 +798,7 @@ $(document).ready(function () {
 		map.spin(true)
 		$.ajax ({
 	        url: "process.php",
-	        data: {call: "gapanalysis", continent: s.continent, country: s.country, adm: s.adm, name: s.name, custom: s.custom, rasters: s.rasters, files: s.files},
+	        data: {call: "gapanalysis", continent: s.continent, country: s.country, adm: s.adm, name: s.name, rasters: s.rasters, files: s.files},
 	        dataType: "text",
 	        type: "post",
 	        async: false,
@@ -801,14 +811,12 @@ $(document).ready(function () {
 	}
 
 	function addPolyData(file) {
+		console.log("file:"+file)
 
 		featureList = {};
 
 		cleanMap("poly");
    		cleanMap("chart");
-
-		console.log(temp)
-		console.log(s)
 
 		var error
 		readJSON(file, function (request, status, e) {
@@ -821,8 +829,13 @@ $(document).ready(function () {
 			return 1;
 		}
 
+		console.log(temp)
+		console.log(s)
+		console.log(geojsonPolyData)
+
 		if (s.method == "weights") {
    	       	// add weighted layer to gapanalysis data option (ga2)
+   	       	console.log(s.hash)
 	        temp.rasters["custom_weighted_layer"] = s.hash + ".csv";
 	        temp.gapanalysis.ga2 = "custom_weighted_layer";
 	        // temp.valid.gapanalysis = true;
@@ -892,7 +905,6 @@ $(document).ready(function () {
 		}
 
 		function clickFeature(e) {
-			// console.log(e)
 
 			// zoom to feature
 	    	// map.fitBounds(e.target.getBounds());
@@ -903,6 +915,49 @@ $(document).ready(function () {
 	    	}
 
 	    	$('#map_chart').show();
+	    	var map_chart_data = {
+	    		raw: [],
+	    		sum: 0,
+	    		min: 0,
+	    		categories:['', ''],
+	    		series:[]
+	    	};
+
+	    	map_chart_data.series.push({
+	    		name: s.rasters[0],
+	    		data: [ roundxy(parseFloat(e.target.feature.properties[s.rasters[0]+"_percent"])) ],
+	    		stack: 0
+	    	})
+
+	    	for ( var i = 0, ix = _.size(current.weights); i < ix; i++ ) {
+	    		var val = parseFloat( e.target.feature.properties[_.values(current.weights)[i]+"_weighted"] )
+	    		console.log(val, isNaN(val))
+	    		map_chart_data.raw.push(val);
+	    	}
+	    	
+	    	map_chart_data.min = ss.min(map_chart_data.raw);
+
+	    	if ( map_chart_data.min < 0 ) {
+		    	for ( var i = 0, ix = map_chart_data.raw.length; i < ix; i++ ) {
+		    		map_chart_data.raw[i] = map_chart_data.raw[i] + map_chart_data.min;
+		    	}
+		    }
+
+	    	map_chart_data.sum = ss.sum(map_chart_data.raw);
+
+	    	for ( var i = 0, ix = map_chart_data.raw.length; i < ix; i++ ) {
+	    		var val = roundxy( parseFloat(e.target.feature.properties[s.rasters[1]+"_percent"]) * map_chart_data.raw[i] / map_chart_data.sum )
+	    		map_chart_data.series.push({
+	    			name: _.values(current.weights)[i],
+	    			data: [ val ],
+	    			stack: 1
+	    		})
+	    	}
+
+	    	console.log(map_chart_data)
+			// console.log(e)
+	    	// console.log(s)
+	    	// console.log(current)
 
 	    	var map_chart_options = {
 		        chart: {
@@ -915,33 +970,34 @@ $(document).ready(function () {
 		            text: ''
 		        },
 		        xAxis: {
-		            categories: ['']
+		            categories: map_chart_data.categories
 		        },
 		        yAxis: [{ 
 		            title: {
 		                text: 'Standarized Values (0-1)',
-		                style: {
-		                    color: Highcharts.getOptions().colors[1]
-		                }
-		            },
-		            labels: {
-		                format: '{value}',
-		                style: {
-		                    color: Highcharts.getOptions().colors[1]
-		                }
-		            },
+		                // style: {
+		                //     color: Highcharts.getOptions().colors[1]
+		                // }
+		            }//,
+		            // labels: {
+		            //     format: '{value}',
+		            //     style: {
+		            //         color: Highcharts.getOptions().colors[1]
+		            //     }
+		            // },
 		        }],
 		        tooltip: {
-		        	enabled:false,
-		        	positioner: function () {
-		                return { x: 0, y: -10 };
-		            },
-		            shadow: false,
-		            borderWidth: 0,
-		            shared: true
+		        	enabled:true//,
+		        	// positioner: function () {
+		         //        return { x: 0, y: -10 };
+		         //    },
+		         //    shadow: false,
+		         //    borderWidth: 0,
+		         //    shared: true
 		        },
 		         plotOptions: {
-		            series: {
+		         	bar: {
+		            	stacking: 'normal',
 		                dataLabels: {
 		                    enabled: true,
 		                    align:'right',
@@ -950,6 +1006,7 @@ $(document).ready(function () {
 		            }
 		        },
 		        legend: {
+		        	enabled:false,
 		            layout: 'horizontal',
 		            align: 'left',
 		            x: 75,
@@ -961,20 +1018,11 @@ $(document).ready(function () {
 		        credits:{
 		        	enabled:false
 		        },
-		        series: [{
-		            name: 'Aid',
-		            // color:'blue',
-		            data: [ roundxy(parseFloat(e.target.feature.properties[s.rasters[0]+"_percent"])) ]
-
-		        }, {
-		            name: 'Data',
-		            // color: 'black',
-		            data: [ roundxy(parseFloat(e.target.feature.properties[s.rasters[1]+"_percent"])) ]
-
-		        }]
+		        series: map_chart_data.series
 	    	 };
 
 	    	$('#map_chart').highcharts(map_chart_options);
+	    	console.log(map_chart_options)
 
 		}
 

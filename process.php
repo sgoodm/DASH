@@ -108,17 +108,16 @@ switch ($_POST['call']) {
 		$rasters = $_POST["rasters"];
 		$files = $_POST["files"];
 		$count = count($rasters);
-		$custom = $_POST["custom"];
 
 		// generate unique name
 		$raw = $country ."_". $adm; 
-		for ($i=0; $i<$count; $i++){
-			$raw .= "_" . $rasters[$i];
-		}
+		$raw .= "_" . $rasters[0];
+		$raw .= "_" . $files[1];
+		
 		$name = $country ."_". $adm ."_". md5($raw);
-
+		file_put_contents('/var/www/html/aiddata/text.txt', $raw);
 		// build variable string for Rscript
-		$vars = strtolower($continent) ." ". strtolower($country) ." ". $adm ." ". $name ." ". $count ." ". $custom;
+		$vars = strtolower($continent) ." ". strtolower($country) ." ". $adm ." ". $name ." ". $count;
 
 		for ($i=0; $i<$count; $i++){
 			$vars .= " " . $rasters[$i] ." ". $files[$i];

@@ -8,14 +8,13 @@ in_country <- readIn[2]
 in_adm <- readIn[3]
 in_name <- readIn[4]
 in_count <- as.numeric(readIn[5])
-in_custom <- readIn[6]
 
 in_rasters <- array()
 in_files <- array()
 
 for (i in 1:in_count){
-	in_rasters[i] <- readIn[6+2*(i-1)+1]
-	in_files[i] <- readIn[6+2*(i-1)+2]
+	in_rasters[i] <- readIn[5+2*(i-1)+1]
+	in_files[i] <- readIn[5+2*(i-1)+2]
 }
 
 base <- paste("/var/www/html/aiddata/DET/resources",in_continent,in_country,sep="/")
@@ -38,6 +37,17 @@ secondary_file <- in_files[2]
 secondary_csv <- read.csv(secondary_file)
 secondary_key <- tail(names(secondary_csv), 1)
 secondary_data <- secondary_csv[,secondary_key]
+
+
+# loop to find "_weighted" in seconadry_data csv 
+# log values in new geojson to build stacked bar charts
+for ( j in 1:length(names(secondary_csv)) ) {
+	name <- names(secondary_csv)[j]
+	name_end <- substr(name,nchar(name) - nchar("_weighted") + 1 , nchar(name))
+	if ( name_end == "_weighted"  ) {
+		 geojson@data[name] <- secondary_csv[,name]
+	}
+}
 
 
 # calculations
