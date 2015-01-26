@@ -421,6 +421,21 @@ i, i:hover, i:active, i:focus, i:visited{
         /*top:50%;*/
         /*margin-top: -100px;*/
     }
+        .highcharts-container { 
+            overflow: visible !important; 
+        }
+        #map_chart_tooltip {
+            background: rgba(255,255,255,1);
+            border: 1px solid rgba(66,139,202,1);
+            padding: 10px;
+            position: relative;
+            top:200px;
+            z-index: 9999;
+        }
+        #map_chart_tooltip {
+            padding:0;
+            margin:0;
+        }
         #map_chart {    
             display:none;
             width:300px;

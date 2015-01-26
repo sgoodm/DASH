@@ -934,7 +934,7 @@ $(document).ready(function () {
 	    		console.log(val, isNaN(val))
 	    		map_chart_data.raw.push(val);
 	    	}
-	    	
+
 	    	map_chart_data.min = ss.min(map_chart_data.raw);
 
 	    	if ( map_chart_data.min < 0 ) {
@@ -987,22 +987,37 @@ $(document).ready(function () {
 		            // },
 		        }],
 		        tooltip: {
-		        	enabled:true//,
-		        	// positioner: function () {
-		         //        return { x: 0, y: -10 };
-		         //    },
-		         //    shadow: false,
-		         //    borderWidth: 0,
-		         //    shared: true
+		        	enabled:true,
+		        	useHTML:true,
+		        	shared:true,
+		            formatter: function () {
+		                var s = '<div id="map_chart_tooltip">';
+		                s += '<b>' + this.x + '</b>';
+		                s += '<ul>';
+		                $.each(this.points, function () {
+		                    s += '<br/><li style="color:'+ this.series.color +'"><span style="color:black">' + this.series.name + ': ' + this.y + '</span></li>';
+		                });
+		                s += '</ul>'
+		                s += '</div>'
+
+		                return s;
+		            },
+		        	positioner: function () {
+		                return { x: 0, y: 0 };
+		            },
+		            shadow: false,
+		            borderWidth: 0,
+		            backgroundColor: 'rgba(0,0,0,0)',
+		            hideDelay:0
 		        },
 		         plotOptions: {
 		         	bar: {
-		            	stacking: 'normal',
-		                dataLabels: {
-		                    enabled: true,
-		                    align:'right',
-		                    color:'white'
-		                }
+		            	stacking: 'normal'//,
+		                // dataLabels: {
+		                //     enabled: true,
+		                //     align:'right',
+		                //     color:'white'
+		                // }
 		            }
 		        },
 		        legend: {
