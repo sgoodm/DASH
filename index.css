@@ -7,7 +7,8 @@ body{
     background:  rgb(88,108,128);
     color: white;
 }
-a, a:hover, a:active, a:focus, a:visited{
+a, a:hover, a:active, a:focus, a:visited,
+i, i:hover, i:active, i:focus, i:visited{
     outline: 0;
     outline: none;
     outline-style: none;
@@ -68,21 +69,102 @@ a, a:hover, a:active, a:focus, a:visited{
                 #method li {
                     padding: 0 5px
                 }
+                .nav-tabs > li > a,
+                .nav-tabs > li > a:hover,
+                .nav-tabs > li > a:active,
+                .nav-tabs > li > a:focus {
+                    color: rgba(66,139,202,1);
+                    background-color: transparent;
+                    border-top:0;
+                    border-right:0;
+                    border-left:0;
+                }
                 .nav-tabs > li.active > a,
                 .nav-tabs > li.active > a:hover,
                 .nav-tabs > li.active > a:focus {
-                  color: white;
-                  cursor: default;
-                  background-color: rgba(66,139,202,1);
-                  border: 1px solid #dddddd;
-                  border-bottom-color: transparent;
+                    color: white;
+                    cursor: default;
+                    background-color: rgba(66,139,202,1);
+                    border: 1px solid #dddddd;
+                    border-bottom-color: transparent;
                 }
-
+                .nav_inactive {
+                    color: rgb(200,200,200);
+                }
             .method {
                 display: none;
                 width:90%;
                 margin:10px 5%;
             }
+                #start {
+                    text-align: center;
+                }
+                    #start_message {
+                        padding: 10px;
+                        text-align:center;
+                    }
+                    #start_option {
+
+                    }
+                    #start_submit {
+                        /*width: 90%;*/
+                        margin-top: 25px;
+                        text-align: center;
+                    }
+                    #start_submit button{
+                        width: 100px;
+                        height: 50px;
+                    }
+                    #start_advanced {
+                        width:50px;
+                        height: 50px;
+                        position: absolute;
+                        bottom:10px;
+                        right:10px;
+                        /*background: black;*/
+                    }
+
+                        .btn {
+                            background: rgba(200,200,200,1);
+                            padding: 0;
+                            margin: 0;
+                            border: 0;
+                            color: black;
+                            -webkit-border-radius: 6px;
+                                -moz-border-radius: 6px;
+                                    border-radius: 6px;
+                            -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 1px 5px rgba(0,0,0,.25);
+                                -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 1px 5px rgba(0,0,0,.25);
+                                    box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 1px 5px rgba(0,0,0,.25);
+                            -webkit-transition: none;
+                                -moz-transition: none;
+                                    transition: none;
+                        }
+                        .btn:hover {
+                            /*background: rgba(255,255,255,0.25);*/
+                            color:rgb(66,139,202);
+                            -webkit-box-shadow: inset 0 2px 4px rgba(0,0,0,.1), 0 1px 0 rgba(255,255,255,.1);
+                                -moz-box-shadow: inset 0 2px 4px rgba(0,0,0,.1), 0 1px 0 rgba(255,255,255,.1);
+                                    box-shadow: inset 0 2px 4px rgba(0,0,0,.1), 0 1px 0 rgba(255,255,255,.1);
+                        }
+                        .btn:active {
+                            -webkit-box-shadow: inset 0 2px 4px rgba(0,0,0,0.75), 0 1px 0 rgba(255,255,255,0.75);
+                                -moz-box-shadow: inset 0 2px 4px rgba(0,0,0,0.75), 0 1px 0 rgba(255,255,255,0.75);
+                                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.75), 0 1px 0 rgba(255,255,255,0.75);
+                        }
+
+                        #start_advanced a {
+                            width: 50px;
+                            height: 50px;
+                            text-align: center;
+                            vertical-align: middle;
+                        }
+                            #start_advanced a span {
+                                font-size:36px;
+                                position: relative;
+                                top:7px;
+                            }
+
                 #weights{
 
                 }
@@ -100,7 +182,10 @@ a, a:hover, a:active, a:focus, a:visited{
                             float: right;
                             margin-top: 1%;
                         }
-
+                        #weights_submit button {
+                            width: 100px;
+                            height: 30px;
+                        }
                 #gapanalysis {
 
                 }
@@ -134,6 +219,10 @@ a, a:hover, a:active, a:focus, a:visited{
                             /*margin-top: 100px;*/
                             color: black;
                         }
+                    #gapanalysis_submit button {
+                        width: 200px;
+                        height: 30px;
+                    }
 
                 #pointdata {
                 /*#data_options{*/
@@ -225,10 +314,6 @@ a, a:hover, a:active, a:focus, a:visited{
                 text-align: center;
                 display: none;
             }
-                .map_options_submit button {
-                    width:100px;
-                    height: 30px;
-                }
 
             #map_options_message {
                 padding: 10px;
@@ -236,10 +321,11 @@ a, a:hover, a:active, a:focus, a:visited{
             }
 
         #map_options_popover {
+            /*display: none;*/
             width:225px;
             height:100px;
             position:absolute;
-            left:-5px;
+            left:0px;
             bottom:125px;
             background: rgba(200,200,200,1);
             border: 1px solid black;
@@ -254,9 +340,9 @@ a, a:hover, a:active, a:focus, a:visited{
             overflow-y:auto; 
         }
         #map_options_toggle {
+            display: block;
             height: 25px;
             width: 100%;
-            display: block;
             position: absolute;
             bottom:-25;
             background: rgba(210,210,210,1);
@@ -346,9 +432,10 @@ a, a:hover, a:active, a:focus, a:visited{
             padding-top: 5px;    
         }
         #map_chart_toggle {
+            display: none;
             height: 100%;
             width: 25px;
-            display: block;
+            /*display: block;*/
             position: absolute;
             top:0;
             right:-25px;

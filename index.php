@@ -51,10 +51,28 @@
                 <div class="divider"></div>
 
                 <ul id="method" class="nav nav-tabs nav-justified">
-                    <li id="method_weights"><a tabindex="0">Weights</a></li>
-                    <li id="method_gapanalysis"><a tabindex="0">Gap Analysis</a></li>
-                    <li id="method_pointdata"><a tabindex="0">Point Data</a></li>
+                    <li id="method_start"><a tabindex="0">Select Method</a></li>
+                    <li id="method_weights"><a tabindex="0">Build Layer</a></li>
+                    <li id="method_gapanalysis"><a tabindex="0">Select Aid Data</a></li>
+                    <li id="method_pointdata"><a tabindex="0"> Add Point Data</a></li>
                 </ul> 
+
+                <div id="start" class="method">
+                    <div id="start_message"></div>
+                    
+                    <select id="start_option">
+                        <option>water security</option>
+                        <option>famine analysis</option>
+                    </select>
+
+                    <div id="start_submit"><button>Go</button></div>
+
+
+                    <div id="start_advanced">
+                        <a tabindex="0" class="btn"><span class="glyphicon glyphicon-cog"></span></a>
+                    </div> 
+
+                </div>
 
                 <div id="weights" class="method">
                     <div id="raster_option_1">
@@ -93,10 +111,12 @@
                     </div>
                     <div id="gapanalysis_option_2">
                         <span>Data Layer</span>
-                        <select id="ga2" class="ga method_select" ></select>
+                        <!-- <select id="ga2" class="ga method_select" ></select> -->
+                        <div id="ga2">Custom Data Layer</div>
+                        <a>Edit Your Custom Layer</a>
                     </div> 
                     <div id="report_container"><button id="report">Download Report</button></div>
-                    <div id="gapanalysis_submit" class="map_options_submit"><button>Build</button></div>
+                    <div id="gapanalysis_submit" class="map_options_submit"><button>Run Gap Analysis</button></div>
 
                 </div>  
 
@@ -127,6 +147,7 @@
                 </div>
 
                 <div id="map_options_message"></div>
+
 
             </div>
 

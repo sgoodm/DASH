@@ -4,6 +4,8 @@
 
 $(document).ready(function () {
 
+	var state = "init";
+
 	//	pending and submission data objects
 	var s, p = {
 		method:"",
@@ -53,12 +55,14 @@ $(document).ready(function () {
 
 	// messages
 	var m = {
-		init:"<p>Welcome to AidData - - DASH - -</p><p>To start, please select the country and the administrative level you would like to explore.</p><p>(You can change these later.)</p>",
-		method:"<p>Choose a method for visualizing data.</p>",
-		weights:"<p>Select rasters from the drop down menus and assign weights.</p>",
-		gapanalysis:"<p>Create a gap analysis using 2 data layers.</p>",
-		pointdata:"<p>Overlay project point data on the map.</p>",
-		toggle:"<p>You can toggle this tab by clicking anywhere on the tab.</p>"
+		init:'<p>Welcome to AidData - - DASH - -</p><p>To start, please select the country and the administrative level you would like to explore.</p><p>(You can change these later.)</p>',
+		start:'<p>Select a predefined analysis to view or click on the advanced options icon to create a custom analysis.</p>',
+		themed:'<p>You can now view / edit the options used for this themed raster by selecting the "Build Layer" or "Select Aid Data" tabs. You can also add point data to the map using the "Add Point Data" tab.</p>',
+		advanced:'<p>Advanced mode enabled.</p>',
+		weights:'<p>Select rasters from the drop down menus and assign weights.</p>',
+		gapanalysis:'<p>Create a gap analysis using 2 data layers.</p>',
+		pointdata:'<p>Overlay project point data on the map.</p>',
+		toggle:'<p>You can toggle this tab by clicking anywhere on the tab.</p>'
 	};
 
 	// init ui
@@ -98,7 +102,8 @@ $(document).ready(function () {
 
 	// change country
 	$('#country').on('change', function () {
-		
+		state = "init"
+
 		var $blank = $('#blank_country_option');
 		if ($blank.length) { 
 			$blank.remove() ;
@@ -124,12 +129,13 @@ $(document).ready(function () {
 
 	// change adm
 	$('#adm').on('change', function () {
+		state = "init"
 
 		var $blank = $('#blank_adm_option');
 		if ($blank.length) { 
 			$blank.remove();
 			$('#method').show(); 
-			message(m.method, "static");
+			message(m.start, "static");
 		}
 
 		p.adm = $(this).val();
@@ -142,8 +148,26 @@ $(document).ready(function () {
 
 	})
 
+	$('#start_submit').click(function () {
+		console.log("themed default");
+	})
+
+	$('#start_advanced').click(function () {
+		state = "advanced";
+		message(m[state]+m.weights)
+		$('#method_weights').click();
+	})
+
 	// change methods
 	$('#method li').click(function () {
+
+		console.log(state)
+		if ( state == "default") {
+			return;
+		}
+		
+		state = ( state == "init" ? "default" : state );
+
 		$('#method li').removeClass("active");
 		$(this).addClass("active");
 		var method = $(this).attr("id").split("_")[1];
@@ -152,12 +176,24 @@ $(document).ready(function () {
 		$('#'+method).show();
 
 		message("", "static");
-		message(m[method]+m.toggle);
-		if ( $('#map_options_popover').data('collapsed') == true ) {
-			$('#map_options_popover').click();
+		if (state == "advanced") {
+			message(m[state] + m.weights);
+		} else { 
+			message(m[method], method);
 		}
 
-		// buildRasterList()
+		state = (state == "default" ? "default" : method);
+
+		if ( p.method == "start" ) {
+			$('#map_options_popover').animate({
+		      left: 0
+		    });
+		} else {
+			$('#map_options_popover').animate({
+		      left: -225
+		    });
+		}
+
 	})
 
 	// selectors for weights and gapanalysis methods
@@ -183,7 +219,6 @@ $(document).ready(function () {
 
 		validateOptions();
 
-
 		// disable select options if they are already selected somewhere else 
 		$('.'+selectors[p.method]).each(function () {
 			var sub_item = $(this).val();
@@ -204,8 +239,11 @@ $(document).ready(function () {
 		validateOptions();
 	})
 
-	$('.map_options_submit button').click(function () {
+	$('#gapanalysis_option_2 a').click( function () {
+		$('#method_weights').click();
+	})
 
+	$('#weights_submit').click(function () {
 
 		validateOptions();
 
@@ -222,59 +260,76 @@ $(document).ready(function () {
 			if ( option != "-----") {
 				p.rasters.push(option);
 				p.files_obj[option] = temp.rasters[option];
-				if (p.method == "weights") {
-					var weight = $(this).next().val();
-					p.weights_obj[option] = weight;
-				}
+				var weight = $(this).next().val();
+				p.weights_obj[option] = weight;
 			}
 		})
 
-
 		// sort rasters list to preserve naming system
 		// prevents identical calls creating different files due to naming system
-		if (p.method == "weights"){
-			p.rasters.sort();
+		p.rasters.sort();
+				
+		// generate unique id
+		p.name = p.country +"_"+ p.adm;
+		for (var i=0, ix=p.rasters.length; i<ix; i++) {
+			p.files[i] = p.files_obj[p.rasters[i]];
+			p.weights[i] = p.weights_obj[p.rasters[i]];
+			p.name += "_" + p.rasters[i] +"_"+ p.weights[i];
 		}
 
-		p.custom = ( $('#ga2').val().indexOf("weighted") > -1 ? "TRUE" : "FALSE" );
-		
+		// copy pending data object to submission data object
+		s = (JSON.parse(JSON.stringify(p)));
+
+		$('#map_chart_toggle').hide();
+		prepWeights();
+
+	})
+
+	$('#gapanalysis_submit').click(function () {
+
+		validateOptions();
+
+		if ( temp.valid[p.method] == false ) {
+			console.log("invalid options selected");
+			return;
+		}
+
+		cleanOptions(2);
+
+		// compile option data for submission
+		var option = $('#ga1').val();
+		if ( option == "-----") {
+			console.log("Bad #ga1 val.");
+			return;
+		}
+
+		p.rasters.push(option);
+		p.files_obj[option] = temp.rasters[option];
+
+		p.rasters.push("custom_weighted_layer")
+		p.files_obj["custom_weighted_layer"] = temp.rasters["custom_weighted_layer"];
 
 		// generate unique id
 		p.name = p.country +"_"+ p.adm;
 		for (var i=0, ix=p.rasters.length; i<ix; i++) {
 			p.files[i] = p.files_obj[p.rasters[i]];
-			if ( p.method == "weights" ) {
-				p.weights[i] = p.weights_obj[p.rasters[i]];
-				p.name += "_" + p.rasters[i] +"_"+ p.weights[i];
-			} else {
-				p.name += "_" + p.rasters[i];
-			}
+			p.name += "_" + p.rasters[i];
 		}
+
+		p.custom = "TRUE"
 
 		// copy pending data object to submission data object
 		s = (JSON.parse(JSON.stringify(p)));
-		
-		// console.log(s);
-		// console.log(temp);
 
-		if ( p.method == "weights" ) {
-			// build weighted geojson
-			prepWeights();
-
-		} else if ( p.method == "gapanalysis" ) {
-			$('#analysis_results').empty()
-			prepGapAnalysis();
-
-		}
-
-		// $('#analysis_title').click();
-
-
+		$('#analysis_results').empty()
+		$('#map_chart_toggle').show();
+		prepGapAnalysis();
 	})
-
 
 	function buildRasterList() {
 		if (p.continent != "" && p.country != "" && p.adm != "") {
+
+			$('#method_start').click();
 			
 			// clear all selectors used by a method
 			$('.method_select').each(function () {
@@ -367,11 +422,17 @@ $(document).ready(function () {
 	}
 
 	// update tooltip with message
- 	function message(html, option) {
- 		if ( option && option == "static") {
+ 	function message(html, option, tab) {
+ 		tab = ( tab ? tab : true );
+ 		if ( option && option == "start") {
+ 			$('#start_message').html(html);
+ 		} else if ( option && option == "static") {
  			$('#map_options_message').html(html);
+
  		}
- 		$('#map_options_popover').html(html);
+ 		if ( tab ) {
+ 			$('#map_options_popover').html(html + m.toggle);
+ 		}
  	}
 
  	// different methods for cleaning up
@@ -746,7 +807,9 @@ $(document).ready(function () {
 		cleanMap("poly");
    		cleanMap("chart");
 
-		
+		console.log(temp)
+		console.log(s)
+
 		var error
 		readJSON(file, function (request, status, e) {
 			geojsonPolyData = request;
@@ -760,20 +823,10 @@ $(document).ready(function () {
 
 		if (s.method == "weights") {
    	       	// add weighted layer to gapanalysis data option (ga2)
-    		if ( !$('#ga2').find(".optgroup_custom").length ) {
-    			$('#ga2 option[value="-----"]').after('<optgroup class="optgroup_custom" label="custom"></optgroup>');
-    		}
-
-	        $('#ga2').find(".optgroup_custom").each(function () {
-	        	$(this).empty();
-	        	$(this).append('<option class="weighted" value="weighted_'+s.hash+'">' + 'custom weighted layer' + '</option>');
-	        })
-
-	        temp.rasters["weighted_"+s.hash] = s.hash + ".csv";
-
-	        delete temp.gapanalysis.ga2;
-	        temp.valid.gapanalysis = false;
-	        $('#gapanalysis_submit').hide();
+	        temp.rasters["custom_weighted_layer"] = s.hash + ".csv";
+	        temp.gapanalysis.ga2 = "custom_weighted_layer";
+	        // temp.valid.gapanalysis = true;
+	        // $('#gapanalysis_submit').show();
 		}
 
 	    var grades = {

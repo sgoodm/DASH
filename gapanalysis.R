@@ -31,13 +31,9 @@ primary_key <- tail(names(primary_csv), 1)
 primary_data <- primary_csv[,primary_key]
 
 # get secondary file
-if ( in_custom == "TRUE" ) {
-	setwd("/var/www/html/aiddata/data/weights_csv")
-	secondary_file <- in_files[2]
-} else {
-	secondary_file <- paste("cache",in_files[2], sep="/")
-}
 
+setwd("/var/www/html/aiddata/data/weights_csv")
+secondary_file <- in_files[2]
 
 secondary_csv <- read.csv(secondary_file)
 secondary_key <- tail(names(secondary_csv), 1)
