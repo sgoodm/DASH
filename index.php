@@ -202,6 +202,7 @@
     <script src="/aiddata/libs/dragslider.js"></script>
     <script src="/aiddata/libs/underscoremin.js"></script>
     <script src="/aiddata/libs/simple_statistics.js"></script>
+    <script src="/aiddata/libs/URI.js"></script>
 
     <script src="index.js"></script>
 

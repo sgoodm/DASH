@@ -74,7 +74,8 @@ $(document).ready(function () {
 		weights:'<p>Select rasters from the drop down menus and assign weights.</p>',
 		gapanalysis:'<p>Create a gap analysis using 2 data layers.</p>',
 		pointdata:'<p>Overlay project point data on the map.</p>',
-		toggle:'<p>You can toggle this tab by clicking anywhere on the tab.</p>'
+		toggle:'<p>You can toggle this tab by clicking anywhere on the tab.</p>',
+		map_chart:'<p id="map_chart_message">Click a feature on the map to generate a chart with data on that area.</p>'
 	};
 
 	// init ui on load
@@ -564,6 +565,9 @@ $(document).ready(function () {
     	$('#gapanalysis_csv').attr('href', '#');
     	$('#report').attr('href', '#');
 
+    	cleanMap('chart');
+    	$('#map_chart_toggle').hide();
+
  	}
 
  	function validateOptions() {
@@ -800,7 +804,7 @@ $(document).ready(function () {
 		}
 
 		if (method == "chart" || method == "all") {
-    		$('#map_chart').empty();
+    	   	$('#map_chart').html(m.map_chart);
     		$('#map_chart').hide();
 		}
 	}
@@ -954,7 +958,7 @@ $(document).ready(function () {
        			$('#gapanalysis_csv').show();
 
 	        	// generate link
-	        	// 
+	        	buildHash();
 
 	        	addPolyData();
        	       	map.spin(false);
@@ -1726,6 +1730,10 @@ $(document).ready(function () {
         		callback(request, status, error);
     		}
 	    });
+	}
+
+	function buildHash() {
+		console.log('building hash link');
 	}
 
 	function readHash() {

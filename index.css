@@ -500,6 +500,11 @@ i, i:hover, i:active, i:focus, i:visited,
             border-right: 0;    
             padding-top: 5px;    
         }
+            #map_chart_message {
+                padding:25px;
+                text-align: center;
+                color:black;
+            }
         #map_chart_toggle {
             display: none;
             height: 100%;
