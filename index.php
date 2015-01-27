@@ -100,23 +100,29 @@
                         <input class="wo" type="number" min="-10" max="10" step="1" value="1" disabled>
                     </div>
 
-                    <div id="weights_submit" class="map_options_submit"><button>Build</button></div>
+                    <div id="weights_submit" class="map_options_valid"><button>Build</button></div>
+                    
+                    <div id="weights_csv" class="map_options_valid">
+                        <a href='#' class="btn"><span class="glyphicon glyphicon-save"></span></a>
+                    </div> 
 
                 </div>
 
                 <div id="gapanalysis"  class="method">
                     <div id="gapanalysis_option_1">
-                        <span>Aid Layer</span>
+                        <span>Aid Layer:</span>
                         <select id="ga1" class="ga method_select" ></select>
                     </div>
                     <div id="gapanalysis_option_2">
-                        <span>Data Layer</span>
-                        <!-- <select id="ga2" class="ga method_select" ></select> -->
-                        <div id="ga2">Custom Data Layer</div>
-                        <a>Edit Your Custom Layer</a>
-                    </div> 
-                    <div id="report_container"><button id="report">Download Report</button></div>
-                    <div id="gapanalysis_submit" class="map_options_submit"><button>Run Gap Analysis</button></div>
+                        <span>Data Layer: <a>Build a Custom Layer</a></span>
+                        
+                    </div>
+                    <div id="gapanalysis_buttons" class="map_options_valid"> 
+                        <a href='#' class="btn" id="report"><span>Generate</br>Report</span></a>
+                        <a href='#' class="btn" id="gapanalysis_csv"><span>Download</br>CSV</span></a>
+                        <a tabindex="0" class="btn" id="gapanalysis_reset"><span>Reload</br>Last</span></a>
+                    </div>
+                    <div id="gapanalysis_submit" class="map_options_valid"><button>Run Gap Analysis</button></div>
 
                 </div>  
 
@@ -156,7 +162,7 @@
 
         </div>
 
-        <div id="map"></div> 
+        <div id="map" data-collapsed="false" ></div> 
         <div id="map_chart_container">
             <div id="map_chart"></div>  
             <div id="map_chart_toggle"><span class="ui-icon ui-icon-carat-2-e-w"></span></div>
@@ -165,6 +171,9 @@
     </div>
 
     <div id="analysis">
+        <div id="map_size">
+            <a tabindex="0" id="map_size_toggle" class="btn" title="Toggle map size"><span class="glyphicon glyphicon-sort"></span></a>
+        </div>         
         <div id="analysis_title"><div>Results Analysis</div></div>
         <div id="analysis_results"></div>
     </div> 
