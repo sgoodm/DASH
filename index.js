@@ -1732,29 +1732,88 @@ $(document).ready(function () {
 	    });
 	}
 
+
+	// --------------------------------------------------
+	// link functions
+
+
+	// function readHash() {
+	// 	var h;
+	// 	h = window.location.hash.substring(1);
+	// 	if ( h == "" ) { 
+	// 		return 
+	// 	}
+
+	// 	process({call:"exists", name:h}, function (result) {
+	// 		if (result == true) {
+	// 			console.log(h);
+	// 			addPolyData("data/"+h+".geojson");
+	// 		} else {
+	// 			console.log("bad hash");
+	// 		}
+
+	// 	});
+
+	// }
+
+	// readHash();
+
+
+	var hash_change = 1;
+
+
 	function buildHash() {
 		console.log('building hash link');
+
+		hash_change = 0;
+
+		// build hash data object
+        var url_search = {
+                            country: s.countryy,
+                            adm: s.adm,
+                            weights: active.weights, 
+                            weight_vals: active.weight_vals, 
+                            weight_keys: _.keys(active.weights),
+                            gapanalysis: active.gapanalysis.ga1,
+                            active_gapanalysis: active.files.gapanalysis,
+                            active_weights: active.files.weights,
+                          };
+
+        var url_new = URI(document.URL).addSearch(url_search);
+
+        window.location.hash = url_new.query();
+      
 	}
 
-	function readHash() {
-		var h;
-		h = window.location.hash.substring(1);
-		if ( h == "" ) { 
-			return 
-		}
+  	function readHash () {
 
-		process({call:"exists", name:h}, function (result) {
-			if (result == true) {
-				console.log(h);
-				addPolyData("data/"+h+".geojson");
-			} else {
-				console.log("bad hash");
-			}
+	    var url = document.URL.replace("#", "?"),
+	        url_query = URI(url).query(true),
+	        h;
 
-		});
+	    // validate link data and then load
+	    if (url_query.country && url_query.adm ) {
+	      	
+			console.log('in.');	   
+	    }
 
-	}
 
-	readHash();
+
+  	};
+
+  	// check hashtag (called on page load or on hashtag change)
+  	function checkHash() {
+	    // check for hash_change variable to avoid reloads when hash change was generate by page
+	    if (window.location.hash !== '' && hash_change == 1) {
+      		setTimeout(readHash, 200);
+    	}
+   		hash_change = 1;
+  	};
 	
+    // check hashtag on page load or on change
+    checkHash();
+    $(window).on('hashchange', function () {
+    	checkHash
+    });
+
 })
