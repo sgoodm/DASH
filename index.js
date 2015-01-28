@@ -446,12 +446,14 @@ $(document).ready(function () {
 				console.log(error);
 				return 1;
 			} else {
-				console.log(themes)
+				// console.log(themes)
 				var html = '';
-				var list = themes.available[p.country][p.adm];
-				console.log(list)
-				var keys = _.keys(list);
-				if (keys.length > 0) {
+				
+				if (themes.available[p.country] && _.keys(themes.available[p.country][p.adm]).length > 0) {
+					
+					var list = themes.available[p.country][p.adm];
+					var keys = _.keys(list);
+					
 					html += '<option value="-----">Select an Option</option>';
 
 					for ( var i = 0, ix = keys.length; i < ix; i++ ) {
@@ -597,9 +599,12 @@ $(document).ready(function () {
  	}
 
  	function cleanInterface() {
+		
+		$('#start_option').empty();
+
 		// go to start menu
 		$('#method_start').click();
-		
+
 		// clear all selectors used by a method
 		$('.method_select').each(function () {
 			$(this).empty();
@@ -1802,7 +1807,7 @@ $(document).ready(function () {
 	var hash_change = 1;
 
 	function buildHash() {
-		console.log('building hash link');
+		console.log('buildHash');
 
 		hash_change = 0;
 
@@ -1839,7 +1844,7 @@ $(document).ready(function () {
 	    var url = document.URL.replace("#", "?"),
 	        url_query = URI(url).query(true);
 
-		console.log('in.');
+		console.log('readHash');
 		console.log(url_query);
 
 	    if ( url_query.country && $('#country option[value="' + url_query.country + '"]').length) {
@@ -1896,7 +1901,6 @@ $(document).ready(function () {
   	function checkHash(type) {
 	    // check for hash_change variable to avoid reloads when hash change was generate by page
 	    if (window.location.hash !== '' && hash_change == 1) {
-      		console.log('in')
       		setTimeout(readHash, 200);
     	} else if (window.location.hash == '' && type == 'init') {
     		$('#map_options_content').slideDown(500);

@@ -115,7 +115,7 @@ switch ($_POST['call']) {
 		$raw .= "_" . $files[1];
 		
 		$name = $country ."_". $adm ."_". md5($raw);
-		file_put_contents('/var/www/html/aiddata/text.txt', $raw);
+
 		// build variable string for Rscript
 		$vars = strtolower($continent) ." ". strtolower($country) ." ". $adm ." ". $name ." ". $count;
 
