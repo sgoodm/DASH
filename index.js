@@ -8,8 +8,8 @@ $(document).ready(function () {
 	var state = 'init';
 	var map_state = 100;
 
-	// load data from defaults.json
-	var themes;
+	// load data from defaults.json, stored selected theme
+	var themes, theme_state;
 
 	// pending and submission data objects (used to generate data for server requests)
 	var s, p = {
@@ -184,6 +184,7 @@ $(document).ready(function () {
 		console.log('themed default');
 		// will load a pre-generated link using the same hash processing function that loads normal links created by DASH
 		var item = $('#start_option').val();
+		theme_state = item;
 		var theme = (themes.available[p.country][p.adm][item])
 		var hash = theme.link.substr(theme.link.indexOf('#')+1)
 		window.location.hash = '';
@@ -1824,7 +1825,9 @@ $(document).ready(function () {
                             active_gapanalysis: active.files.gapanalysis,
                             active_weights: active.files.weights,
                           };
-
+        if ( theme_state != '-----' && theme_state != undefined ) {
+        	url_search.theme = theme_state;
+        }
         var url_new = URI(document.URL).addSearch(url_search);
 
         window.location.hash = url_new.query();
@@ -1848,6 +1851,11 @@ $(document).ready(function () {
 	    	$('#adm').val(url_query.adm);
 	    	$('#adm').change();
 	    } 
+
+	    if ( theme_state ) {
+	    	$('#start_option').val(url_query.theme);
+	    	$('#start_option').change();
+	    }
 
 	    if ( url_query.weights && url_query.active_weights ) {
 	    	

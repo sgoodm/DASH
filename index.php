@@ -60,10 +60,7 @@
                 <div id="start" class="method">
                     <div id="start_message"></div>
                     
-                    <select id="start_option">
-                        <option>water security</option>
-                        <option>famine analysis</option>
-                    </select>
+                    <select id="start_option"></select>
 
                     <div id="start_submit"><button>Go</button></div>
 
