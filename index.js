@@ -8,6 +8,9 @@ $(document).ready(function () {
 	var state = 'init';
 	var map_state = 100;
 
+	// load data from defaults.json
+	var themes;
+
 	// pending and submission data objects (used to generate data for server requests)
 	var s, p = {
 		method:'',
@@ -83,7 +86,7 @@ $(document).ready(function () {
 	$('#adm').val('-----');
 	$('#adm').prop('disabled', true);
 	message(m.init, "static");
-	$('#map_options_content').slideDown(500);
+	// $('#map_options_content').slideDown(500);
 
 
 	// --------------------------------------------------
@@ -170,9 +173,21 @@ $(document).ready(function () {
 
 	});
 
-	$('#start_submit').click(function () {
+	$('#start_option').on('change', function () {
+		var val = ( $(this).val() != '-----' );
+		console.log(val)
+		showState('#start_submit', val);
+
+	})
+
+	$('#start_submit button').click(function () {
 		console.log('themed default');
 		// will load a pre-generated link using the same hash processing function that loads normal links created by DASH
+		var item = $('#start_option').val();
+		var theme = (themes.available[p.country][p.adm][item])
+		var hash = theme.link.substr(theme.link.indexOf('#')+1)
+		window.location.hash = '';
+		window.location.hash =  hash;
 	});
 
 	$('#start_advanced').click(function () {
@@ -281,7 +296,7 @@ $(document).ready(function () {
 
 		validateOptions();
 
-		if ( current.valid[p.method] == false ) {
+		if ( current.valid.weights == false ) {
 			console.log("invalid options selected");
 			return;
 		}
@@ -368,7 +383,7 @@ $(document).ready(function () {
 
 		validateOptions();
 
-		if ( current.valid[p.method] == false ) {
+		if ( current.valid.gapanalysis == false ) {
 			console.log("invalid options selected");
 			return;
 		}
@@ -419,7 +434,40 @@ $(document).ready(function () {
 			// clean all objects
 			cleanOptions(1);
 
-			// build
+			// build themed default options
+			var error;
+			readJSON('defaults.json', function (request, status, e) {
+				themes = request;
+				error = e;
+			})
+
+			if (error) {
+				console.log(error);
+				return 1;
+			} else {
+				console.log(themes)
+				var html = '';
+				var list = themes.available[p.country][p.adm];
+				console.log(list)
+				var keys = _.keys(list);
+				if (keys.length > 0) {
+					html += '<option value="-----">Select an Option</option>';
+
+					for ( var i = 0, ix = keys.length; i < ix; i++ ) {
+						var key = keys[i];
+						html += '<option value="'+key+'">'+key+'</option>'
+					}
+
+				} else {
+					html += '<option value="-----">No Options Available</option>';
+
+				}
+				$('#start_option').html(html);
+
+			}
+
+
+			// build weights and gapanalysis options
 			process({ call: "scan", path: "/"+p.continent.toLowerCase().toLowerCase()+"/"+p.country.toLowerCase()+"/cache" }, function (options) {
 					var op_count = 0;
 				    for (var op in options) {
@@ -581,13 +629,17 @@ $(document).ready(function () {
 			}
 		})
 
+		showState('#weights_submit', current.valid.weights);
+
 		current.valid.gapanalysis = ( _.size(current.gapanalysis) == 2 );
 
-		if ( $('#'+p.method+'_submit').length && current.valid[p.method] == true ) {
-			$('#'+p.method+'_submit').show();
-		} else {
-			$('#'+p.method+'_submit').hide();
-		}
+		showState('#gapanalysis_submit', current.valid.gapanalysis);
+
+		// if ( $('#'+p.method+'_submit').length && current.valid[p.method] == true ) {
+		// 	$('#'+p.method+'_submit').show();
+		// } else {
+		// 	$('#'+p.method+'_submit').hide();
+		// }
 
  	}
 
@@ -967,6 +1019,7 @@ $(document).ready(function () {
 	    });
 	}
 
+	// depends on s.method, s.adm, s.rasters, active.weights, geojsonPolyData
 	function addPolyData() {
 
 		featureList = {};
@@ -1085,8 +1138,8 @@ $(document).ready(function () {
 	    		stack: 0
 	    	});
 
-	    	for ( var i = 0, ix = _.size(current.weights); i < ix; i++ ) {
-	    		var val = parseFloat( layer.feature.properties[_.values(current.weights)[i]+"_weighted"] );
+	    	for ( var i = 0, ix = _.size(active.weights); i < ix; i++ ) {
+	    		var val = parseFloat( layer.feature.properties[_.values(active.weights)[i]+"_weighted"] );
 	    		// console.log(val, isNaN(val))
 	    		map_chart_data.raw.push(val);
 	    	}
@@ -1105,7 +1158,7 @@ $(document).ready(function () {
 	    	for ( var i = 0, ix = map_chart_data.count; i < ix; i++ ) {
 	    		var val = roundxy( parseFloat(layer.feature.properties[s.rasters[1]+"_percent"]) * map_chart_data.raw[i] / map_chart_data.sum );
 	    		map_chart_data.series.push({
-	    			name: _.values(current.weights)[i],
+	    			name: _.values(active.weights)[i],
 	    			data: [ val ],
 	    			stack: 1
 	    		});
@@ -1114,7 +1167,7 @@ $(document).ready(function () {
 	    	// console.log(map_chart_data);
 			// console.log(e)
 	    	// console.log(s)
-	    	// console.log(current)
+	    	// console.log(active)
 
 	    	var map_chart_options = {
 		        chart: {
@@ -1403,6 +1456,7 @@ $(document).ready(function () {
 			// console.log( docViewTop, docViewBottom, analysisTop, analysisBottom)
 	});
 
+	// depends on s.adm, s.rasters and active.weights
 	function runAnalysis() {
 		$('#analysis').show();
 		$('#analysis_tab').show();
@@ -1414,7 +1468,7 @@ $(document).ready(function () {
 			keys: _.keys(geojsonPolyData.features),
 			props: {},
 			featureCount: _.size(geojsonPolyData.features),
-			weightCount: _.size(current.weights),
+			weightCount: _.size(active.weights),
 			results: {},
 			// primary: [],
 			// secondary: [],
@@ -1443,7 +1497,7 @@ $(document).ready(function () {
 		// init data items of series
 		for ( var j = 0, jx = data.weightCount; j < jx; j++ ) {
 			data.series.push ({
-				name: _.values(current.weights)[j],
+				name: _.values(active.weights)[j],
 				data: [],
 				stack: 1
 			});
@@ -1464,7 +1518,7 @@ $(document).ready(function () {
 				// normalize data per feature
 				data.temp = [];
 				for ( var j = 0, jx = data.weightCount; j < jx; j++ ) {
-					data.temp.push(  roundxy( parseFloat(item[_.values(current.weights)[j]+"_weighted"]) ) );
+					data.temp.push(  roundxy( parseFloat(item[_.values(active.weights)[j]+"_weighted"]) ) );
 				}
 				data.temp = normalize(data.temp,  roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
 				for ( var j = 0, jx = data.weightCount; j < jx; j++ ) {
@@ -1484,7 +1538,7 @@ $(document).ready(function () {
 					// normalize data per feature
 					data.temp = [];
 					for ( var j = 0, jx = data.weightCount; j < jx; j++ ) {
-						data.temp.push(  roundxy( parseFloat(item[_.values(current.weights)[j]+"_weighted"]) ) );
+						data.temp.push(  roundxy( parseFloat(item[_.values(active.weights)[j]+"_weighted"]) ) );
 					}
 					data.temp = normalize(data.temp,  roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
 					for ( var j = 0, jx = data.weightCount; j < jx; j++ ) {
@@ -1502,7 +1556,7 @@ $(document).ready(function () {
 					// normalize data per feature
 					data.temp = [];
 					for ( var j = 0, jx = data.weightCount; j < jx; j++ ) {
-						data.temp.push(  roundxy( parseFloat(item[_.values(current.weights)[j]+"_weighted"]) ) );
+						data.temp.push(  roundxy( parseFloat(item[_.values(active.weights)[j]+"_weighted"]) ) );
 					}
 					data.temp = normalize(data.temp,  roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
 					for ( var j = 0, jx = data.weightCount; j < jx; j++ ) {
@@ -1695,6 +1749,13 @@ $(document).ready(function () {
 	// --------------------------------------------------
 	// general functions
 
+	function showState(el, state) {
+		if (state == true) {
+			$(el).show();
+		} else {
+			$(el).hide();
+		}
+	}
 
 	function roundxy(x,y) {
 		y = ( y == undefined ? 3 : y );
@@ -1737,43 +1798,28 @@ $(document).ready(function () {
 	// link functions
 
 
-	// function readHash() {
-	// 	var h;
-	// 	h = window.location.hash.substring(1);
-	// 	if ( h == "" ) { 
-	// 		return 
-	// 	}
-
-	// 	process({call:"exists", name:h}, function (result) {
-	// 		if (result == true) {
-	// 			console.log(h);
-	// 			addPolyData("data/"+h+".geojson");
-	// 		} else {
-	// 			console.log("bad hash");
-	// 		}
-
-	// 	});
-
-	// }
-
-	// readHash();
-
-
 	var hash_change = 1;
-
 
 	function buildHash() {
 		console.log('building hash link');
 
 		hash_change = 0;
 
+		var link_weight = [];
+
+		$('.ro').each(function () {
+			var id = $(this).attr('id');
+			if (active.weights[id]) {
+				var weight_item = id + '--' + active.weights[id] + '--' + active.weight_vals[id];
+				link_weight.push(weight_item);
+			}
+		});
+
 		// build hash data object
         var url_search = {
-                            country: s.countryy,
+                            country: s.country,
                             adm: s.adm,
-                            weights: active.weights, 
-                            weight_vals: active.weight_vals, 
-                            weight_keys: _.keys(active.weights),
+                            weights: link_weight, 
                             gapanalysis: active.gapanalysis.ga1,
                             active_gapanalysis: active.files.gapanalysis,
                             active_weights: active.files.weights,
@@ -1786,34 +1832,75 @@ $(document).ready(function () {
 	}
 
   	function readHash () {
-
+  		$('#map_options_content').hide();
 	    var url = document.URL.replace("#", "?"),
-	        url_query = URI(url).query(true),
-	        h;
+	        url_query = URI(url).query(true);
 
-	    // validate link data and then load
-	    if (url_query.country && url_query.adm ) {
-	      	
-			console.log('in.');	   
+		console.log('in.');
+		console.log(url_query);
+
+	    if ( url_query.country && $('#country option[value="' + url_query.country + '"]').length) {
+	    	$('#country').val(url_query.country);
+	    	$('#country').change();
+	    } 
+
+	    if ( url_query.adm && $('#adm option[value="' + url_query.adm + '"]').length) {
+	    	$('#adm').val(url_query.adm);
+	    	$('#adm').change();
+	    } 
+
+	    if ( url_query.weights && url_query.active_weights ) {
+	    	
+	    	if ( !_.isArray(url_query.weights) ) {
+	    		url_query.weights = [url_query.weights];
+	    	}
+	  
+	    	for ( var i = 0, ix = url_query.weights.length; i < ix; i++ ) {
+	    		var weight_parts = url_query.weights[i].split('--');
+	    		$('#'+weight_parts[0]).val(weight_parts[1]);
+	    		$('#'+weight_parts[0]).change();
+	    		$('#'+weight_parts[0]).next().val(weight_parts[2]);
+	    		$('#'+weight_parts[0]).next().change();
+	    	}
+
+
 	    }
 
+		if ( url_query.gapanalysis && url_query.active_gapanalysis ) {
+    		$('#ga1').val(url_query.gapanalysis);
+    		$('#ga1').change();   
+	    }
 
+	    state = 'link';
+
+	    validateOptions();
+
+	    $('#method_weights').click();
+	    $('#weights_submit').click();
+
+	    $('#method_gapanalysis').click();
+	    $('#gapanalysis_submit').click();
+  		$('#map_options_toggle').click();
 
   	};
 
   	// check hashtag (called on page load or on hashtag change)
-  	function checkHash() {
+  	function checkHash(type) {
 	    // check for hash_change variable to avoid reloads when hash change was generate by page
 	    if (window.location.hash !== '' && hash_change == 1) {
+      		console.log('in')
       		setTimeout(readHash, 200);
+    	} else if (window.location.hash == '' && type == 'init') {
+    		$('#map_options_content').slideDown(500);
+
     	}
    		hash_change = 1;
   	};
 	
     // check hashtag on page load or on change
-    checkHash();
+    checkHash('init');
     $(window).on('hashchange', function () {
-    	checkHash
+    	checkHash();
     });
 
 })
