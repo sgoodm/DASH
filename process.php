@@ -130,7 +130,7 @@ switch ($_POST['call']) {
 		break;
 
 	case 'saveimg':
-		$base = '/var/www/html/aiddata/DASH/reports/';
+		$base = '/var/www/html/aiddata/DASH/images/gapanalysis/';
 		$name = time();
 		if (!is_dir($base.$name)){
 			$old_mask = umask(0);
@@ -142,12 +142,29 @@ switch ($_POST['call']) {
 			$img = str_replace('data:image/png;base64,', '', $img);
 			$img = str_replace(' ', '+', $img);
 			$data = base64_decode($img);
+
 			$success = file_put_contents($filename, $data);			
 
 			$out = $name;
 		} else {
 			$out = 'exists';
 		}
+
+		echo json_encode($out);
+		break;
+
+	case 'savemap':
+
+		$base = '/var/www/html/aiddata/DASH/images/map/';
+		$file = $base . uniqid() . '.png';
+
+		$img = $_POST['img'];
+		$img = str_replace('data:image/png;base64,', '', $img);
+		$img = str_replace(' ', '+', $img);
+		$data = base64_decode($img);
+
+		$success = file_put_contents($file, $data);
+		$out = $success ? $file : 'Unable to save the file.';
 
 		echo json_encode($out);
 		break;

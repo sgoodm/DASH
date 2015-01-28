@@ -419,7 +419,7 @@ $(document).ready(function () {
 		var height = 200 + ( 20 * ( _.size(temp.weights) + 1 ) );
 		$('#map_chart_container').css('height', height )
 		var new_height = height / 2 - 4;
-		console.log(height, new_height);
+		// console.log(height, new_height);
 		$('#map_chart_toggle span').css('top', new_height );
 
 		$('#map_chart_toggle').show();
@@ -448,7 +448,7 @@ $(document).ready(function () {
 			} else {
 				// console.log(themes)
 				var html = '';
-				
+
 				if (themes.available[p.country] && _.keys(themes.available[p.country][p.adm]).length > 0) {
 					
 					var list = themes.available[p.country][p.adm];
@@ -617,7 +617,7 @@ $(document).ready(function () {
 
     	$('#weights_csv a').attr('href', "#");
     	$('#gapanalysis_csv').attr('href', '#');
-    	$('#report').attr('href', '#');
+    	// $('#report').attr('href', '#');
 
     	cleanMap('chart');
     	$('#map_chart_toggle').hide();
@@ -728,11 +728,13 @@ $(document).ready(function () {
 
 
 	// init
+	var map, tiles, map_display, map_button, allCountryBounds, mapinfo;
+	
 	L.mapbox.accessToken = 'pk.eyJ1Ijoic2dvb2RtIiwiYSI6InotZ3EzZFkifQ.s306QpxfiAngAwxzRi2gWg';
 
-	var map = L.mapbox.map('map', {});
+	map = L.mapbox.map('map', {});
 
-	var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+	tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 				attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap contributors</a>'
 			}).addTo(map);
 
@@ -741,15 +743,49 @@ $(document).ready(function () {
 	map.options.maxZoom = 11;
 	map.options.minZoom = 2;
 
+ //    map_display = {
+ //    		map_button:true,
+ //    		map_options: '',
+ //    		map_chart_container: '',
+ //    		analysis_tab: ''
+ //    	}
+    	
+	// map_button = L.easyButton('fa-exchange', 
+ //  		function (){
+ //  			for ( var i=1, ix=_.keys(map_display).length; i<ix; i++) {
+ //  				var key = _.keys(map_display)[i]; 
+ //  				console.log(key)
+ //  				if ( map_display.map_button == true ) {
+ //  					if ( $('#'+key).length > 0 ) {
+	//   					map_display[key] = 'on';
+	//   					showState('#'+key,false)
+	//   				} else {
+	//   					map_display[key] = 'off'
+	//   				}
+  					
+ //  				} else {
+ //  					if ( map_display[key] == 'on' ) {
+ //  						showState('#'+key,true)
+ //  					}
+ //  				}
+ //  			}
+  			
+ //        	map_display.map_button = !map_display.map_button;
+ //      	},
+ //      	'Toggle map UI display',
+ //      	map
+ //    )
+
 	// bounds objects
-	var allCountryBounds = { global:{_northEast:{lat:90, lng:180}, _southWest:{lat:-90, lng:-180}} };
+	allCountryBounds = { global:{_northEast:{lat:90, lng:180}, _southWest:{lat:-90, lng:-180}} };
+
+	mapinfo = {};
 
 	// addCountry vars: countryLayer
 	// addPointData vars: markers, geojsonPoints
 	// addPolyData vars: geojsonPolyData, geojson, info, legend, featureList
 	var countryLayer, markers, geojsonPoints, geojsonPolyData, geojson, info, legend, featureList, lastClicked; 
 
-	var mapinfo = {};
 	
 	mapinfo.pointdata =  function(feature, layer) {
 		var a = feature.properties;
@@ -1020,7 +1056,8 @@ $(document).ready(function () {
 
 	        	addPolyData();
        	       	map.spin(false);
-        	    runAnalysis();
+        	    runAnalysis();	
+
 	        }
 	    });
 	}
@@ -1703,6 +1740,24 @@ $(document).ready(function () {
 
     $("#report").click(function(){
         saveChart('gapanalysis_chart', 'gapanalysis_chart_name');
+
+		setTimeout(function() {
+
+			html2canvas($('#map'),{
+                onrendered: function (canvas) {                     
+                            var imgString = canvas.toDataURL("image/png");
+                            window.open(imgString);   
+                }               
+            });
+			// $('#map').html2canvas({
+				// flashcanvas: "/aiddata/libs/canvas/flashcanvas.min.js",
+				// proxy: 'proxy.php',
+				// logging: false,
+				// profile: false,
+				// useCORS: false
+			// });
+		},1000)
+
     });
 
     // save a highchart to png
@@ -1916,3 +1971,14 @@ $(document).ready(function () {
     });
 
 })
+
+function manipulateCanvasFunction(savedMap) {
+    dataURL = savedMap.toDataURL("image/png");
+    dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+    $.post("process.php", { call: 'savemap', img: dataURL }, function(data) {
+        console.log('Image Saved to : ' + data);
+    });
+
+}
+
+

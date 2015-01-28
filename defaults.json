@@ -12,7 +12,7 @@
                 "Agricultural Security": {
                     "title": "Agricultural Security",
                     "description": "Utilizes data from riverthreat.net to generate a agricultural security index for Nepal. The data is then compared to all available aid designated for agriculture related sectors.",
-                    "link": "http://labs.aiddata.org/aiddata/DASH/#country=Nepal&adm=ADM1&weights=ro1--agriculture__cropland__2014--10&weights=ro2--natural_disasters__impervious_surfaces__2014--8&weights=ro3--agriculture__livestock_density__2014--4&weights=ro4--natural_disasters__wetland_disconnectivity__2014--2&gapanalysis=aid__water_aid_all__2014&active_gapanalysis=Nepal_ADM1_2aa1d7a3353e39da5302d2bff23c702f&active_weights=Nepal_ADM1_e8f77069d27bfb73fe57ecf7539e86b2&theme=Water+Security"
+                    "link": "http://labs.aiddata.org/aiddata/DASH/#country=Nepal&adm=ADM1&weights=ro2--agriculture__actual_potential_yield_gap__2000--1&weights=ro3--agriculture__agricultural_water_stress__2000--1&gapanalysis=aid__agricultural_aid_all__2014&active_gapanalysis=Nepal_ADM1_bd6ab5dd0963c07b27bce0dba25cb34a&active_weights=Nepal_ADM1_93c88e77515daa0c21ba92e558aac30d&theme=Agricultural+Security"
                 },
                 "Education": {
                     "title": "Education",
@@ -29,7 +29,7 @@
                 "Agricultural Security": {
                     "title": "Agricultural Security",
                     "description": "Utilizes data from riverthreat.net to generate a agricultural security index for Nepal. The data is then compared to all available aid designated for agriculture related sectors.",
-                    "link": "http://labs.aiddata.org/aiddata/DASH/#country=Nepal&adm=ADM2&weights=ro1--agriculture__cropland__2014--10&weights=ro2--natural_disasters__impervious_surfaces__2014--8&weights=ro3--agriculture__livestock_density__2014--4&weights=ro4--natural_disasters__wetland_disconnectivity__2014--2&gapanalysis=aid__water_aid_all__2014&active_gapanalysis=Nepal_ADM2_c6b1521144f0ff5aa2d950a6182d2360&active_weights=Nepal_ADM2_a5aa74b11a3a91eac7ffe59817f139de&theme=Water+Security"
+                    "link": "http://labs.aiddata.org/aiddata/DASH/#country=Nepal&adm=ADM2&weights=ro2--agriculture__actual_potential_yield_gap__2000--1&weights=ro3--agriculture__agricultural_water_stress__2000--1&gapanalysis=aid__agricultural_aid_all__2014&active_gapanalysis=Nepal_ADM2_b4df6d8de83c160f3549c1d2433a4cf8&active_weights=Nepal_ADM2_42e3f41864b3e166400dd4b6f3b7a834&theme=Agricultural+Security"
                 },
                 "Education": {
                     "title": "Education",

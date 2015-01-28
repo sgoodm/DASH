@@ -416,6 +416,9 @@ i, i:hover, i:active, i:focus, i:visited,
             z-index: 10;
             pointer-events: none;
         }
+        .leaflet-bar-part{
+            text-align: center;
+        }
         .legend {
             width: 100px;
             line-height: 20px;

@@ -32,8 +32,8 @@
                         <select id="country" >
                             <option id="blank_country_option" value="-----">Country</option>
                             <option value="Nepal">Nepal</option>
-                            <option value="Uganda">Uganda</option>
-                            <option value="Malawi">Malawi</option>  
+                            <!-- <option value="Uganda">Uganda</option> -->
+                            <!-- <option value="Malawi">Malawi</option>   -->
                         </select>
                     </div>       
 
@@ -115,7 +115,7 @@
                         
                     </div>
                     <div id="gapanalysis_buttons" class="map_options_valid"> 
-                        <a href='#' class="btn" id="report"><span>Generate</br>Report</span></a>
+                        <a tabindex="0" class="btn" id="report"><span>Generate</br>Report</span></a>
                         <a href='#' class="btn" id="gapanalysis_csv"><span>Download</br>CSV</span></a>
                         <a tabindex="0" class="btn" id="gapanalysis_reset"><span>Reload</br>Last</span></a>
                     </div>
@@ -194,12 +194,17 @@
     <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script>
 
     <script src="/aiddata/libs/MarkerCluster/leaflet.markercluster-src.js"></script>
+    <script src="/aiddata/libs/dragslider.js"></script>
     <script src="/aiddata/libs/leaflet.spin.js"></script>
     <script src="/aiddata/libs/spin.min.js"></script>    
-    <script src="/aiddata/libs/dragslider.js"></script>
     <script src="/aiddata/libs/underscoremin.js"></script>
     <script src="/aiddata/libs/simple_statistics.js"></script>
     <script src="/aiddata/libs/URI.js"></script>
+    <script src="/aiddata/libs/leaflet.easy-button.js"></script>
+
+    <script src="/aiddata/libs/canvas/html2canvas.min.js"></script>
+    <script src="/aiddata/libs/canvas/jquery.plugin.html2canvas.js"></script>
+    
 
     <script src="index.js"></script>
 
