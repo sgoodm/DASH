@@ -115,7 +115,7 @@
                         
                     </div>
                     <div id="gapanalysis_buttons" class="map_options_valid"> 
-                        <a tabindex="0" class="btn" id="report"><span>Generate</br>Report</span></a>
+                        <a tabindex="0" class="btn" id="report"><span>Export</br>Results</span></a>
                         <a href='#' class="btn" id="gapanalysis_csv"><span>Download</br>CSV</span></a>
                         <a tabindex="0" class="btn" id="gapanalysis_reset"><span>Reload</br>Last</span></a>
                     </div>
@@ -168,10 +168,13 @@
     </div>
 
     <div id="analysis">
+        <div id="analysis_title"><div>Results Analysis</div></div>
+
         <div id="map_size">
             <a tabindex="0" id="map_size_toggle" class="btn" title="Toggle map size"><span class="glyphicon glyphicon-sort"></span></a>
         </div>         
-        <div id="analysis_title"><div>Results Analysis</div></div>
+        
+        <!-- <div id="analysis_map"></div> -->
         <div id="analysis_results"></div>
     </div> 
 
@@ -181,6 +184,7 @@
     <!-- <div id="navbar_spacer"></div> -->
     <?php include("/var/www/html/aiddata/home/nav.php"); ?>  
 
+    <!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>

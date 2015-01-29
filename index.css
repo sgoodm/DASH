@@ -50,10 +50,18 @@ i, i:hover, i:active, i:focus, i:visited,
     margin: 1px 2.5%;
 }
 
+/*
+ *
+ * MAP SECTION 
+ *
+ */
+
 #map_container {
     height: 100%; 
     width: 100%;
 }
+    /* MAP OPTIONS */
+
     #map_options {
         width:400px;
         border-top: 0;
@@ -121,6 +129,7 @@ i, i:hover, i:active, i:focus, i:visited,
                 .nav_inactive {
                     color: rgb(200,200,200);
                 }
+
             .method {
                 display: none;
                 width:90%;
@@ -146,6 +155,7 @@ i, i:hover, i:active, i:focus, i:visited,
                             width: 100px;
                             height: 50px;
                         }
+
                     #start_advanced {
                         width:50px;
                         height: 50px;
@@ -194,6 +204,7 @@ i, i:hover, i:active, i:focus, i:visited,
                                 width: 100px;
                                 height: 30px;
                             }
+
                         #weights_csv {
                             display: none;
                             position: absolute;
@@ -216,9 +227,9 @@ i, i:hover, i:active, i:focus, i:visited,
                                     position: relative;
                                     top: 5px;
                                 }
-                #gapanalysis {
 
-                }
+                #gapanalysis {}
+
                     #gapanalysis div {
                         margin: 1% 0;
                     }   
@@ -232,6 +243,7 @@ i, i:hover, i:active, i:focus, i:visited,
                             margin-left: 20px;
                             cursor: pointer;
                         }
+
                     #gapanalysis_option_2 {
                         padding-top:10px;
                     }
@@ -258,15 +270,7 @@ i, i:hover, i:active, i:focus, i:visited,
                             #gapanalysis_buttons span {
                                 margin-top: 5px;
                             }
-                   /*     #report {
-                            width: 200px;
-                            height: 30px;
-                            position: absolute;
-                            left: 50%;
-                            bottom: 0px;
-                            margin-left:-100px;
-                            color: black;
-                        }*/
+
                     #gapanalysis_submit {
                         width:90%;
                         position: absolute;
@@ -357,7 +361,10 @@ i, i:hover, i:active, i:focus, i:visited,
                             margin: auto;
                         }
                         #slider{}
-                        #slider_bot span{ width:33%; position:relative; top: 10px; }
+                        #slider_bot span { 
+                            width:33%; 
+                            position:relative; 
+                            top: 10px; }
                         #slider_min { right: 30%; }
                         #slider_max { left: 30%;}
                         #slider_value {}
@@ -406,6 +413,8 @@ i, i:hover, i:active, i:focus, i:visited,
                 left: 192px;
             }
 
+    /* MAP ACTUAL*/
+
     #map{ 
         height: 100%; 
         width: 100%;
@@ -423,6 +432,10 @@ i, i:hover, i:active, i:focus, i:visited,
             width: 100px;
             line-height: 20px;
             color: #555;
+        }
+        #legend_title {
+            margin-bottom: 5px;
+            font-weight: bold;
         }
         .legend i {
             width: 20px;
@@ -468,6 +481,8 @@ i, i:hover, i:active, i:focus, i:visited,
                 border-collapse: collapse;
             }
 
+    /* MAP CHART */
+
     #map_chart_container {
         height: 200px;
         position: absolute;
@@ -479,6 +494,7 @@ i, i:hover, i:active, i:focus, i:visited,
         .highcharts-container { 
             overflow: visible !important; 
         }
+
         #map_chart_tooltip {
             background: rgba(255,255,255,1);
             border: 1px solid rgba(66,139,202,1);
@@ -487,6 +503,7 @@ i, i:hover, i:active, i:focus, i:visited,
             top:200px;
             z-index: 9999;
         }
+
         #map_chart_tooltip {
             padding:0;
             margin:0;
@@ -494,6 +511,7 @@ i, i:hover, i:active, i:focus, i:visited,
             #map_chart_tooltip ul li {
                 padding: 0;
             }
+
         #map_chart {    
             display:none;
             width:350px;
@@ -509,6 +527,7 @@ i, i:hover, i:active, i:focus, i:visited,
                 text-align: center;
                 color:black;
             }
+
         #map_chart_toggle {
             display: none;
             height: 100%;
@@ -531,6 +550,8 @@ i, i:hover, i:active, i:focus, i:visited,
                 top: 96px;
             }
 
+    /* ANALYSIS TAB */
+
     #analysis_tab {
         display: none;
         height:40px;
@@ -552,6 +573,12 @@ i, i:hover, i:active, i:focus, i:visited,
             text-align: center;
         }
 
+/*
+ *
+ * ANALYSIS SECTION 
+ *
+ */
+
 #analysis {
     display: none;
     width:100%;
@@ -560,27 +587,7 @@ i, i:hover, i:active, i:focus, i:visited,
     /*top: -5px;*/
     /*background: rgba(122,122,122,1);*/
 }
-    #map_size {
-        float: right;
-        position: relative;
-        width: 50px;
-        height: 50px;
-        background: transparent;
-    }
-        #map_size a {
-            position: relative;
-            top: 10px;
-            left: 0px;
-            width: 40px;
-            height: 40px;
-            text-align: center;
-            vertical-align: middle;
-        }
-            #map_size a span {
-                font-size:30px;
-                position: relative;
-                top: 5px;
-            }
+
     #analysis_title{
         display: none;
         height:40px;
@@ -601,14 +608,51 @@ i, i:hover, i:active, i:focus, i:visited,
             text-align: center;
         }
 
+    #map_size {
+        float: right;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        width: 50px;
+        height: 50px;
+        background: transparent;
+    }
+        #map_size a {
+            position: relative;
+            top: 10px;
+            left: 0px;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            vertical-align: middle;
+        }
+            #map_size a span {
+                font-size:30px;
+                position: relative;
+                top: 5px;
+            }
+
     #analysis_results {
         width:100%;
         min-height: 500px;
         position: absolute;
         top:70px;
+        margin-bottom: 250px;
     }
-        #gapanalysis_chart {
-            width: 90%;
+        #analysis_chart {
             height: 400px;
-            margin-left: 5%;
+            width: 1200px;
+            position: relative;
+            left:50%;
+            margin-left: -600px;
         }
+
+        /*#analysis_map {
+            display:none;
+            height: 400px;
+            width: 1200px;
+            position: relative;
+            left:50%;
+            margin-left: -600px;
+            top:500px;
+        }*/

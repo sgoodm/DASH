@@ -4,7 +4,7 @@ switch ($_POST['call']) {
 
 	case 'exists':
 		$name = $_POST['name'];
-		if ( file_exists("/var/www/html/aiddata/data/weights/".$name.".geojson") ) {
+		if ( file_exists("/var/www/html/aiddata/".$name) ) {
 			echo "true";
 		} else {
 			echo "false";
@@ -130,13 +130,13 @@ switch ($_POST['call']) {
 		break;
 
 	case 'saveimg':
-		$base = '/var/www/html/aiddata/DASH/images/gapanalysis/';
-		$name = time();
-		if (!is_dir($base.$name)){
-			$old_mask = umask(0);
-			mkdir($base.$name,0775,true);
+		$base = '/var/www/html/aiddata/data/images/gapanalysis/';
+		$name = $_POST['name'] .'.png';
+		if (!file_exists($base.$name)){
+			// $old_mask = umask(0);
+			// mkdir($base.$name,0775,true);
 
-			$filename = $base . $name .'/'. $_POST['name'].'.png';
+			$filename = $base . $name ;
 
 			$img = $_POST['img'];
 			$img = str_replace('data:image/png;base64,', '', $img);
@@ -155,7 +155,7 @@ switch ($_POST['call']) {
 
 	case 'savemap':
 
-		$base = '/var/www/html/aiddata/DASH/images/map/';
+		$base = '/var/www/html/aiddata/data/images/map/';
 		$file = $base . uniqid() . '.png';
 
 		$img = $_POST['img'];
