@@ -7,12 +7,12 @@ $(document).ready(function () {
 	var hash = '',
 		files = {
 			map: 'data/gapanalysis/PLACEHOLDER.geojson',
-			analysis_chart: 'data/images/gapanalysis/PLACEHOLDER_analysis_chart.png'
+			analysis_chart: 'data/images/gapanalysis/PLACEHOLDER_analysis_chart.jpeg'
 		};
 
 	var style = {
-		grid_title: 'height:100px;text-align:center;font-size:40px',
-		grid_container: 'height:400px;width:1200px;margin-top:15px;margin-left:50px;'
+		grid_title: 'height:100px;width:1200px;text-align:center;font-size:40px',
+		grid_container: 'height:400px;width:1200px;margin-top:15px;'
 	}
 
 	var tile_load = false;
@@ -197,7 +197,8 @@ $(document).ready(function () {
 
 	function addImage(el, file){
 		console.log('addImage');
-		var html = '<img src="../'+file+'" style="height:100%;width:100%;">';
+		console.log(file)
+		var html = '<img src="../'+file+'" width="1200" height="400">';
 		$(el).html(html);
 	};
 
@@ -233,6 +234,8 @@ $(document).ready(function () {
 		console.log('checkMapImage', map_image_filename)
 
 		if (map_image_filename) {
+			map_image_filename = map_image_filename.substr(0,map_image_filename.length-1)
+			$('#map').attr('class','');
 			addImage('#map', 'data/images/map/'+map_image_filename )
 			buildReport();
 		} else {
@@ -252,13 +255,20 @@ $(document).ready(function () {
 
 		console.log(html);
 
-		// set export option hrefs
-		$('#export_pdf').attr('href',pdf_file)
-		$('#export_docx').attr('href',docx_file)
+		process({call:'report', html: html}, function (result) {
 
-		// load export options
-		$('#message').hide();
-		$('.export').show();
+			console.log(result);
+
+			// set export option hrefs
+			$('#export_pdf').attr('href',pdf_file)
+			$('#export_docx').attr('href',docx_file)
+
+			// load export options
+			$('#message').hide();
+			$('.export').show();
+		})
+
+
 	};
 
 
@@ -300,10 +310,11 @@ $(document).ready(function () {
 var map_image_filename;
 
 function manipulateCanvasFunction(savedMap) {
-    dataURL = savedMap.toDataURL("image/png");
-    dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+    dataURL = savedMap.toDataURL("image/jpeg");
+    dataURL = dataURL.replace(/^data:image\/(png|jpeg);base64,/, "");
     $.post("process.php", { call: 'savemap', img: dataURL }, function(data) {
-    	map_image_filename = data.substr(data.indexOf('map')+5, data.indexOf('png')+3);
+    	map_image_filename = data.substr(data.indexOf('map') + 5, data.indexOf('jpeg') + 2);
+
         console.log('Image Saved to : ' + data, map_image_filename);
     });
 

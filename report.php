@@ -29,7 +29,7 @@
     </div>
 
     <div style="padding:50px;margin-top:50px;z-index:-1">
-        <div id="grid" style="width:1300px;padding:50px 0;border: 1px solid black;">
+        <div id="grid" style="padding:50px 0;border: 1px solid black;">
             <!-- <div class="grid_container"></div>  -->
         </div>       
     </div>
