@@ -1840,6 +1840,9 @@ $(document).ready(function () {
 
     $("#report").click(function(){
 
+    	// save all analysis section content
+    	// 
+
         saveChart('analysis_chart', active.files.gapanalysis + '_analysis_chart');
  
        	window.open('report.php#'+active.files.gapanalysis);
