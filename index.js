@@ -1450,6 +1450,27 @@ $(document).ready(function () {
 		}
 	});
 
+	$( window ).scroll(function() {
+
+		    var docViewTop = $(window).scrollTop();
+		    var docViewBottom = docViewTop + $(window).height();
+
+		    var analysisTop = $('#analysis').offset().top;
+		    // var analysisBottom = analysisTop + $('#analysis').height();
+
+		    if ( $('#analysis_tab').length && analysisTop <= docViewTop + 250 ) {
+		    	$('#analysis_tab').hide();
+		    	$('#analysis_title').show();
+
+		    } else if ( $('#analysis_title').length && analysisTop >= docViewBottom - 300 ) {
+		    	$('#analysis_title').hide();
+		    	$('#analysis_tab').show();
+
+		    }
+			
+			// console.log( docViewTop, docViewBottom, analysisTop, analysisBottom)
+	});
+
 	function mapSize(percent, div) {
 
 	    // var pan = map.getCenter();
@@ -1479,28 +1500,6 @@ $(document).ready(function () {
 	    });
 	}
 
-
-	$( window ).scroll(function() {
-
-		    var docViewTop = $(window).scrollTop();
-		    var docViewBottom = docViewTop + $(window).height();
-
-		    var analysisTop = $('#analysis').offset().top;
-		    // var analysisBottom = analysisTop + $('#analysis').height();
-
-		    if ( $('#analysis_tab').length && analysisTop <= docViewTop + 250 ) {
-		    	$('#analysis_tab').hide();
-		    	$('#analysis_title').show();
-
-		    } else if ( $('#analysis_title').length && analysisTop >= docViewBottom - 300 ) {
-		    	$('#analysis_title').hide();
-		    	$('#analysis_tab').show();
-
-		    }
-			
-			// console.log( docViewTop, docViewBottom, analysisTop, analysisBottom)
-	});
-
 	// depends on s.adm, s.rasters and active.weights
 	function runAnalysis() {
 		$('#analysis').show();
@@ -1519,16 +1518,42 @@ $(document).ready(function () {
 			// secondary: [],
 			categories: [],
 			series: [],
-			temp: []
+			temp: [],
+			subtitle: '',
+			chart_options: {
+				extremes: {},
+				funding: {},
+				ratio: {}
+			}
 		};
 
-		var subtitle = ( data.featureCount > 10 ? 'Top 5 Underfunded / Top 5 Overfunded' : '');
+		var funding = {
+			underfunded:0,
+			average:0,
+			overfunded:0
+		};
+
+		var ratio = [];
+
+		data.subtitle = ( data.featureCount > 10 ? 'Top 5 Underfunded / Top 5 Overfunded' : '');
 
 		for ( var i = 0, ix = data.featureCount; i < ix; i++ ) {
 			data.props[i] = data.raw[data.keys[i]].properties;
 			data.results[i] = parseFloat(data.props[i].result);
-		}
+			
+			if ( data.results[i] <= -0.5 ) {
+				funding.underfunded++;
+			} else if ( data.results[i] <= 0.5 ) {
+				funding.average++;
+			} else {
+				funding.overfunded++;
+			}
 
+			ratio.push( [ roundxy(parseFloat(data.props[i]['custom_weighted_layer'])), roundxy(parseFloat(data.props[i][s.rasters[0]]), 0) ] );
+
+		}
+		ratio.sort(function(a, b) {return a[0] - b[0]})
+		
 		data.bot5 = _.values(data.results).sort( function(a, b) { return a-b } )[4];
 		data.top5 = _.values(data.results).sort( function(a, b) { return b-a } )[4];
 
@@ -1615,7 +1640,7 @@ $(document).ready(function () {
 
 		console.log(data);
 
-		data.chart_options = {
+		data.chart_options.extremes = {
 	        chart: {
 	        	type: 'column',
 	        	spacingBottom: 75
@@ -1629,7 +1654,7 @@ $(document).ready(function () {
 	            text: 'Gap Analysis'
 	        },
 	        subtitle: {
-	            text: subtitle
+	            text: data.subtitle
 	        },
           	plotOptions: {
 	         	// column: {
@@ -1706,8 +1731,81 @@ $(document).ready(function () {
 	        // }]
 	    };
 
-		$('#analysis_results').append('<div id="analysis_chart"></div>');
-		$('#analysis_chart').highcharts(data.chart_options);
+		data.chart_options.funding = {
+	        chart: {
+	        	type: 'column'
+	        },
+	        title: {
+	            text: 'Funding'
+	        },
+	        xAxis: {
+	            categories: _.keys(funding)
+	        },
+	        yAxis: [{ 
+	            title: {
+	                text: 'Number of Projects'
+	            }
+	        }],
+	        tooltip: {
+	            shared: false
+	        },
+	        legend: {
+	        	enabled:false    
+	        },
+	        credits:{
+	        	enabled:false
+	        },
+	        series: [{
+	            name: 'Projects',
+	            data: _.values(funding)
+	        }]
+	    };
+
+		data.chart_options.ratio = {
+	        chart: {
+	
+	        },
+	        title: {
+	            text: 'Ratio'
+	        },
+	        xAxis: {
+	            title: {
+	            	text: 'Weighted Index (0-1)'	            
+	        	}
+	        },
+	        yAxis: [{ 
+	            title:  {
+	            	text: 'Aid'
+            	}	            
+	        }],
+	        tooltip: {
+	            shared: false
+	        },
+	        legend: {
+	        	enabled:false    
+	        },
+	        credits:{
+	        	enabled:false
+	        },
+	        series: [{
+	        	name: s.adm,
+	            data: ratio
+	        }]
+	    };
+
+	    console.log(ratio)
+
+	    for (var i = 0, ix = _.keys(data.chart_options).length; i < ix; i++) {
+		    var key, html;
+
+		    key = _.keys(data.chart_options)[i];
+
+		    html = '<div id="analysis_chart_'+key+'" class="analysis_chart"></div>';
+			$('#analysis_results').append(html);
+			
+			$('#analysis_chart_'+key).highcharts(data.chart_options[key]);
+		}
+
         $('html, body').animate({ scrollTop: 0 }, 0);
 
 	}
@@ -1742,136 +1840,9 @@ $(document).ready(function () {
 
     $("#report").click(function(){
 
-  //   	$('#map_container').hide();
-  //   	$('#map_size').hide();
-  //   	// $('#analysis_title').hide();
-  //   	$('#navbar').hide();
-  //   	$('#analysis_map').show();
-
-		// var file = "../data/gapanalysis/" + active.files.gapanalysis + ".geojson";
-
-		// var analysis_map = L.map('analysis_map', {});
-
-		// var analysis_tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-		// 			attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap contributors</a>'
-		// 		}).addTo(analysis_map);
-
-		// map.setView([0,0], 3);
-
-		// var analysisPolyData;
-		// var error
-		// readJSON(file, function (request, status, e) {
-		// 	analysisPolyData = request;
-		// 	error = e;
-		// })
-
-		// if (error) {
-		// 	console.log(error);
-		// 	return 1;
-		// }
-
-	 //    var grades = {
-	 //    	gapanalysis: [-1.5, -1.0, -0.5, 0.5, 1.0, 1.5, 2]
-	 //    };
-
-		// function getColor(d) {
-
-		//     return d <= -1.5 ? '#de2d26' :
-		//            d <= -1.0 ? '#fc9272' :
-		//            d <= -0.5 ? '#fee0d2' :
-
-		//            d <= 0.5 ? '#fff7bc' :
-		//            d <= 1.0 ? '#e5f5e0' :
-  //  		           d <= 1.5 ? '#a1d99b' :
-  //  		           			  '#31a354';
-   		    
-		// }
-
-		// function style(feature) {
-		//     return {
-		//         fillColor: getColor(feature.properties.result),
-		//         weight: 1,
-		//         opacity: 1,
-		//         color: 'black',
-		//         fillOpacity: 0.75
-		//     };
-		// }
-
-
-
-		// var analysis_geojson = L.geoJson(analysisPolyData, {
-		//     style: style
-		// });
-
-		// analysis_map.addLayer(analysis_geojson, true);
-
-		// analysis_map.fitBounds( analysis_geojson.getBounds() );
-
-
-		// // manage legend
-		// var analysis_legend = L.control({position: 'bottomright'});
-
-		// analysis_legend.onAdd = function (map) {
-
-		//     var div = L.DomUtil.create('div', 'info legend');
-
-		//     // loop through grades and generate a label with a colored square for each interval
-		// 	for (var i = 0, ix=grades[s.method].length; i < ix; i++) {
-		//         div.innerHTML += '<i style="background:' + getColor(grades[s.method][i]) + '"></i> ';
-		       
-		//         if ( s.method == "gapanalysis" && !grades[s.method][i+1] ) {
-		//         	div.innerHTML += grades[s.method][i-1]  + '+<br>';
-		//         } else {
-		//         	div.innerHTML += "<= " + grades[s.method][i]  + '<br>';
-		//         }
-		//     }
-
-		//     return div;
-		// };
-
-		// analysis_legend.addTo(analysis_map);
-
-
-
         saveChart('analysis_chart', active.files.gapanalysis + '_analysis_chart');
-        // saveChart('analysis_map', 'analysis_map_name');
-
-		// setTimeout(function() {
-
-			// html2canvas($('#map'),{
-   //              onrendered: function (canvas) {                     
-   //                          var imgString = canvas.toDataURL("image/png");
-   //                          window.open(imgString);   
-   //              }               
-   //          });
-		// 	$('#analysis_map').html2canvas({
-		// 		flashcanvas: "/aiddata/libs/canvas/flashcanvas.min.js",
-		// 		proxy: 'proxy.php',
-		// 		logging: false,
-		// 		profile: false,
-		// 		useCORS: true,
-	 //            allowTaint: true
-		// 	});
-		// },1000)
-
+ 
        	window.open('report.php#'+active.files.gapanalysis);
-
-
-		// $.ajax({
-  //         	url: "report.php",
-  //         	data: {filename: active.files.gapanalysis},
-  // 	        dataType: "json",
-	 //        type: "post",
-	 //        async: true,
-  //         	success: function(result){
-  //           	console.log(result);
-  //         	},    
-	 //    	error: function (request, status, error) {
-  //       		// console.log(request) 
-  //       		// console.log(status) 
-  //       		console.log(error);
-  //   		}
-  //       });
 
     });
 
@@ -1900,30 +1871,10 @@ $(document).ready(function () {
         });
     }
 
-    // call report building php
-    function buildReport() {
-    	var report_data = {};
-
-        $.ajax({
-          	url: "report.php",
-          	data: report_data,
-  	        dataType: "json",
-	        type: "post",
-	        async: false,
-          	success: function(result){
-            	console.log(result);
-          	},    
-	    	error: function (request, status, error) {
-        		// console.log(request) 
-        		// console.log(status) 
-        		console.log(error);
-    		}
-        });
-    }
-
 
 	// --------------------------------------------------
 	// general functions
+
 
 	function showState(el, state) {
 		if (state == true) {
@@ -1975,6 +1926,11 @@ $(document).ready(function () {
 
 
 	var hash_change = 1;
+	
+    // check hashtag on change and on page load
+    $(window).on('hashchange', function () {
+    	checkHash();
+    });
 
 	function buildHash() {
 		console.log('buildHash');
@@ -2078,22 +2034,7 @@ $(document).ready(function () {
     	}
    		hash_change = 1;
   	};
-	
-    // check hashtag on change and on page load
-    $(window).on('hashchange', function () {
-    	checkHash();
-    });
+
     checkHash('init');
 
 })
-
-// function manipulateCanvasFunction(savedMap) {
-//     dataURL = savedMap.toDataURL("image/png");
-//     dataURL = dataURL.replace(/^data:image\/(png|jpeg);base64,/, "");
-//     $.post("process.php", { call: 'savemap', img: dataURL }, function(data) {
-//         console.log('Image Saved to : ' + data);
-//     });
-
-// }
-
-

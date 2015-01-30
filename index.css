@@ -6,6 +6,7 @@ body{
     /*min-width: 1200px;*/
     background:  rgb(88,108,128);
     color: white;
+    margin-bottom: 100px;
 }
 a, a:hover, a:active, a:focus, a:visited,
 i, i:hover, i:active, i:focus, i:visited,
@@ -637,22 +638,15 @@ i, i:hover, i:active, i:focus, i:visited,
         min-height: 500px;
         position: absolute;
         top:70px;
-        margin-bottom: 250px;
+        padding-bottom: 300px;
     }
-        #analysis_chart {
+        .analysis_chart {
             height: 400px;
             width: 1200px;
             position: relative;
             left:50%;
             margin-left: -600px;
+            margin-top: 10px;
+            margin-bottom: 10px;
         }
 
-        /*#analysis_map {
-            display:none;
-            height: 400px;
-            width: 1200px;
-            position: relative;
-            left:50%;
-            margin-left: -600px;
-            top:500px;
-        }*/
