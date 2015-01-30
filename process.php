@@ -131,7 +131,7 @@ switch ($_POST['call']) {
 
 	case 'saveimg':
 		$base = '/var/www/html/aiddata/data/images/gapanalysis/';
-		$name = $_POST['name'] .'.jpeg';
+		$name = $_POST['name'] .'.png';
 		if (!file_exists($base.$name)){
 			// $old_mask = umask(0);
 			// mkdir($base.$name,0775,true);
@@ -139,7 +139,7 @@ switch ($_POST['call']) {
 			$filename = $base . $name ;
 
 			$img = $_POST['img'];
-			$img = str_replace('data:image/jpeg;base64,', '', $img);
+			$img = str_replace('data:image/png;base64,', '', $img);
 			$img = str_replace(' ', '+', $img);
 			$data = base64_decode($img);
 
@@ -156,10 +156,10 @@ switch ($_POST['call']) {
 	case 'savemap':
 
 		$base = '/var/www/html/aiddata/data/images/map/';
-		$file = $base . uniqid() . '.jpeg';
+		$file = $base . uniqid() . '.png';
 
 		$img = $_POST['img'];
-		$img = str_replace('data:image/jpeg;base64,', '', $img);
+		$img = str_replace('data:image/png;base64,', '', $img);
 		$img = str_replace(' ', '+', $img);
 		$data = base64_decode($img);
 
@@ -169,22 +169,6 @@ switch ($_POST['call']) {
 		echo json_encode($out);
 		break;
 
-	case 'report':
-
-
-		$html = str_ireplace("../data", "/var/www/html/aiddata/data", $_POST['html']);
-
-		file_put_contents('test.txt', $html);
-
-		//convert html to pdf
-		include '/var/www/html/aiddata/libs/mpdf/mpdf.php';
-		$mpdf = new mPDF();
-		$mpdf->WriteHTML($html);
-		$mpdf->Output("/var/www/html/aiddata/data/documentation.pdf", "F");
-
-		echo json_encode("done");
-
-		break;
 }
 
 ?>

@@ -7,13 +7,8 @@ $(document).ready(function () {
 	var hash = '',
 		files = {
 			map: 'data/gapanalysis/PLACEHOLDER.geojson',
-			analysis_chart: 'data/images/gapanalysis/PLACEHOLDER_analysis_chart.jpeg'
+			analysis_chart: 'data/images/gapanalysis/PLACEHOLDER_analysis_chart.png'
 		};
-
-	var style = {
-		grid_title: 'height:100px;width:1200px;text-align:center;font-size:40px',
-		grid_container: 'height:400px;width:1200px;margin-top:15px;'
-	}
 
 	var tile_load = false;
 
@@ -83,14 +78,15 @@ $(document).ready(function () {
 			values = _.values(files),
 			html = '';
 
-		html += '<div style="'+style.grid_title+'">AidData DASH Gap Analysis Results</div>'
+		$('#grid_container').prepend('<div class="grid_title">AidData DASH Gap Analysis Results</div>');
+
 		for ( var i = 0, ix = values.length; i < ix; i++ ) {
 			console.log(keys[i])
-			html += '<div style="'+style.grid_container+'"><div id="'+keys[i]+'" style="height:100%;width:100%;"></div></div>';
+			html += '<div class="grid_container"><div id="'+keys[i]+'"></div></div>';
 		}
 
 		$('#grid').html(html);	
-		// $("#grid").sortable();
+		$("#grid").sortable();
 
 
 		// add map
@@ -249,31 +245,61 @@ $(document).ready(function () {
 	function buildReport() {
 
 		// build documents
-		var pdf_file, docx_file, html;
+		// var pdf_file, docx_file, html;
 
-		html = $('#grid').html();
+		// html = $('#grid').html();
 
-		console.log(html);
+		// console.log(html);
 
-		process({call:'report', html: html}, function (result) {
-
-			console.log(result);
-
-			// set export option hrefs
-			$('#export_pdf').attr('href',pdf_file)
-			$('#export_docx').attr('href',docx_file)
-
-			// load export options
-			$('#message').hide();
-			$('.export').show();
-		})
+		// load export options
+		$('#message').html('Create your own report view then select an export option.');
+		$('.export').show();
 
 
 	};
 
+	$('.export').click(function () {
+		var id, filetype, imgs;
+
+		$('#message').html('Building report download...');
+
+
+		id = $(this).find('a').attr('id');
+		filetype = id.substr(id.indexOf('_') + 1);
+
+		imgs = [];
+
+		$('img').each(function () {
+			imgs.push($(this).attr('src'));
+		})
+
+		console.log(imgs)
+
+
+		parseReport({filetype:filetype, imgs: imgs}, function (result) {
+
+			console.log(result);
+
+			// set export option  hrefs
+			$('#message').html('<a href="'+result+'" class="btn" ><span>Download</span></a>');
+		})
+	})
 
 	// --------------------------------------------------
 	// general functions
+
+	function parseReport(data, callback) {
+		$.ajax ({
+	        url: "parse.php",
+	        data: data,
+	        dataType: "json",
+	        type: "post",
+	        async: true,
+	        success: function (result) {
+			    callback(result);
+			}
+	    });
+	};
 
 	// generic ajax call to process.php
 	function process(data, callback) {
@@ -310,10 +336,10 @@ $(document).ready(function () {
 var map_image_filename;
 
 function manipulateCanvasFunction(savedMap) {
-    dataURL = savedMap.toDataURL("image/jpeg");
+    dataURL = savedMap.toDataURL("image/png");
     dataURL = dataURL.replace(/^data:image\/(png|jpeg);base64,/, "");
     $.post("process.php", { call: 'savemap', img: dataURL }, function(data) {
-    	map_image_filename = data.substr(data.indexOf('map') + 5, data.indexOf('jpeg') + 2);
+    	map_image_filename = data.substr(data.indexOf('map') + 5, data.indexOf('png') + 2);
 
         console.log('Image Saved to : ' + data, map_image_filename);
     });

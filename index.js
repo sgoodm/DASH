@@ -1880,7 +1880,7 @@ $(document).ready(function () {
 		var svg = document.getElementById(chart).children[0].innerHTML;
         var canvas = document.getElementById('canvas');
         canvg(canvas,svg);
-        var img = canvas.toDataURL("image/jpeg"); //img is data:image/png;base64
+        var img = canvas.toDataURL("image/png"); //img is data:image/png;base64
         var img_data = {call:'saveimg', img: img, name:name};
         console.log(img_data);
         $.ajax({

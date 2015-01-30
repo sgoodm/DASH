@@ -24,12 +24,18 @@
 
     <div id="options">
         <div id="message">Generating export options and content...</div>
-        <div class="export"><a href='#' class="btn" id="export_pdf"><span>Export to PDF</span></a></div>
-        <div class="export"><a href='#' class="btn" id="export_docx"><span>Export to DOCX</span></a></div>
+        <div id="buttons">
+            <div class="export">
+                <a tabindex="0" class="btn" id="export_pdf"><span>Export to PDF</span></a>
+            </div>
+            <div class="export">
+                <a tabindex="0" class="btn" id="export_docx"><span>Export to DOCX</span></a>
+            </div>
+        </div>
     </div>
 
-    <div style="padding:50px;margin-top:50px;z-index:-1">
-        <div id="grid" style="padding:50px 0;border: 1px solid black;">
+    <div id="grid_container">
+        <div id="grid">
             <!-- <div class="grid_container"></div>  -->
         </div>       
     </div>
