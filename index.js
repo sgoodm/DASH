@@ -1843,7 +1843,7 @@ $(document).ready(function () {
     	// save all analysis section content
     	// 
 
-        saveChart('analysis_chart', active.files.gapanalysis + '_analysis_chart');
+        saveChart('analysis_extremes', active.files.gapanalysis + '_analysis_extremes');
  
        	window.open('report.php#'+active.files.gapanalysis);
 

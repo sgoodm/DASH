@@ -7,7 +7,7 @@ $(document).ready(function () {
 	var hash = '',
 		files = {
 			map: 'data/gapanalysis/PLACEHOLDER.geojson',
-			analysis_chart: 'data/images/gapanalysis/PLACEHOLDER_analysis_chart.png'
+			analysis_extremes: 'data/images/gapanalysis/PLACEHOLDER_analysis_extremes.png'
 		};
 
 	var tile_load = false;
@@ -92,8 +92,8 @@ $(document).ready(function () {
 		// add map
 		buildMap();
 
-		// add analysis chart
-		addImage('#analysis_chart', files.analysis_chart);
+		// add analysis_extremes chart
+		addImage('#analysis_extremes', files.analysis_extremes);
 
 		// save map to image
 		saveMap();
