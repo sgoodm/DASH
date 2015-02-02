@@ -23,7 +23,7 @@
 <body>
 
     <div id="options">
-        <div id="message">Generating export options and content...</div>
+        <div id="message"></div>
         <div id="buttons">
             <div class="export">
                 <a tabindex="0" class="btn" id="export_pdf"><span>Export to PDF</span></a>
@@ -54,6 +54,8 @@
 
     <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.2/mapbox.js'></script>
 
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
 
     <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script>
     <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/StackBlur.js"></script>

@@ -81,6 +81,8 @@ $(document).ready(function () {
 		map_chart:'<p id="map_chart_message">Click a feature on the map to generate a chart with data on that area.</p>'
 	};
 
+	var chart_options;
+
 	// init ui on load
 	$('#country').val('-----');
 	$('#adm').val('-----');
@@ -1507,7 +1509,7 @@ $(document).ready(function () {
 		$('#gapanalysis_buttons').show();
 		// console.log(geojsonPolyData);
 
-		var data = {
+		var analysis_data = {
 			raw: geojsonPolyData.features,
 			keys: _.keys(geojsonPolyData.features),
 			props: {},
@@ -1519,13 +1521,14 @@ $(document).ready(function () {
 			categories: [],
 			series: [],
 			temp: [],
-			subtitle: '',
-			chart_options: {
-				extremes: {},
-				funding: {},
-				ratio: {}
-			}
+			subtitle: ''
 		};
+
+		chart_options = {
+			extremes: {},
+			funding: {},
+			ratio: {}
+		}
 
 		var funding = {
 			projects: {
@@ -1543,24 +1546,24 @@ $(document).ready(function () {
 
 		var ratio = [];
 
-		data.subtitle = ( data.featureCount > 10 ? 'Top 5 Underfunded / Top 5 Overfunded' : '');
+		analysis_data.subtitle = ( analysis_data.featureCount > 10 ? 'Top 5 Underfunded / Top 5 Overfunded' : '');
 
-		for ( var i = 0, ix = data.featureCount; i < ix; i++ ) {
-			data.props[i] = data.raw[data.keys[i]].properties;
-			data.results[i] = parseFloat(data.props[i].result);
+		for ( var i = 0, ix = analysis_data.featureCount; i < ix; i++ ) {
+			analysis_data.props[i] = analysis_data.raw[analysis_data.keys[i]].properties;
+			analysis_data.results[i] = parseFloat(analysis_data.props[i].result);
 			
-			if ( data.results[i] <= -0.5 ) {
+			if ( analysis_data.results[i] <= -0.5 ) {
 				funding.projects.underfunded++;
-				funding.aid.underfunded += roundxy(parseFloat(data.props[i][s.rasters[0]]), 0)
-			} else if ( data.results[i] <= 0.5 ) {
+				funding.aid.underfunded += roundxy(parseFloat(analysis_data.props[i][s.rasters[0]]), 0);
+			} else if ( analysis_data.results[i] <= 0.5 ) {
 				funding.projects.average++;
-				funding.aid.average += roundxy(parseFloat(data.props[i][s.rasters[0]]), 0)
+				funding.aid.average += roundxy(parseFloat(analysis_data.props[i][s.rasters[0]]), 0);
 			} else {
 				funding.projects.overfunded++;
-				funding.aid.overfunded += roundxy(parseFloat(data.props[i][s.rasters[0]]), 0)
+				funding.aid.overfunded += roundxy(parseFloat(analysis_data.props[i][s.rasters[0]]), 0);
 			}
 
-			ratio.push( [ roundxy(parseFloat(data.props[i]['custom_weighted_layer'])), roundxy(parseFloat(data.props[i][s.rasters[0]]), 0) ] );
+			ratio.push( [ roundxy(parseFloat(analysis_data.props[i]['custom_weighted_layer'])), roundxy(parseFloat(analysis_data.props[i][s.rasters[0]]), 0) ] );
 
 		}
 
@@ -1570,19 +1573,19 @@ $(document).ready(function () {
 
 		ratio.sort(function(a, b) {return a[0] - b[0]})
 		
-		data.bot5 = _.values(data.results).sort( function(a, b) { return a-b } )[4];
-		data.top5 = _.values(data.results).sort( function(a, b) { return b-a } )[4];
+		analysis_data.bot5 = _.values(analysis_data.results).sort( function(a, b) { return a-b } )[4];
+		analysis_data.top5 = _.values(analysis_data.results).sort( function(a, b) { return b-a } )[4];
 
 		// init aid item of series
-		data.series.push({
+		analysis_data.series.push({
 			name: s.rasters[0],
 			data: [],
 			stack: 0
 		});
 
 		// init data items of series
-		for ( var j = 0, jx = data.weightCount; j < jx; j++ ) {
-			data.series.push ({
+		for ( var j = 0, jx = analysis_data.weightCount; j < jx; j++ ) {
+			analysis_data.series.push ({
 				name: _.values(active.weights)[j],
 				data: [],
 				stack: 1
@@ -1590,63 +1593,63 @@ $(document).ready(function () {
 		}
 
 		// build subdata
-		for ( var i = 0, ix = data.featureCount; i < ix; i++ ) {
+		for ( var i = 0, ix = analysis_data.featureCount; i < ix; i++ ) {
 
-			var item = data.props[data.keys[i]]; 
+			var item = analysis_data.props[analysis_data.keys[i]]; 
 
-			if ( data.featureCount <= 10 ) {
-				data.categories.push(item["NAME_" + s.adm.substr(3,1)]);
+			if ( analysis_data.featureCount <= 10 ) {
+				analysis_data.categories.push(item["NAME_" + s.adm.substr(3,1)]);
 
-				// data.primary.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
-				data.series[0].data.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
+				// analysis_data.primary.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
+				analysis_data.series[0].data.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
 
 				// data.secondary.push( roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
 				// normalize data per feature
-				data.temp = [];
-				for ( var j = 0, jx = data.weightCount; j < jx; j++ ) {
-					data.temp.push(  roundxy( parseFloat(item[_.values(active.weights)[j]+"_weighted"]) ) );
+				analysis_data.temp = [];
+				for ( var j = 0, jx = analysis_data.weightCount; j < jx; j++ ) {
+					analysis_data.temp.push(  roundxy( parseFloat(item[_.values(active.weights)[j]+"_weighted"]) ) );
 				}
-				data.temp = normalize(data.temp,  roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
-				for ( var j = 0, jx = data.weightCount; j < jx; j++ ) {
-					data.series[j+1].data.push( data.temp[j] );
+				analysis_data.temp = normalize(analysis_data.temp,  roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
+				for ( var j = 0, jx = analysis_data.weightCount; j < jx; j++ ) {
+					analysis_data.series[j+1].data.push( analysis_data.temp[j] );
 				}
 
 
 			} else {
 
-				if ( parseFloat(item.result) <= data.bot5 ) {
-					data.categories.unshift(item["NAME_" + s.adm.substr(3,1)]);
+				if ( parseFloat(item.result) <= analysis_data.bot5 ) {
+					analysis_data.categories.unshift(item["NAME_" + s.adm.substr(3,1)]);
 
-					// data.primary.unshift( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
-					data.series[0].data.unshift( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
+					// analysis_data.primary.unshift( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
+					analysis_data.series[0].data.unshift( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
 
-					// data.secondary.unshift( roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
+					// analysis_data.secondary.unshift( roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
 					// normalize data per feature
-					data.temp = [];
-					for ( var j = 0, jx = data.weightCount; j < jx; j++ ) {
-						data.temp.push(  roundxy( parseFloat(item[_.values(active.weights)[j]+"_weighted"]) ) );
+					analysis_data.temp = [];
+					for ( var j = 0, jx = analysis_data.weightCount; j < jx; j++ ) {
+						analysis_data.temp.push(  roundxy( parseFloat(item[_.values(active.weights)[j]+"_weighted"]) ) );
 					}
-					data.temp = normalize(data.temp,  roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
-					for ( var j = 0, jx = data.weightCount; j < jx; j++ ) {
-						data.series[j+1].data.unshift( data.temp[j] );
+					analysis_data.temp = normalize(analysis_data.temp,  roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
+					for ( var j = 0, jx = analysis_data.weightCount; j < jx; j++ ) {
+						analysis_data.series[j+1].data.unshift( analysis_data.temp[j] );
 					}
 				}
 
-				if ( parseFloat(item.result) >= data.top5 ) {
-					data.categories.push(item["NAME_" + s.adm.substr(3,1)]);
+				if ( parseFloat(item.result) >= analysis_data.top5 ) {
+					analysis_data.categories.push(item["NAME_" + s.adm.substr(3,1)]);
 
-					// data.primary.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
-					data.series[0].data.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
+					// analysis_data.primary.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
+					analysis_data.series[0].data.push( roundxy( parseFloat(item[s.rasters[0]+'_percent']) ) );
 
-					// data.secondary.push( roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
+					// analysis_data.secondary.push( roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
 					// normalize data per feature
-					data.temp = [];
-					for ( var j = 0, jx = data.weightCount; j < jx; j++ ) {
-						data.temp.push(  roundxy( parseFloat(item[_.values(active.weights)[j]+"_weighted"]) ) );
+					analysis_data.temp = [];
+					for ( var j = 0, jx = analysis_data.weightCount; j < jx; j++ ) {
+						analysis_data.temp.push(  roundxy( parseFloat(item[_.values(active.weights)[j]+"_weighted"]) ) );
 					}
-					data.temp = normalize(data.temp,  roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
-					for ( var j = 0, jx = data.weightCount; j < jx; j++ ) {
-						data.series[j+1].data.push( data.temp[j] );
+					analysis_data.temp = normalize(analysis_data.temp,  roundxy( parseFloat(item[s.rasters[1]+'_percent']) ) );
+					for ( var j = 0, jx = analysis_data.weightCount; j < jx; j++ ) {
+						analysis_data.series[j+1].data.push( analysis_data.temp[j] );
 					}
 				}
 
@@ -1654,9 +1657,9 @@ $(document).ready(function () {
 
 		}
 
-		console.log(data);
+		console.log(analysis_data);
 
-		data.chart_options.extremes = {
+		chart_options.extremes = {
 	        chart: {
 	        	type: 'column',
 	        	spacingBottom: 75
@@ -1670,7 +1673,7 @@ $(document).ready(function () {
 	            text: 'Gap Analysis'
 	        },
 	        subtitle: {
-	            text: data.subtitle
+	            text: analysis_data.subtitle
 	        },
           	plotOptions: {
 	         	// column: {
@@ -1686,21 +1689,21 @@ $(document).ready(function () {
 	                    			lay.fire('mouseout');
 	                    		})
 	   
-	                    		map._layers[ featureList[data.categories[this.x]] ].fire('mouseover');
+	                    		map._layers[ featureList[analysis_data.categories[this.x]] ].fire('mouseover');
 	                    	}
 	                     //    mouseOver: function () {
-	                     //       console.log( data.categories[this.x], featureList[data.categories[this.x]] );
-	                     //       map._layers[ featureList[data.categories[this.x]] ].fire('mouseover');
+	                     //       console.log( analysis_data.categories[this.x], featureList[analysis_data.categories[this.x]] );
+	                     //       map._layers[ featureList[analysis_data.categories[this.x]] ].fire('mouseover');
 	                     //    },
 	                     //    mouseOut: function () {
-		                    //     map._layers[ featureList[data.categories[this.x]] ].fire('mouseout');
+		                    //     map._layers[ featureList[analysis_data.categories[this.x]] ].fire('mouseout');
 		                    // }
 	                    }
 	                }
 	            }
 	        },
 	        xAxis: {
-	            categories: data.categories
+	            categories: analysis_data.categories
 	        },
 	        yAxis: [{ 
 	            title: {
@@ -1731,23 +1734,23 @@ $(document).ready(function () {
 	        credits:{
 	        	enabled:false
 	        },
-	        series: data.series//[{
+	        series: analysis_data.series//[{
 	        //     name: 'Aid',
-	        //     data: data.primary//,
+	        //     data: analysis_data.primary//,
 	        //     // tooltip: {
 	        //     //     valueSuffix: ''
 	        //     // }
 
 	        // }, {
 	        //     name: 'Data',
-	        //     data: data.secondary//,
+	        //     data: analysis_data.secondary//,
 	        // //     // tooltip: {
 	        // //     //     valueSuffix: ''
 	        //     // }
 	        // }]
 	    };
 
-		data.chart_options.funding = {
+		chart_options.funding = {
 	        chart: {
 	        	type: 'column'
 	        },
@@ -1805,10 +1808,8 @@ $(document).ready(function () {
 	        }]
 	    };
 
-		data.chart_options.ratio = {
-	        chart: {
-	
-	        },
+		chart_options.ratio = {
+
 	        title: {
 	            text: 'Ratio'
 	        },
@@ -1820,7 +1821,8 @@ $(document).ready(function () {
 	        yAxis: [{ 
 	            title:  {
 	            	text: 'Aid'
-            	}	            
+            	},
+            	min:0	            
 	        }],
 	        tooltip: {
 	            shared: false
@@ -1839,15 +1841,15 @@ $(document).ready(function () {
 
 	    console.log(ratio)
 
-	    for (var i = 0, ix = _.keys(data.chart_options).length; i < ix; i++) {
+	    for (var i = 0, ix = _.keys(chart_options).length; i < ix; i++) {
 		    var key, html;
 
-		    key = _.keys(data.chart_options)[i];
+		    key = _.keys(chart_options)[i];
 
 		    html = '<div id="analysis_chart_'+key+'" class="analysis_chart"></div>';
 			$('#analysis_results').append(html);
-			
-			$('#analysis_chart_'+key).highcharts(data.chart_options[key]);
+			chart_options[key] = JSON.stringify(chart_options[key]);
+			$('#analysis_chart_'+key).highcharts( JSON.parse(chart_options[key]) );
 		}
 
         $('html, body').animate({ scrollTop: 0 }, 0);
@@ -1883,40 +1885,59 @@ $(document).ready(function () {
 
 
     $("#report").click(function(){
+    	var keys, json;
 
     	// save all analysis section content
-    	// 
+    	keys = _.keys(chart_options);
 
-        saveChart('analysis_chart_extremes', active.files.gapanalysis + '_analysis_chart_extremes');
+    	// for (var i=0, ix=keys.length; i<ix; i++) {
+        
+     //    	saveChart('analysis_chart_'+keys[i], active.files.gapanalysis + '_analysis_chart_' + keys[i]);
+
+    	// }
+    	console.log(chart_options)
+    	json = JSON.parse(JSON.stringify(chart_options));
+
+		json.meta = {
+			country: s.country,
+			adm: s.adm,
+			gapanalysis: active.gapanalysis.ga1,
+			weights: active.weights,
+			weight_vals: active.weight_vals
+		};
+
+    	process({call: 'write', hash: active.files.gapanalysis, json: JSON.stringify(json)}, function (result) {
+    		console.log('chart options json write:' + result);
+    	})
  
        	window.open('report.php#'+active.files.gapanalysis);
 
     });
 
-    // save a highchart to png
-    function saveChart(chart, name) {
-		var svg = document.getElementById(chart).children[0].innerHTML;
-        var canvas = document.getElementById('canvas');
-        canvg(canvas,svg);
-        var img = canvas.toDataURL("image/png"); //img is data:image/png;base64
-        var img_data = {call:'saveimg', img: img, name:name};
-        console.log(img_data);
-        $.ajax({
-          	url: "process.php",
-          	data: img_data,
-  	        dataType: "json",
-	        type: "post",
-	        async: false,
-          	success: function(result){
-            	console.log(result);
-          	},    
-	    	error: function (request, status, error) {
-        		// console.log(request) 
-        		// console.log(status) 
-        		console.log(error);
-    		}
-        });
-    }
+  //   // save a highchart to png
+  //   function saveChart(chart, name) {
+		// var svg = document.getElementById(chart).children[0].innerHTML;
+  //       var canvas = document.getElementById('canvas');
+  //       canvg(canvas,svg);
+  //       var img = canvas.toDataURL("image/png"); //img is data:image/png;base64
+  //       var img_data = {call:'saveimg', img: img, name:name};
+  //       console.log(img_data);
+  //       $.ajax({
+  //         	url: "process.php",
+  //         	data: img_data,
+  // 	        dataType: "json",
+	 //        type: "post",
+	 //        async: false,
+  //         	success: function(result){
+  //           	console.log(result);
+  //         	},    
+	 //    	error: function (request, status, error) {
+  //       		// console.log(request) 
+  //       		// console.log(status) 
+  //       		console.log(error);
+  //   		}
+  //       });
+  //   }
 
 
 	// --------------------------------------------------

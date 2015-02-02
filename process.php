@@ -130,25 +130,19 @@ switch ($_POST['call']) {
 		break;
 
 	case 'saveimg':
-		$base = '/var/www/html/aiddata/data/images/gapanalysis/';
+		$base = '/var/www/html/aiddata/data/images/gapanalysis/' . $_POST['hash'] . '/';
 		$name = $_POST['name'] .'.png';
-		if (!file_exists($base.$name)){
-			// $old_mask = umask(0);
-			// mkdir($base.$name,0775,true);
 
-			$filename = $base . $name ;
 
-			$img = $_POST['img'];
-			$img = str_replace('data:image/png;base64,', '', $img);
-			$img = str_replace(' ', '+', $img);
-			$data = base64_decode($img);
+		$filename = $base . $name ;
 
-			$success = file_put_contents($filename, $data);			
+		$img = $_POST['img'];
+		$img = str_replace('data:image/png;base64,', '', $img);
+		$img = str_replace(' ', '+', $img);
+		$data = base64_decode($img);
 
-			$out = $name;
-		} else {
-			$out = 'exists';
-		}
+		$success = file_put_contents($filename, $data);			
+		$out = $success ? $name : 'Unable to save the file.';
 
 		echo json_encode($out);
 		break;
@@ -167,6 +161,25 @@ switch ($_POST['call']) {
 		$out = $success ? $file : 'Unable to save the file.';
 
 		echo json_encode($out);
+		break;
+
+	case 'write':
+		$hash = $_POST['hash'];
+		$json = json_encode(json_decode($_POST['json']), JSON_PRETTY_PRINT);
+
+		$base = '/var/www/html/aiddata/data/images/gapanalysis/' . $hash;
+		if (!file_exists($base) && !is_dir($base)) {
+			$old_mask = umask(0);
+			mkdir($base, 0775, true);
+
+			file_put_contents($base . '/chart_options.json', $json);
+			$out = 'done';
+		} else {
+			$out = 'exists';
+		} 			
+
+		echo $out;
+
 		break;
 
 }

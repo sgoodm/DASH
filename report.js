@@ -7,12 +7,22 @@ $(document).ready(function () {
 	var hash = '',
 		files = {
 			map: 'data/gapanalysis/PLACEHOLDER.geojson',
-			analysis_extremes: 'data/images/gapanalysis/PLACEHOLDER_analysis_chart_extremes.png'
+			chart_options: {
+				extremes: 'data/images/gapanalysis/PLACEHOLDER/analysis_chart_extremes.png',
+				funding: 'data/images/gapanalysis/PLACEHOLDER/analysis_chart_funding.png',
+				ratio: 'data/images/gapanalysis/PLACEHOLDER/analysis_chart_ratio.png'
+			}
+			// chart_options: {
+			// 	extremes: 'data/images/gapanalysis/PLACEHOLDER/analysis_chart_extremes.png',
+			// 	funding: 'data/images/gapanalysis/PLACEHOLDER/analysis_chart_funding.png',
+			// 	ratio: 'data/images/gapanalysis/PLACEHOLDER/analysis_chart_ratio.png'
+			// }
 		};
 
 	var tile_load = false;
 
-	$('.export').hide();
+	var json;
+
 
     // check hashtag on change and on page load
     $(window).on('hashchange', function () {
@@ -31,37 +41,69 @@ $(document).ready(function () {
 	    	// validate hash
 	    	if ( valid ) {
 	    		console.log('valid hash');
+	    		$('#message').html('Generating export options and content...');
 		    	// generate page
 	      		setTimeout(readHash, 200);
 
 	    	} else {
 	    		console.log('not a valid hash');
+	    		$('#message').html('Not a valid link.');
 	    		return;
 	    	}
 
-    	} 
+    	} else {
+    		$('#message').html('Not a valid link.');
+    	}
   	};
 	
 
 	function validateHash() {
 		console.log('validateHash');
 
-		var keys = _.keys(files),
-			values = _.values(files);
-		
-		for ( var i = 0, ix = values.length; i < ix; i++ ) {
+		var keys = _.keys(files.chart_options),
+			// values = _.values(files.chart_options),
+			state = false,
+			error;
 
-			var state = false;
+		readJSON('../data/images/gapanalysis/'+hash+'/chart_options.json', function (request, status, e) {
+			json = request;
+			error = e;
+		})
 
-			files[keys[i]] = values[i].replace('PLACEHOLDER', hash);
+		if (error) {
+			// state = false
+			return false;
+		}
 
-			process({call: 'exists', name: files[keys[i]]}, function (result) {
-				state = result;
-			})
+		// check if geojson exists
+		files.map = files.map.replace('PLACEHOLDER', hash);
 
-			if (state == false) {
+		process({call: 'exists', name: files.map}, function (result) {
+			state = result;
+		})
+
+		if (state == false) {
+			return false;
+		}
+
+		// check if chart images exist
+		for ( var i = 0, ix = keys.length; i < ix; i++ ) {
+
+			// files.chart_options[keys[i]] = values[i].replace('PLACEHOLDER', hash);
+
+			// process({call: 'exists', name: files.chart_options[keys[i]]}, function (result) {
+			// 	state = result;
+			// })
+
+			// if (state == false) {
+			// 	return false;
+			// }
+
+			if (!json[keys[i]]) {
 				return false;
 			}
+
+
 
 		}
 		return true;
@@ -74,15 +116,25 @@ $(document).ready(function () {
 		$('#grid').empty();
 
 		// init grid
-		var keys = _.keys(files),
-			values = _.values(files),
-			html = '';
+		var keys = _.keys(files.chart_options),
+			values = _.values(files.chart_options),
+			html = '', meta_html = '', info_html = '';
 
+		// add title
 		$('#grid_container').prepend('<div class="grid_title">AidData DASH Gap Analysis Results</div>');
 
+		// add div for map
+		html += '<div class="grid_container"><div id="map" class="grid_content" data-source="map"></div><div id="meta"></div></div>'
+
+		// add divs for chart images
 		for ( var i = 0, ix = values.length; i < ix; i++ ) {
 			console.log(keys[i])
-			html += '<div class="grid_container"><div id="'+keys[i]+'"></div></div>';
+			if ( keys[i] == 'funding' ) {
+				html += '<div class="grid_container"><div id="info"></div><div id="analysis_chart_'+keys[i]+'" class="grid_content medium-chart" data-source="gapanalysis/'+hash+'/analysis_chart_'+keys[i]+'.png"></div></div>';
+
+			} else {
+				html += '<div class="grid_container"><div id="analysis_chart_'+keys[i]+'" class="grid_content large-chart" data-source="gapanalysis/'+hash+'/analysis_chart_'+keys[i]+'.png"></div></div>';
+			}
 		}
 
 		$('#grid').html(html);	
@@ -92,9 +144,39 @@ $(document).ready(function () {
 		// add map
 		buildMap();
 
-		// add analysis_extremes chart
-		addImage('#analysis_extremes', files.analysis_extremes);
+		// add charts
+		for ( var i = 0, ix = values.length; i < ix; i++ ) {
+			var key = keys[i];
+			console.log(key);
+			// addImage('#analysis_chart'+keys[i], values[i]);
+			$('#analysis_chart_'+key).highcharts(json[key]);
 
+		}
+
+		// add meta
+		meta_html += '<table>'
+		meta_html += '<thead><tr><th colspan=2>Meta Info</th></tr></thead><tbody>';
+		meta_html += '<tr><td>Country</td><td class="tright">Nepal</td></tr>';
+		meta_html += '<tr><td>ADM</td><td class="tright">2</td></tr>';
+		meta_html += '<tr><td>Aid Layer</td><td class="tright">Water Aid</td></tr>';
+		meta_html += '<tr><td colspan=2 style="text-align:center;">Weighted Layers</td></tr>';
+
+		for (var i=0, ix=_.size(json.meta.weights); i<ix; i++) {
+			var key, w_name, w_val;
+			key = _.keys(json.meta.weights)[i];
+			w_name = json.meta.weights[key];
+			w_val = json.meta.weight_vals[key];
+			meta_html += '<tr><td colspan=2>'+w_name+' ('+w_val+')</td></tr>';
+		}
+
+		meta_html += '</tbody></table';
+
+		$('#meta').html(meta_html);
+		
+		// add info
+		info_html += '';
+		$('#info').html(info_html);
+		
 		// save map to image
 		saveMap();
 
@@ -191,13 +273,6 @@ $(document).ready(function () {
 
 	};
 
-	function addImage(el, file){
-		console.log('addImage');
-		console.log(file)
-		var html = '<img src="../'+file+'" width="1200" height="400">';
-		$(el).html(html);
-	};
-
 	function saveMap() {
 		console.log('saveMap')
 		if (tile_load){
@@ -231,7 +306,7 @@ $(document).ready(function () {
 
 		if (map_image_filename) {
 			map_image_filename = map_image_filename.substr(0,map_image_filename.length-1)
-			$('#map').attr('class','');
+			$('#map').attr('class','grid_content map');
 			addImage('#map', 'data/images/map/'+map_image_filename )
 			buildReport();
 		} else {
@@ -242,41 +317,58 @@ $(document).ready(function () {
 	
 	}
 
+	function addImage(el, file){
+		console.log('addImage');
+		console.log(file)
+		var html = '<img src="../'+file+'" width="800" height="400">';
+		$(el).html(html);
+	};
+
 	function buildReport() {
 
-		// build documents
-		// var pdf_file, docx_file, html;
-
-		// html = $('#grid').html();
-
-		// console.log(html);
+		// prep for building selected document type
+		// ~ may not be needed ~
 
 		// load export options
 		$('#message').html('Create your own report view then select an export option.');
-		$('.export').show();
+		$('#buttons').show();
 
 
 	};
 
 	$('.export').click(function () {
-		var id, filetype, imgs;
+		var id, filetype, keys, imgs;
 
 		$('#message').html('Building report download...');
 
 
 		id = $(this).find('a').attr('id');
 		filetype = id.substr(id.indexOf('_') + 1);
-
 		imgs = [];
+		sizes = [];
 
-		$('img').each(function () {
-			imgs.push($(this).attr('src'));
+		keys = _.keys(files.chart_options);
+		for (var i=0, ix=keys.length; i<ix; i++) {
+        	saveChart('analysis_chart_'+keys[i], 'analysis_chart_' + keys[i]);
+    		// imgs.push(keys[i]);
+    		// sizes.push(files.chart_options[keys[i]]);
+    	}
+
+		$('.grid_content').each(function () {
+			var source = $(this).data('source');
+			source = ( source == "map" ? 'map/'+map_image_filename : source );
+			imgs.push(source);
+			// sizes.push(files.chart_options[keys[i]]);
+
 		})
+
+		// $('img').each(function () {
+		// 	imgs.push($(this).attr('src'));
+		// })
 
 		console.log(imgs)
 
-
-		parseReport({filetype:filetype, imgs: imgs}, function (result) {
+		parseReport({hash: hash, data: JSON.stringify(json.meta), filetype:filetype, imgs: imgs}, function (result) {
 
 			console.log(result);
 
@@ -287,6 +379,32 @@ $(document).ready(function () {
 
 	// --------------------------------------------------
 	// general functions
+
+    // save a highchart to png
+    function saveChart(chart, name) {
+		var svg = document.getElementById(chart).children[0].innerHTML;
+        var canvas = document.getElementById('canvas');
+        canvg(canvas,svg);
+        var img = canvas.toDataURL("image/png"); //img is data:image/png;base64
+        var img_data = {call:'saveimg', img: img, hash:hash, name:name};
+        console.log(img_data);
+        $.ajax({
+          	url: "process.php",
+          	data: img_data,
+  	        dataType: "json",
+	        type: "post",
+	        async: false,
+          	success: function(result){
+            	console.log(result);
+          	},    
+	    	error: function (request, status, error) {
+        		// console.log(request) 
+        		// console.log(status) 
+        		console.log(error);
+    		}
+        });
+    }
+
 
 	function parseReport(data, callback) {
 		$.ajax ({

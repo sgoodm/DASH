@@ -1,26 +1,45 @@
 <?php
 
 // init
+
+$hash = $_POST['hash']; 
+$json = json_decode($_POST['json'], true); 
+
+// $filetype = $_POST['filetype'];
+
 $imgs = $_POST['imgs'];
-$filetype = $_POST['filetype'];
+// $sizes = $_POST['sizes'];
 $count = count($imgs);
 
 for ($i=0; $i<$count; $i++){
-	$imgs[$i] = str_ireplace("../data", "/var/www/html/aiddata/data", $imgs[$i]);
-	$new_image = substr($imgs[$i],0,-4) . "_resize.jpeg";
+
+	$imgs[$i] = "/var/www/html/aiddata/data/images/" . $imgs[$i];
+	
+	$new_image = substr($imgs[$i],0,-4) . ".jpeg";
 	
 	$im = new Imagick(); 
-
-	// $im->setOption('png:size', '768x256');
-	// $im->setResolution(72,72); 
-	// $im->setSize(768,256);
-
 	$im->readImage($imgs[$i]);
-	// $im->scaleImage(400,0);
 	$im->writeImage($new_image);
 
 	$imgs[$i] = $new_image;
 }
+
+// for ($i=0; $i<$count; $i++){
+// 	$imgs[$i] = str_ireplace("../data", "/var/www/html/aiddata/data", $imgs[$i]);
+// 	// $new_image = substr($imgs[$i],0,-4) . "_resize.jpeg";
+	
+// 	$im = new Imagick(); 
+
+// 	// $im->setOption('png:size', '768x256');
+// 	// $im->setResolution(72,72); 
+// 	// $im->setSize(768,256);
+
+// 	$im->readImage($imgs[$i]);
+// 	// $im->scaleImage(400,0);
+// 	$im->writeImage($new_image);
+
+// 	$imgs[$i] = $new_image;
+// }
 
 // build raw string
 $raw = '';
@@ -42,9 +61,6 @@ $raw .= '<style>
 				text-align:center;
 			}
 
-			#logo {
-				text-align:center;
-			}
 
 			img {
 				width:1000px;
@@ -55,6 +71,8 @@ $raw .= '<style>
 $raw .= '<h1>AidData DASH Gap Analysis Results</h1>';
 $raw .= '<div id="logo"><img src="'.$imgs[0].'"/></div>';				
 $raw .= '<div id="logo"><img src="'.$imgs[1].'"/></div>';				
+$raw .= '<div id="logo"><img src="'.$imgs[2].'"/></div>';				
+$raw .= '<div id="logo"><img src="'.$imgs[3].'"/></div>';				
 
 // convert markdownextra to html
 require_once '/var/www/html/aiddata/libs/Michelf/MarkdownExtra.inc.php';
