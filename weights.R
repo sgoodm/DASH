@@ -26,26 +26,48 @@ geojson <- readOGR(paste("shapefiles",in_adm,"Leaflet.geojson",sep="/"), "OGRGeo
 
 for (i in 1:in_count){
 	csv <-  read.csv(paste("cache",in_files[i], sep="/"))
+
+	# check whether layer was given a negative weight by user
 	n <- 1
 	if (in_weights[i] < 0) {
 		n <- -1
 	}
+
+	# determine weights multiplier 
 	weight <- abs(in_weights[i]) / sum(abs(in_weights))
+
+	# extract layer data 
 	extract <- csv[,length(csv)]
 	
 	max <- max(extract)
+
+	# if (max == 0){
+	# 	max <- 1
+	# 	calc <- weight
+	# } else {
+	# 	calc <- ( extract / max(extract) ) * weight  
+	# }
+
+	# prevent div by zero error for all zero layer 
 	if (max == 0){
 		max <- 1
-		calc <- weight
-	} else {
-		calc <- ( extract / max(extract) ) * weight  
 	}
 
-	if (i==1){
+	# use raw data if layer is already weighted
+	if ( max(extract) <= 1 & min(extract) >= 0 ) {
+		max <- 1
+	}
+
+
+	calc <- ( extract / max ) * weight  
+	
+
+	if (i == 1){
 		result <- calc * n
 	} else {
 		result <- result + calc * n
 	}
+
 	geojson@data[in_rasters[i]] <- extract
 	geojson@data[paste(in_rasters[i],"_weighted",sep="")] <- calc * n
 }

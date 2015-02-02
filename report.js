@@ -7,7 +7,7 @@ $(document).ready(function () {
 	var hash = '',
 		files = {
 			map: 'data/gapanalysis/PLACEHOLDER.geojson',
-			analysis_extremes: 'data/images/gapanalysis/PLACEHOLDER_analysis_extremes.png'
+			analysis_extremes: 'data/images/gapanalysis/PLACEHOLDER_analysis_chart_extremes.png'
 		};
 
 	var tile_load = false;

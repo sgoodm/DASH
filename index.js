@@ -1528,9 +1528,17 @@ $(document).ready(function () {
 		};
 
 		var funding = {
-			underfunded:0,
-			average:0,
-			overfunded:0
+			projects: {
+				underfunded:0,
+				average:0,
+				overfunded:0
+			},
+			aid: {
+				underfunded:0,
+				average:0,
+				overfunded:0				
+			}
+
 		};
 
 		var ratio = [];
@@ -1542,16 +1550,24 @@ $(document).ready(function () {
 			data.results[i] = parseFloat(data.props[i].result);
 			
 			if ( data.results[i] <= -0.5 ) {
-				funding.underfunded++;
+				funding.projects.underfunded++;
+				funding.aid.underfunded += roundxy(parseFloat(data.props[i][s.rasters[0]]), 0)
 			} else if ( data.results[i] <= 0.5 ) {
-				funding.average++;
+				funding.projects.average++;
+				funding.aid.average += roundxy(parseFloat(data.props[i][s.rasters[0]]), 0)
 			} else {
-				funding.overfunded++;
+				funding.projects.overfunded++;
+				funding.aid.overfunded += roundxy(parseFloat(data.props[i][s.rasters[0]]), 0)
 			}
 
 			ratio.push( [ roundxy(parseFloat(data.props[i]['custom_weighted_layer'])), roundxy(parseFloat(data.props[i][s.rasters[0]]), 0) ] );
 
 		}
+
+		funding.aid.underfunded = ( funding.aid.underfunded < 0 ? 0 : funding.aid.underfunded );
+		funding.aid.average = ( funding.aid.average < 0 ? 0 : funding.aid.average );
+		funding.aid.overfunded = ( funding.aid.overfunded < 0 ? 0 : funding.aid.overfunded );
+
 		ratio.sort(function(a, b) {return a[0] - b[0]})
 		
 		data.bot5 = _.values(data.results).sort( function(a, b) { return a-b } )[4];
@@ -1739,25 +1755,53 @@ $(document).ready(function () {
 	            text: 'Funding'
 	        },
 	        xAxis: {
-	            categories: _.keys(funding)
+	            categories: _.keys(funding.projects)
 	        },
 	        yAxis: [{ 
 	            title: {
-	                text: 'Number of Projects'
-	            }
+	                text: 'Project Count',
+	                style: {
+	                    color: Highcharts.getOptions().colors[0]
+	                }
+	            },
+	            labels: {
+	                format: '{value}',
+	                style: {
+	                    color: Highcharts.getOptions().colors[0]
+	                }
+	            },
+	        }, { 
+	            title: {
+	                text: 'Aid Total',
+	                style: {
+	                    color: Highcharts.getOptions().colors[1]
+	                }
+	            },
+	            labels: {
+	                format: '{value}',
+	                style: {
+	                    color: Highcharts.getOptions().colors[1]
+	                }
+	            },
+	            opposite: true
 	        }],
 	        tooltip: {
-	            shared: false
+	            shared: true
 	        },
 	        legend: {
-	        	enabled:false    
+	        	enabled:true    
 	        },
 	        credits:{
 	        	enabled:false
 	        },
 	        series: [{
 	            name: 'Projects',
-	            data: _.values(funding)
+	            data: _.values(funding.projects)
+	        },
+	        {
+	            name: 'Value',
+	            yAxis: 1,
+	            data: _.values(funding.aid)
 	        }]
 	    };
 
@@ -1843,7 +1887,7 @@ $(document).ready(function () {
     	// save all analysis section content
     	// 
 
-        saveChart('analysis_extremes', active.files.gapanalysis + '_analysis_extremes');
+        saveChart('analysis_chart_extremes', active.files.gapanalysis + '_analysis_chart_extremes');
  
        	window.open('report.php#'+active.files.gapanalysis);
 
