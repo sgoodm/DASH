@@ -19,9 +19,12 @@ $(document).ready(function () {
 			// }
 		};
 
-	var tile_load = false;
+	var tile_load = false, 
+		tile_timeout = 0,
+		tile_timelimit = 5000;
 
 	var json;
+
 
 
     // check hashtag on change and on page load
@@ -138,7 +141,7 @@ $(document).ready(function () {
 		}
 
 		$('#grid').html(html);	
-		$("#grid").sortable();
+		// $("#grid").sortable();
 
 
 		// add map
@@ -156,9 +159,9 @@ $(document).ready(function () {
 		// add meta
 		meta_html += '<table>'
 		meta_html += '<thead><tr><th colspan=2>Meta Info</th></tr></thead><tbody>';
-		meta_html += '<tr><td>Country</td><td class="tright">Nepal</td></tr>';
-		meta_html += '<tr><td>ADM</td><td class="tright">2</td></tr>';
-		meta_html += '<tr><td>Aid Layer</td><td class="tright">Water Aid</td></tr>';
+		meta_html += '<tr><td>Country</td><td class="tright">'+json.meta.country+'</td></tr>';
+		meta_html += '<tr><td>ADM</td><td class="tright">'+json.meta.adm+'</td></tr>';
+		meta_html += '<tr><td>Aid Layer</td><td class="tright">'+json.meta.gapanalysis+'</td></tr>';
 		meta_html += '<tr><td colspan=2 style="text-align:center;">Weighted Layers</td></tr>';
 
 		for (var i=0, ix=_.size(json.meta.weights); i<ix; i++) {
@@ -275,7 +278,7 @@ $(document).ready(function () {
 
 	function saveMap() {
 		console.log('saveMap')
-		if (tile_load){
+		if (tile_load || tile_timeout > tile_timelimit){
 			setTimeout(function() {
 				console.log('generating map image')
 				$('#map').html2canvas({
@@ -285,7 +288,7 @@ $(document).ready(function () {
 					profile: false,
 					useCORS: true		      		
 				});
-
+				tile_timeout = 0;
 				checkMapImage();
 			}, 1000);
 
@@ -293,8 +296,9 @@ $(document).ready(function () {
 
 			setTimeout(function() {
 				// create map image
+				tile_timeout += 1000
 				saveMap();
-			}, 2000);
+			}, 1000);
 
 		}
 
@@ -306,13 +310,13 @@ $(document).ready(function () {
 
 		if (map_image_filename) {
 			map_image_filename = map_image_filename.substr(0,map_image_filename.length-1)
-			$('#map').attr('class','grid_content map');
+			$('#map').attr('class','grid_content');
 			addImage('#map', 'data/images/map/'+map_image_filename )
 			buildReport();
 		} else {
 			setTimeout(function() {
 				checkMapImage();
-			}, 2000)
+			}, 1000)
 		}
 	
 	}
@@ -320,7 +324,7 @@ $(document).ready(function () {
 	function addImage(el, file){
 		console.log('addImage');
 		console.log(file)
-		var html = '<img src="../'+file+'" width="800" height="400">';
+		var html = '<img src="../'+file+'">';
 		$(el).html(html);
 	};
 
@@ -368,7 +372,7 @@ $(document).ready(function () {
 
 		console.log(imgs)
 
-		parseReport({hash: hash, data: JSON.stringify(json.meta), filetype:filetype, imgs: imgs}, function (result) {
+		parseReport({hash: hash, meta: JSON.stringify(json.meta), filetype:filetype, imgs: imgs}, function (result) {
 
 			console.log(result);
 

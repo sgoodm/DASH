@@ -1014,7 +1014,10 @@ $(document).ready(function () {
 
        			$('#gapanalysis_option_2 a').html('Edit Your Custom Layer');
 
-	        	addPolyData();
+       			if (state != 'link-weights') {
+   					addPolyData();
+       			}
+
        	       	map.spin(false);
 	        }
 	    });
@@ -1657,50 +1660,39 @@ $(document).ready(function () {
 
 		}
 
-		console.log(analysis_data);
+		// console.log(analysis_data);
 
 		chart_options.extremes = {
 	        chart: {
 	        	type: 'column',
 	        	spacingBottom: 75
-	            // zoomType: '',
-	            // spacingLeft: 10,
-	            // marginRight: 100,
-	            // backgroundColor: '#ffc425'
-
-	        },
-	        title: {
-	            text: 'Gap Analysis'
-	        },
-	        subtitle: {
-	            text: analysis_data.subtitle
 	        },
           	plotOptions: {
-	         	// column: {
-	          //   	stacking: 'normal'
-           //  	},
             	series: {
 	            	stacking: 'normal',
             		cursor: 'pointer',
 	                point: {
 	                    events: {
-	                    	click: function () {
+	                    	click: function (e) {
+
+	                    		// not working
+
 	                    		_.each( map._layers, function(lay) {
 	                    			lay.fire('mouseout');
 	                    		})
 	   
 	                    		map._layers[ featureList[analysis_data.categories[this.x]] ].fire('mouseover');
+
 	                    	}
-	                     //    mouseOver: function () {
-	                     //       console.log( analysis_data.categories[this.x], featureList[analysis_data.categories[this.x]] );
-	                     //       map._layers[ featureList[analysis_data.categories[this.x]] ].fire('mouseover');
-	                     //    },
-	                     //    mouseOut: function () {
-		                    //     map._layers[ featureList[analysis_data.categories[this.x]] ].fire('mouseout');
-		                    // }
 	                    }
 	                }
 	            }
+	        },
+		    title: {
+	            text: 'Gap Analysis'
+	        },
+	        subtitle: {
+	            text: analysis_data.subtitle
 	        },
 	        xAxis: {
 	            categories: analysis_data.categories
@@ -1734,20 +1726,7 @@ $(document).ready(function () {
 	        credits:{
 	        	enabled:false
 	        },
-	        series: analysis_data.series//[{
-	        //     name: 'Aid',
-	        //     data: analysis_data.primary//,
-	        //     // tooltip: {
-	        //     //     valueSuffix: ''
-	        //     // }
-
-	        // }, {
-	        //     name: 'Data',
-	        //     data: analysis_data.secondary//,
-	        // //     // tooltip: {
-	        // //     //     valueSuffix: ''
-	        //     // }
-	        // }]
+	        series: analysis_data.series
 	    };
 
 		chart_options.funding = {
@@ -1839,7 +1818,7 @@ $(document).ready(function () {
 	        }]
 	    };
 
-	    console.log(ratio)
+	    // console.log(ratio)
 
 	    for (var i = 0, ix = _.keys(chart_options).length; i < ix; i++) {
 		    var key, html;
@@ -1848,8 +1827,8 @@ $(document).ready(function () {
 
 		    html = '<div id="analysis_chart_'+key+'" class="analysis_chart"></div>';
 			$('#analysis_results').append(html);
-			chart_options[key] = JSON.stringify(chart_options[key]);
-			$('#analysis_chart_'+key).highcharts( JSON.parse(chart_options[key]) );
+			chart_options[key] = JSON.parse(JSON.stringify(chart_options[key]));
+			$('#analysis_chart_'+key).highcharts( chart_options[key] );
 		}
 
         $('html, body').animate({ scrollTop: 0 }, 0);
@@ -1944,8 +1923,8 @@ $(document).ready(function () {
 	// general functions
 
 
-	function showState(el, state) {
-		if (state == true) {
+	function showState(el, newState) {
+		if (newState == true) {
 			$(el).show();
 		} else {
 			$(el).hide();
@@ -2078,15 +2057,16 @@ $(document).ready(function () {
     		$('#ga1').change();   
 	    }
 
-	    state = 'link';
-
 	    validateOptions();
 
+	    state = 'link-weights';
 	    $('#method_weights').click();
 	    $('#weights_submit').click();
 
+	    state = 'link-gapanalysis';
 	    $('#method_gapanalysis').click();
 	    $('#gapanalysis_submit').click();
+
   		$('#map_options_toggle').click();
 
   	};
