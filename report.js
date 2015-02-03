@@ -343,6 +343,13 @@ $(document).ready(function () {
 	$('.export').click(function () {
 		var id, filetype, keys, imgs;
 
+		$('.highcharts-title').each(function () {
+			$(this).hide();
+		})
+		$('.highcharts-button').each(function () {
+			$(this).hide();
+		})
+
 		$('#message').html('Building report download...');
 
 
@@ -378,6 +385,13 @@ $(document).ready(function () {
 
 			// set export option  hrefs
 			$('#message').html('<a href="'+result+'" class="btn" ><span>Download</span></a>');
+
+			$('.highcharts-title').each(function () {
+				$(this).show();
+			})
+			$('.highcharts-button').each(function () {
+				$(this).show();
+			})
 		})
 	})
 

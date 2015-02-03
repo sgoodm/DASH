@@ -1014,7 +1014,9 @@ $(document).ready(function () {
 
        			$('#gapanalysis_option_2 a').html('Edit Your Custom Layer');
 
+       			console.log(state)
        			if (state != 'link-weights') {
+       				console.log('adding weight layer')
    					addPolyData();
        			}
 
@@ -1547,7 +1549,13 @@ $(document).ready(function () {
 
 		};
 
-		var ratio = [];
+		var ratio = {
+			raw: [],
+			// rank: [],
+			// aid: {},
+			// name: {},
+			series: []
+		};
 
 		analysis_data.subtitle = ( analysis_data.featureCount > 10 ? 'Top 5 Underfunded / Top 5 Overfunded' : '');
 
@@ -1566,7 +1574,12 @@ $(document).ready(function () {
 				funding.aid.overfunded += roundxy(parseFloat(analysis_data.props[i][s.rasters[0]]), 0);
 			}
 
-			ratio.push( [ roundxy(parseFloat(analysis_data.props[i]['custom_weighted_layer'])), roundxy(parseFloat(analysis_data.props[i][s.rasters[0]]), 0) ] );
+			ratio.raw.push( [ 
+				roundxy(parseFloat(analysis_data.props[i]['custom_weighted_layer']), 3), 
+				parseFloat(analysis_data.props[i]['rank']), 
+				roundxy(parseFloat(analysis_data.props[i][s.rasters[0]]), 0),
+				analysis_data.props[i]['NAME_' + s.adm.substr(3,1)]
+			] );
 
 		}
 
@@ -1574,7 +1587,7 @@ $(document).ready(function () {
 		funding.aid.average = ( funding.aid.average < 0 ? 0 : funding.aid.average );
 		funding.aid.overfunded = ( funding.aid.overfunded < 0 ? 0 : funding.aid.overfunded );
 
-		ratio.sort(function(a, b) {return a[0] - b[0]})
+		ratio.raw.sort(function(a, b) {return a[0] - b[0]})
 		
 		analysis_data.bot5 = _.values(analysis_data.results).sort( function(a, b) { return a-b } )[4];
 		analysis_data.top5 = _.values(analysis_data.results).sort( function(a, b) { return b-a } )[4];
@@ -1658,6 +1671,23 @@ $(document).ready(function () {
 
 			}
 
+			// manage ratio data
+			// ratio.rank.push( [ ratio.raw[i][0], ratio.raw[i][1] ] );
+			// if ( ratio.aid[ratio.raw[i][0]] ) {
+			// 	ratio.aid[ratio.raw[i][0]] = String(ratio.aid[ratio.raw[i][0]]) +', '+ String(ratio.raw[i][2]);
+			// 	ratio.name[ratio.raw[i][0]] = String(ratio.name[ratio.raw[i][0]]) +', '+ String(ratio.raw[i][3]);
+			// } else {
+			// 	ratio.aid[ratio.raw[i][0]] = String(ratio.raw[i][2]);
+			// 	ratio.name[ratio.raw[i][0]] = String(ratio.raw[i][3]);
+			// }
+
+			ratio.series.push( {
+				x: ratio.raw[i][0],
+				y: ratio.raw[i][1],
+				aid: ratio.raw[i][2],
+				adm: ratio.raw[i][3] 
+			} );
+
 		}
 
 		// console.log(analysis_data);
@@ -1712,7 +1742,8 @@ $(document).ready(function () {
 	            },
 	        }],
 	        tooltip: {
-	            shared: true
+	            shared: true,
+	            hideDelay:0
 	        },
 	        legend: {
 	            layout: 'horizontal',
@@ -1741,7 +1772,7 @@ $(document).ready(function () {
 	        },
 	        yAxis: [{ 
 	            title: {
-	                text: 'Project Count',
+	                text: 'ADM Count',
 	                style: {
 	                    color: Highcharts.getOptions().colors[0]
 	                }
@@ -1768,7 +1799,8 @@ $(document).ready(function () {
 	            opposite: true
 	        }],
 	        tooltip: {
-	            shared: true
+	            shared: true,
+	            hideDelay:0
 	        },
 	        legend: {
 	        	enabled:true    
@@ -1777,34 +1809,72 @@ $(document).ready(function () {
 	        	enabled:false
 	        },
 	        series: [{
-	            name: 'Projects',
+	            name: 'ADM Count',
 	            data: _.values(funding.projects)
 	        },
 	        {
-	            name: 'Value',
+	            name: 'Aid Total',
 	            yAxis: 1,
 	            data: _.values(funding.aid)
 	        }]
 	    };
 
 		chart_options.ratio = {
-
+			chart: {
+				type: 'scatter'
+			},
 	        title: {
-	            text: 'Ratio'
+	            text: 'Ratio of Aid Rank to Weighted Index'
 	        },
 	        xAxis: {
 	            title: {
-	            	text: 'Weighted Index (0-1)'	            
+	            	text: 'Relative Vulnerability (0 = least vulnerable)'	            
 	        	}
 	        },
 	        yAxis: [{ 
 	            title:  {
-	            	text: 'Aid'
+	            	text: 'ADM Rank ( rank 1 = least aid )'
             	},
             	min:0	            
 	        }],
-	        tooltip: {
-	            shared: false
+	        // tooltip: {
+	        //     formatter: function () {
+	        //     	// var html =  '';
+	        //     	// html += '<b>' + this.point.adm + '</b><br>';
+	        //      //    html += 'Aid Rank: ' + this.point.y + '<br>';
+	        //      //    html += 'Aid Actual: ' + this.point.aid + '<br>';
+	        //      //    html += 'Weighted Index: ' + this.point.x + '<br>';
+	        //      //    return html;
+
+	        //         return '<b>' + this.point.adm + '</b><br> Aid Rank: ' + this.point.y + '<br> Aid Actual: ' + this.point.aid + '<br> Weighted Index: ' + this.point.x + '<br>';
+	        //     }
+	        // },
+            plotOptions: {
+	            scatter: {
+	                marker: {
+	                    radius: 5,
+	                    states: {
+	                        hover: {
+	                            enabled: true,
+	                            lineColor: 'rgb(100,100,100)'
+	                        }
+	                    }
+	                },
+	                states: {
+	                    hover: {
+	                        marker: {
+	                            enabled: false
+	                        }
+	                    }
+	                },
+                    tooltip: {
+                        headerFormat: '',
+                        pointFormat: '<b> {point.adm} </b> <br> Rank: {point.y} <br> Aid: {point.aid} <br> Weighted Index: {point.x} <br>',
+                        hideDelay:0
+                    },
+
+
+	            }
 	        },
 	        legend: {
 	        	enabled:false    
@@ -1814,11 +1884,12 @@ $(document).ready(function () {
 	        },
 	        series: [{
 	        	name: s.adm,
-	            data: ratio
+	            data: ratio.series,
+
 	        }]
 	    };
 
-	    // console.log(ratio)
+	    console.log(ratio)
 
 	    for (var i = 0, ix = _.keys(chart_options).length; i < ix; i++) {
 		    var key, html;
@@ -2059,12 +2130,12 @@ $(document).ready(function () {
 
 	    validateOptions();
 
-	    state = 'link-weights';
 	    $('#method_weights').click();
+	    state = 'link-weights';
 	    $('#weights_submit').click();
 
-	    state = 'link-gapanalysis';
 	    $('#method_gapanalysis').click();
+	    state = 'link-gapanalysis';
 	    $('#gapanalysis_submit').click();
 
   		$('#map_options_toggle').click();

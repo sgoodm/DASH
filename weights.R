@@ -54,9 +54,9 @@ for (i in 1:in_count){
 	}
 
 	# use raw data if layer is already weighted
-	if ( max(extract) <= 1 & min(extract) >= 0 ) {
-		max <- 1
-	}
+	# if ( max(extract) <= 1 & min(extract) >= 0 ) {
+	# 	max <- 1
+	# }
 
 
 	calc <- ( extract / max ) * weight  

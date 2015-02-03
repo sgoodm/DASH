@@ -171,12 +171,10 @@ switch ($_POST['call']) {
 		if (!file_exists($base) && !is_dir($base)) {
 			$old_mask = umask(0);
 			mkdir($base, 0775, true);
-
-			file_put_contents($base . '/chart_options.json', $json);
-			$out = 'done';
-		} else {
-			$out = 'exists';
-		} 			
+		}
+		file_put_contents($base . '/chart_options.json', $json);
+		$out = 'done';
+	
 
 		echo $out;
 

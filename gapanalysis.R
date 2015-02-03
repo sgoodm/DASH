@@ -65,7 +65,7 @@ if ( as.numeric(min(secondary_data) < 0) ) {
 	secondary_data <- secondary_data - min(secondary_data)
 }
 # secondary data is already weighted 0-1 by weights.R
-secondary_data_percent <- secondary_data #/ sum(secondary_data)
+secondary_data_percent <- secondary_data / sum(secondary_data)
 secondary_data_percent[is.nan(secondary_data_percent)] = 0
 
 geojson@data[paste(in_rasters[2],"percent",sep="_")] <- secondary_data_percent
@@ -76,6 +76,8 @@ geojson@data["ratio"] <- ratio
 sd <- (ratio-mean(ratio))/sd(ratio)
 geojson@data["result"] <- sd
 
+rank <- rank(primary_data)
+geojson@data["rank"] <- rank
 
 setwd("/var/www/html/aiddata/data/gapanalysis")
 toGeoJSON(data=geojson, name=in_name)
