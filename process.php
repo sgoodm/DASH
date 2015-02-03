@@ -2,6 +2,7 @@
 
 switch ($_POST['call']) {
 
+	// check if a file exists
 	case 'exists':
 		$name = $_POST['name'];
 		if ( file_exists("/var/www/html/aiddata/".$name) ) {
@@ -11,7 +12,7 @@ switch ($_POST['call']) {
 		}
 		break;
 
-	//returns directory contents
+	// returns directory contents
 	case 'scan':
 		$path = $_POST['path'];
 		$dir = "/var/www/html/aiddata/DET/resources" . $path;
@@ -68,12 +69,11 @@ switch ($_POST['call']) {
 		}
 		break;
 
-	// send variables to Rscript to create geojson with weighted data
+	// send variables to weights.R to create geojson
 	case 'weights':
 		$continent = $_POST["continent"];
 		$country = $_POST["country"];
 		$adm = $_POST["adm"];
-		// $name = $country ."_". $adm ."_". md5($_POST["name"]);
 		$rasters = $_POST["rasters"];
 		$weights = $_POST["weights"]; 
 		$files = $_POST["files"];
@@ -100,11 +100,11 @@ switch ($_POST['call']) {
 		
 		break;
 
+	// send variables to gapanalysis.R to create geojson
 	case 'gapanalysis':
 		$continent = $_POST["continent"];
 		$country = $_POST["country"];
 		$adm = $_POST["adm"];
-		// $name = $country ."_". $adm ."_". md5($_POST["name"]);
 		$rasters = $_POST["rasters"];
 		$files = $_POST["files"];
 		$count = count($rasters);
@@ -129,12 +129,18 @@ switch ($_POST['call']) {
 		echo $name;
 		break;
 
+	// save a highcharts chart as image
 	case 'saveimg':
 		$base = '/var/www/html/aiddata/data/images/gapanalysis/' . $_POST['hash'] . '/';
 		$name = $_POST['name'] .'.png';
 
-
 		$filename = $base . $name ;
+
+		// if ( file_exists($filename) ) {
+		// 	$out = 'image exists';//$name;
+		// 	echo json_encode($out);
+		// 	break;
+		// }
 
 		$img = $_POST['img'];
 		$img = str_replace('data:image/png;base64,', '', $img);
@@ -147,6 +153,7 @@ switch ($_POST['call']) {
 		echo json_encode($out);
 		break;
 
+	// save a leaflet map as image
 	case 'savemap':
 
 		$base = '/var/www/html/aiddata/data/images/map/';
@@ -163,19 +170,30 @@ switch ($_POST['call']) {
 		echo json_encode($out);
 		break;
 
+	// write json to file
 	case 'write':
 		$hash = $_POST['hash'];
 		$json = json_encode(json_decode($_POST['json']), JSON_PRETTY_PRINT);
 
 		$base = '/var/www/html/aiddata/data/images/gapanalysis/' . $hash;
+		$filename = $base .  '/chart_options.json';
+
+		
+		// if ( file_exists($filename) ) {
+		// 	$out = 'write DASH json: exists';
+		// 	echo $out;
+		// 	break;
+		// }
+
 		if (!file_exists($base) && !is_dir($base)) {
 			$old_mask = umask(0);
 			mkdir($base, 0775, true);
 		}
-		file_put_contents($base . '/chart_options.json', $json);
-		$out = 'done';
-	
 
+		file_put_contents($filename, $json);
+
+		$out = 'write DASH json: done';
+	
 		echo $out;
 
 		break;

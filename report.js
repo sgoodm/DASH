@@ -334,7 +334,7 @@ $(document).ready(function () {
 		// ~ may not be needed ~
 
 		// load export options
-		$('#message').html('Create your own report view then select an export option.');
+		$('#message').html('Select an export option');
 		$('#buttons').show();
 
 
@@ -356,28 +356,20 @@ $(document).ready(function () {
 		id = $(this).find('a').attr('id');
 		filetype = id.substr(id.indexOf('_') + 1);
 		imgs = [];
-		sizes = [];
 
 		keys = _.keys(files.chart_options);
 		for (var i=0, ix=keys.length; i<ix; i++) {
         	saveChart('analysis_chart_'+keys[i], 'analysis_chart_' + keys[i]);
-    		// imgs.push(keys[i]);
-    		// sizes.push(files.chart_options[keys[i]]);
     	}
 
 		$('.grid_content').each(function () {
 			var source = $(this).data('source');
 			source = ( source == "map" ? 'map/'+map_image_filename : source );
 			imgs.push(source);
-			// sizes.push(files.chart_options[keys[i]]);
-
 		})
 
-		// $('img').each(function () {
-		// 	imgs.push($(this).attr('src'));
-		// })
 
-		console.log(imgs)
+		// console.log(imgs)
 
 		parseReport({hash: hash, meta: JSON.stringify(json.meta), filetype:filetype, imgs: imgs}, function (result) {
 
