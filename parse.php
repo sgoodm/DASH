@@ -3,13 +3,19 @@
 // init
 
 $hash = $_POST['hash']; 
+$path = "/var/www/html/aiddata/data/reports/".$hash;
 // $filetype = $_POST['filetype'];
 
-// if ( file_exists("/var/www/html/aiddata/data/images/gapanalysis/".$hash."/report.pdf") ) {
-// 	$out = '../data/images/gapanalysis/'.$hash.'/report.pdf';
+// if ( file_exists($path."/report.pdf") ) {
+// 	$out = '../data/reports/'.$hash.'/report.pdf';
 // 	echo json_encode($out);
 // 	return;
 // }
+
+if (!file_exists($path) && !is_dir($path)) {
+	$old_mask = umask(0);
+	mkdir($path, 0775, true);
+}
 
 $meta = json_decode($_POST['meta'], true); 
 
@@ -263,16 +269,16 @@ require_once '/var/www/html/aiddata/libs/Michelf/MarkdownExtra.inc.php';
 use \Michelf\MarkdownExtra;
 $parser = new MarkdownExtra();
 $html = $parser->transform($raw);
-file_put_contents("/var/www/html/aiddata/data/images/gapanalysis/".$hash."/report.html", $html);
+file_put_contents($path."/report.html", $html);
 
 // convert html to pdf
 include '/var/www/html/aiddata/libs/mpdf/mpdf.php';
 $mpdf = new mPDF();
 $mpdf->WriteHTML($html);
-$mpdf->Output("/var/www/html/aiddata/data/images/gapanalysis/".$hash."/report.pdf", "F");
+$mpdf->Output($path."/report.pdf", "F");
 
 
-$out = '../data/images/gapanalysis/'.$hash.'/report.pdf';
+$out = '../data/reports/'.$hash.'/report.pdf';
 
 echo json_encode($out);
 
