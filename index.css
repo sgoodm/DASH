@@ -421,6 +421,11 @@ i, i:hover, i:active, i:focus, i:visited,
         width: 100%;
         display:inline-block;
     }
+        .leaflet-control-layers {
+            position: fixed;
+            top: 5px;
+            left:100px;
+        }
         .leaflet-top, .leaflet-bottom {
             position: absolute;
             z-index: 10;
@@ -549,6 +554,29 @@ i, i:hover, i:active, i:focus, i:visited,
                 position: relative;
                 left:4px;
                 top: 96px;
+            }
+
+    #map_layers_container {
+        display:none;
+        height:25px;
+        position:fixed;
+        top:0;
+        left:75px;
+        border:1px solid black;
+        border-top:0;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        background: rgba(210,210,210,1);
+        color:black;
+    }
+
+        #map_layers label {
+            display: inline-block;
+            padding: 0px 10px;
+        }
+
+            #map_layers input {
+                margin-right: 5px;
             }
 
     /* ANALYSIS TAB */

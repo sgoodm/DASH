@@ -333,7 +333,6 @@ $(document).ready(function () {
 		// copy pending data object to submission data object
 		s = (JSON.parse(JSON.stringify(p)));
 
-		$('#map_chart_toggle').hide();
 		prepWeights();
 	});
 
@@ -423,8 +422,6 @@ $(document).ready(function () {
 		var new_height = height / 2 - 4;
 		// console.log(height, new_height);
 		$('#map_chart_toggle span').css('top', new_height );
-
-		$('#map_chart_toggle').show();
 
 		prepGapAnalysis();
 	});
@@ -729,9 +726,15 @@ $(document).ready(function () {
 	// map
 
 
-	// init
-	var map, tiles, map_display, map_button, allCountryBounds, mapinfo;
-	
+	var map, tiles, map_display, map_button, allCountryBounds, mapinfo, layersControl, map_button = {},
+		// addCountry vars: countryLayer
+		countryLayer, 
+		// addPointData vars: markers, geojsonPoints
+		markers, geojsonPoints, 
+		// addPolyData vars: geojsonPolyData, geojson, info, legend, featureList, lastClicked, layer_type
+		geojsonPolyData = {}, geojson = {}, info = {}, legend = {}, 
+		/*featureList,*/ lastClicked/*, layer_type*/, current_layer; 
+
 	L.mapbox.accessToken = 'pk.eyJ1Ijoic2dvb2RtIiwiYSI6InotZ3EzZFkifQ.s306QpxfiAngAwxzRi2gWg';
 
 	map = L.mapbox.map('map', {});
@@ -745,49 +748,22 @@ $(document).ready(function () {
 	map.options.maxZoom = 11;
 	map.options.minZoom = 2;
 
- //    map_display = {
- //    		map_button:true,
- //    		map_options: '',
- //    		map_chart_container: '',
- //    		analysis_tab: ''
- //    	}
-    	
-	// map_button = L.easyButton('fa-exchange', 
- //  		function (){
- //  			for ( var i=1, ix=_.keys(map_display).length; i<ix; i++) {
- //  				var key = _.keys(map_display)[i]; 
- //  				console.log(key)
- //  				if ( map_display.map_button == true ) {
- //  					if ( $('#'+key).length > 0 ) {
-	//   					map_display[key] = 'on';
-	//   					showState('#'+key,false)
-	//   				} else {
-	//   					map_display[key] = 'off'
-	//   				}
-  					
- //  				} else {
- //  					if ( map_display[key] == 'on' ) {
- //  						showState('#'+key,true)
- //  					}
- //  				}
- //  			}
-  			
- //        	map_display.map_button = !map_display.map_button;
- //      	},
- //      	'Toggle map UI display',
- //      	map
- //    )
+	$('.leaflet-control-attribution').hide();
+
+	$('#map_layers').on('change', 'input[name="map_layer"]:radio', function (){
+		var val = $(this).val()
+		console.log(val);
+		if (geojsonPolyData[val]) {
+			addPolyData(val)
+		}
+	})
+
+
 
 	// bounds objects
 	allCountryBounds = { global:{_northEast:{lat:90, lng:180}, _southWest:{lat:-90, lng:-180}} };
 
 	mapinfo = {};
-
-	// addCountry vars: countryLayer
-	// addPointData vars: markers, geojsonPoints
-	// addPolyData vars: geojsonPolyData, geojson, info, legend, featureList
-	var countryLayer, markers, geojsonPoints, geojsonPolyData, geojson, info, legend, featureList, lastClicked; 
-
 	
 	mapinfo.pointdata =  function(feature, layer) {
 		var a = feature.properties;
@@ -835,9 +811,10 @@ $(document).ready(function () {
 			html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />';
 	        
 	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Weighted</th></tr></thead><tbody>";
-	        for (var i=0, ix=s.rasters.length; i<ix; i++) {
+	        var vals = _.values(active.weights);
+	        for (var i=0, ix=vals.length; i<ix; i++) {
 
-			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundxy( props[s.rasters[i]] ) + '</td><td>' + (props[s.rasters[i]+"_weighted"] ? roundxy(props[s.rasters[i]+"_weighted"]) : "" ) + '</td></tr>';
+			    html += '<tr><td>' + vals[i] + '</td><td>' + roundxy( props[vals[i]] ) + '</td><td>' + (props[vals[i]+"_weighted"] ? roundxy(props[vals[i]+"_weighted"]) : "" ) + '</td></tr>';
 
 	        }
 	        html += "</tbody></table>";
@@ -858,15 +835,34 @@ $(document).ready(function () {
 			html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />'; 
 	        
 	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Percent</th></tr></thead><tbody>";
-	        for (var i=0, ix=s.rasters.length; i<ix; i++) {
+	        var vals = _.values(active.gapanalysis);
+	        for (var i=0, ix=vals.length; i<ix; i++) {
 
-			    html += '<tr><td>' + s.rasters[i] + '</td><td>' + roundxy( props[s.rasters[i]] ) + '</td><td>' + roundxy( props[s.rasters[i]+"_percent"] )  + '</td></tr>';
+			    html += '<tr><td>' + vals[i] + '</td><td>' + roundxy( props[vals[i]] ) + '</td><td>' + roundxy( props[vals[i]+"_percent"] )  + '</td></tr>';
 
 	        }
 	        html += "</tbody></table>";
 
 	        html += 'Ratio: ' + roundxy(props.ratio) + '<br>';
 	        html += 'Result: ' + roundxy(props.result);
+		
+		} else {
+			html = 'Hover over an area';
+		}
+
+	    this._div.innerHTML = html;
+	}
+
+	mapinfo.aid = function(props) {
+
+		var html =  '<h4>Aid Layer</h4>';
+
+		if (props) {
+			html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />'; 
+	        
+
+	        html += 'Rank: ' + roundxy(props.rank) + '<br>';
+	        html += 'Aid: ' + roundxy(props[active.gapanalysis.ga1]);
 		
 		} else {
 			html = 'Hover over an area';
@@ -890,10 +886,20 @@ $(document).ready(function () {
 				map.removeLayer(countryLayer);
 			}
 
-			if (map.hasLayer(geojson)) {
-				map.removeLayer(geojson);
-				info.removeFrom(map);
-				legend.removeFrom(map);		
+			if (map.hasLayer(geojson['weights'])) {
+				map.removeLayer(geojson['weights']);
+				info['weights'].removeFrom(map);
+				legend['weights'].removeFrom(map);		
+			}
+			if (map.hasLayer(geojson['aid'])) {
+				map.removeLayer(geojson['aid']);
+				info['aid'].removeFrom(map);
+				legend['aid'].removeFrom(map);		
+			}
+			if (map.hasLayer(geojson['gapanalysis'])) {
+				map.removeLayer(geojson['gapanalysis']);
+				info['gapanalysis'].removeFrom(map);
+				legend['gapanalysis'].removeFrom(map);		
 			}
 
 			lastClicked = undefined;
@@ -991,7 +997,7 @@ $(document).ready(function () {
 	        	var file = "../data/weights/" + result + ".geojson";
 				var error
 				readJSON(file, function (request, status, e) {
-					geojsonPolyData = request;
+					geojsonPolyData.weights = request;
 					error = e;
 				})
 
@@ -1014,10 +1020,20 @@ $(document).ready(function () {
 
        			$('#gapanalysis_option_2 a').html('Edit Your Custom Layer');
 
+	        	if ( $('#map_layer_weights').length == 0 ) {
+                	$('#map_layers').append('<label class="map_layer" id="map_layer_weights"><input type=radio name="map_layer" value="weights">Weights</label>');
+                }
+                $('input:radio[name=map_layer]').filter('[value=weights]').prop('checked', true);
+
+                if ( $('.map_layer').length > 1 ) {
+   	       			$('#map_layers_container').show();
+                }
+
        			console.log(state)
        			if (state != 'link-weights') {
        				console.log('adding weight layer')
-   					addPolyData();
+
+   					addPolyData('weights');
        			}
 
        	       	map.spin(false);
@@ -1039,7 +1055,9 @@ $(document).ready(function () {
 
     			var error
 				readJSON(file, function (request, status, e) {
-					geojsonPolyData = request;
+					geojsonPolyData.aid = request;
+					geojsonPolyData.gapanalysis = request;
+
 					error = e;
 				})
 
@@ -1061,7 +1079,21 @@ $(document).ready(function () {
 	        	// generate link
 	        	buildHash();
 
-	        	addPolyData();
+	        	addPolyData('gapanalysis');
+
+	        	$('#map_layer_containers').show();
+	        	if ( $('#map_layer_aid').length == 0 ) {
+                	$('#map_layers').append('<label class="map_layer" id="map_layer_aid"><input type=radio name="map_layer" value="aid">Aid</label>');
+                }
+                if ( $('#map_layer_gapanalysis').length == 0 ) {
+                	$('#map_layers').append('<label class="map_layer" id="map_layer_gapanalysis"><input type=radio name="map_layer" value="gapanalysis">Gap Analysis</label>');
+                }
+
+                $('input:radio[name=map_layer]').filter('[value=gapanalysis]').prop('checked', true);
+
+                if ( $('.map_layer' ).length > 1 ) {
+   	       			$('#map_layers_container').show();
+                }
        	       	map.spin(false);
         	    runAnalysis();	
 
@@ -1070,24 +1102,32 @@ $(document).ready(function () {
 	}
 
 	// depends on s.method, s.adm, s.rasters, active.weights, geojsonPolyData
-	function addPolyData() {
+	function addPolyData(layer_type) {
 
-		featureList = {};
+		current_layer = layer_type;
+		// featureList = {};
+
+		if (current_layer == 'gapanalysis') {
+			$('#map_chart_toggle').show();
+
+		} else {
+			$('#map_chart_toggle').hide();
+		}
 
 		cleanMap("poly");
    		cleanMap("chart");
 
-		// console.log(current);
-		// console.log(s);
-		// console.log(geojsonPolyData);
+    	var size = 	geojsonPolyData[layer_type].features.length;
 
 	    var grades = {
 	    	weights: [0.15, 0.30, 0.45, 0.60, 0.85, 1],
+	    	aid: [Math.floor(size*1/5), Math.floor(size*2/5), Math.floor(size*3/5), Math.floor(size*4/5), Math.floor(size*5/5)],
 	    	gapanalysis: [-1.5, -1.0, -0.5, 0.5, 1.0, 1.5, 2]
+
 	    };
 
 		function getColor(d) {
-			if (s.method == "weights") {
+			if (current_layer == 'weights') {
 
 			    return d <= 0.15 ? '#de2d26' :
 			           d <= 0.30 ? '#fc9272' :
@@ -1097,7 +1137,16 @@ $(document).ready(function () {
 			           d <= 0.85 ? '#e5f5e0' :
 	   		           			   '#a1d99b' ; 
 
-   		    } else if (s.method == "gapanalysis") {
+   		    } else if (current_layer == 'aid') {
+   		    	// console.log(d, size)
+			    return d <= Math.floor(size*1/5) ? '#de2d26' :
+			           d <= Math.floor(size*2/5) ? '#fc9272' :
+
+			           d <= Math.floor(size*3/5) ? '#fff7bc' :
+	   		           d <= Math.floor(size*4/5) ? '#a1d99b' :
+	   		           			  	   			   '#31a354';
+
+   		    } else if (current_layer == 'gapanalysis') {
 
 			    return d <= -1.5 ? '#de2d26' :
 			           d <= -1.0 ? '#fc9272' :
@@ -1107,17 +1156,8 @@ $(document).ready(function () {
 			           d <= 1.0 ? '#e5f5e0' :
 	   		           d <= 1.5 ? '#a1d99b' :
 	   		           			  '#31a354';
-   		    }
-		}
 
-		function style(feature) {
-		    return {
-		        fillColor: getColor(feature.properties.result),
-		        weight: 1,
-		        opacity: 1,
-		        color: 'black',
-		        fillOpacity: 0.75
-		    };
+   		    }
 		}
 
 		function mouseoverFeature(e) {
@@ -1131,7 +1171,7 @@ $(document).ready(function () {
 		        layer.bringToFront();
 		    }
 
-   		    info.update(e.target.feature.properties);
+   		    info[current_layer].update(e.target.feature.properties);
 
 		}
 
@@ -1147,7 +1187,7 @@ $(document).ready(function () {
 		        layer.bringToFront();
 		    }
 
-   		    info.update(e.target.feature.properties);
+   		    info[current_layer].update(e.target.feature.properties);
 
 		    // geojson.resetStyle(layer);
 		    // info.update();
@@ -1167,7 +1207,7 @@ $(document).ready(function () {
 			// zoom to feature
 	    	// map.fitBounds(e.target.getBounds());
 
-	    	if (s.method == "weights" || map_state < 100) {
+	    	if (current_layer != "gapanalysis" || map_state < 100) {
 	    		// add message
 	    		return;
 	    	}
@@ -1183,8 +1223,8 @@ $(document).ready(function () {
 
 	    	// aid series
 	    	map_chart_data.series.push({
-	    		name: s.rasters[0],
-	    		data: [ roundxy(parseFloat(layer.feature.properties[s.rasters[0]+"_percent"])) ],
+	    		name: active.gapanalysis.ga1,
+	    		data: [ roundxy(parseFloat(layer.feature.properties[active.gapanalysis.ga1+"_percent"])) ],
 	    		stack: 0
 	    	});
 
@@ -1206,18 +1246,13 @@ $(document).ready(function () {
 	    	map_chart_data.sum = ss.sum(map_chart_data.raw);
 
 	    	for ( var i = 0, ix = map_chart_data.count; i < ix; i++ ) {
-	    		var val = roundxy( parseFloat(layer.feature.properties[s.rasters[1]+"_percent"]) * map_chart_data.raw[i] / map_chart_data.sum );
+	    		var val = roundxy( parseFloat(layer.feature.properties[active.gapanalysis.ga2+"_percent"]) * map_chart_data.raw[i] / map_chart_data.sum );
 	    		map_chart_data.series.push({
 	    			name: _.values(active.weights)[i],
 	    			data: [ val ],
 	    			stack: 1
 	    		});
 	    	}
-
-	    	// console.log(map_chart_data);
-			// console.log(e)
-	    	// console.log(s)
-	    	// console.log(active)
 
 	    	var map_chart_options = {
 		        chart: {
@@ -1335,62 +1370,71 @@ $(document).ready(function () {
 		        mouseout: mouseoutFeature,
 		        click: clickFeature
 		    });
-		    var poly_id = "polygon_" +  feature.properties.ID;
-		    layer._leaflet_id = poly_id;
-		    featureList[ feature.properties["NAME_"+s.adm.substr(3)] ] = poly_id; 
-		    // console.log(feature)
-		    // console.log(layer)
+		    // var poly_id = "polygon_" +  feature.properties.ID;
+		    // layer._leaflet_id = poly_id;
+		    // featureList[ feature.properties["NAME_"+s.adm.substr(3)] ] = poly_id; 
+
 		}
 
-		geojson = L.geoJson(geojsonPolyData, {
+		function style(feature) {
+			var result = ( current_layer == 'aid' ? 'rank' : 'result' );
+		    return {
+		        fillColor: getColor( parseFloat(feature.properties[result]) ),
+		        weight: 1,
+		        opacity: 1,
+		        color: 'black',
+		        fillOpacity: 0.75
+		    };
+		}
+
+		geojson[current_layer] = L.geoJson(geojsonPolyData[current_layer], {
 		    style: style,
 		    onEachFeature: onEachFeature
 		});
 
-		map.addLayer(geojson, true);
+		map.addLayer(geojson[current_layer], true);
 
-		map.fitBounds( geojson.getBounds() );
+		map.fitBounds( geojson[current_layer].getBounds() );
 
-
-		info = L.control({
+		info[current_layer] = L.control({
 			position:'bottomleft'
 		});
 
-		info.onAdd = function (map) {
+		info[current_layer].onAdd = function (map) {
 		    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
 		    this.update();
 		    return this._div;
 		};
 
 		// method that we will use to update the control based on feature properties passed
-		info.update = mapinfo[s.method];
+		info[current_layer].update = mapinfo[current_layer];
 
-		info.addTo(map);
+		info[current_layer].addTo(map);
 
 		// manage legend
-		legend = L.control({position: 'bottomright'});
+		legend[current_layer] = L.control({position: 'bottomright'});
 
-		legend.onAdd = function (map) {
+		legend[current_layer].onAdd = function (map) {
 
 		    var div = L.DomUtil.create('div', 'info legend');
 
-		    div.innerHTML += '<div id="legend_title">' + s.method + '</div>';
+		    div.innerHTML += '<div id="legend_title">' + current_layer + '</div>';
 
 		    // loop through grades and generate a label with a colored square for each interval
-			for (var i = 0, ix=grades[s.method].length; i < ix; i++) {
-		        div.innerHTML += '<i style="background:' + getColor(grades[s.method][i]) + '"></i> ';
+			for (var i = 0, ix=grades[current_layer].length; i < ix; i++) {
+		        div.innerHTML += '<i style="background:' + getColor(grades[current_layer][i]) + '"></i> ';
 		       
-		        if ( s.method == "gapanalysis" && !grades[s.method][i+1] ) {
-		        	div.innerHTML += grades[s.method][i-1]  + '+<br>';
+		        if ( current_layer == "gapanalysis" && !grades[current_layer][i+1] ) {
+		        	div.innerHTML += grades[current_layer][i-1]  + '+<br>';
 		        } else {
-		        	div.innerHTML += "<= " + grades[s.method][i]  + '<br>';
+		        	div.innerHTML += "<= " + grades[current_layer][i]  + '<br>';
 		        }
 		    }
 
 		    return div;
 		};
 
-		legend.addTo(map);
+		legend[current_layer].addTo(map);
 
 	}
 
@@ -1512,13 +1556,12 @@ $(document).ready(function () {
 		$('#analysis').show();
 		$('#analysis_tab').show();
 		$('#gapanalysis_buttons').show();
-		// console.log(geojsonPolyData);
 
 		var analysis_data = {
-			raw: geojsonPolyData.features,
-			keys: _.keys(geojsonPolyData.features),
+			raw: geojsonPolyData.gapanalysis.features,
+			keys: _.keys(geojsonPolyData.gapanalysis.features),
 			props: {},
-			featureCount: _.size(geojsonPolyData.features),
+			featureCount: _.size(geojsonPolyData.gapanalysis.features),
 			weightCount: _.size(active.weights),
 			results: {},
 			// primary: [],
@@ -1707,11 +1750,11 @@ $(document).ready(function () {
 
 	                    		// not working
 
-	                    		_.each( map._layers, function(lay) {
-	                    			lay.fire('mouseout');
-	                    		})
+	                    		// _.each( map._layers, function(lay) {
+	                    		// 	lay.fire('mouseout');
+	                    		// })
 	   
-	                    		map._layers[ featureList[analysis_data.categories[this.x]] ].fire('mouseover');
+	                    		// map._layers[ featureList[analysis_data.categories[this.x]] ].fire('mouseover');
 
 	                    	}
 	                    }

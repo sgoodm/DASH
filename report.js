@@ -209,6 +209,8 @@ $(document).ready(function () {
 		map.dragging.disable();
 		map.doubleClickZoom.disable();
 
+		$('.leaflet-control-attribution').hide();
+
 		readJSON('../'+files.map, function (request, status, e) {
 			geojsonPolyData = request;
 			error = e;

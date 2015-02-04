@@ -160,10 +160,16 @@
         </div>
 
         <div id="map" data-collapsed="false" ></div> 
+
         <div id="map_chart_container">
             <div id="map_chart"></div>  
             <div id="map_chart_toggle"><span class="ui-icon ui-icon-carat-2-e-w"></span></div>
         </div>
+
+        <div id="map_layers_container">
+            <div id="map_layers"></div>
+        </div>
+
         <div id="analysis_tab"><div>Results Analysis</div></div> 
     </div>
 
