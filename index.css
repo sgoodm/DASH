@@ -376,12 +376,12 @@ i, i:hover, i:active, i:focus, i:visited,
             }
 
         #map_options_popover {
-            /*display: none;*/
+            display: none;
             width:225px;
-            height:100px;
+            height:200px;
             position:absolute;
             left:0px;
-            bottom:125px;
+            top:25px;
             background: rgba(200,200,200,1);
             border: 1px solid black;
             border-right: 0;
@@ -435,7 +435,7 @@ i, i:hover, i:active, i:focus, i:visited,
             text-align: center;
         }
         .legend {
-            width: 100px;
+            width: 150px;
             line-height: 20px;
             color: #555;
         }
