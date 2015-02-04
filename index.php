@@ -22,7 +22,13 @@
 </head>
 
 <body>
-
+    <div id="overlay">
+        <div id="tutorial">
+            <div id="tutorial_text"></div>
+            <div id="tutorial_button"><button>Next</button></div>
+            <!-- <div id="tutorial_exit"><button></button></div>   -->
+        </div>
+    </div>
     <div id="map_container">
         <div id="map_options">
 
@@ -154,7 +160,10 @@
 
             </div>
 
-            <div id="map_options_popover" data-collapsed="true"></div>
+            <div id="map_options_popover" data-collapsed="true">
+                <div id="popover_text"></div>
+                <div id="tutorial_start"><button>Start</button></div>
+            </div>
             <div id="map_options_toggle"><span class="ui-icon ui-icon-carat-2-n-s"></span></div>
 
         </div>

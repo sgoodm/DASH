@@ -5,11 +5,12 @@
 $(document).ready(function () {
 
 	// tracks cetain UI/UX states
-	var state = 'init';
-	var map_state = 100;
-	var advanced = false;
+	var page_state = 'init',
+		map_state = 100,
+		tutorial_state = 0,
+		advanced = false;
 
-	// load data from defaults.json, stored selected theme
+	// load data from defaults.json, stored selected theme value
 	var themes, theme_state;
 
 	// pending and submission data objects (used to generate data for server requests)
@@ -48,7 +49,6 @@ $(document).ready(function () {
 		layer: ''
 	};
 
-
 	// dynamic point info data
 	var d = {
 		type:"",
@@ -73,7 +73,7 @@ $(document).ready(function () {
 	var m = {
 		init:'<p>Welcome to AidData - - DASH - -</p><p>Utilize our data on international aid along with a range of external data to create power visualizations and analyze how aid is impacting the developing world.</p><p>To start, please select the country and the administrative level you would like to explore.</p><p style="font-size:10px;">(You can change these later.)</p>',
 		start:'<p>Select a predefined analysis to view or click on the advanced options icon to create a custom analysis.</p>',
-		tutorial:'<p>This is DASH tutorial. As you progress through the tool, we will help you understand the available options and provide suggestions.</p>',
+		tutorial:'<p>This is DASH help window. As you use the tool we will provide useful information about the section you are in.</p><p> If you are a new user we suggest following the tutorial. To start the tutorial click the "start" button below. ',
 		themed:'<p>You can now view / edit the options used for this themed raster by selecting the "Build Layer" or "Select Aid Data" tabs. You can also add point data to the map using the "Add Point Data" tab.</p>',
 		advanced:'<p>Advanced mode enabled.</p>',
 		weights:'<p>Select rasters from the drop down menus and assign weights to create a custom layer. Weights may be assigned from -10 to 10 where larger positive weights will contribute more to the index and negative weights will reduce the index.</p>',
@@ -83,6 +83,7 @@ $(document).ready(function () {
 		map_chart:'<p id="map_chart_message">Click a feature on the map to generate a chart with data on that area.</p>'
 	};
 
+	// data that will be saved to a json file for use in report.js
 	var chart_options;
 
 	// init ui on load
@@ -90,7 +91,6 @@ $(document).ready(function () {
 	$('#adm').val('-----');
 	$('#adm').prop('disabled', true);
 	message(m.init, "static");
-	// $('#map_options_content').slideDown(500);
 
 
 	// --------------------------------------------------
@@ -130,9 +130,15 @@ $(document).ready(function () {
 		}
 	});
 
+	$("#tutorial_start button").click(function (event) {
+		event.stopPropagation();
+
+		$('#overlay').show();
+	});
+
 	// change country
 	$('#country').on('change', function () {
-		state = 'init';
+		page_state = 'init';
 
 		var $blank = $('#blank_country_option');
 		if ($blank.length) { 
@@ -159,7 +165,7 @@ $(document).ready(function () {
 
 	// change adm
 	$('#adm').on('change', function () {
-		state = 'init';
+		page_state = 'init';
 
 		// clean up any existing weight / gap analysis layer
 		cleanMap('all');
@@ -206,7 +212,7 @@ $(document).ready(function () {
 	});
 
 	$('#start_advanced').click(function () {
-		state = 'advanced';
+		page_state = 'advanced';
 		advanced = true;
 		$('#method_weights').click();
 	});
@@ -215,11 +221,11 @@ $(document).ready(function () {
 	$('#method li').click(function () {
 
 		// prevent changing tabs before selecting a themed default or clicking on advanced options
-		if ( state == 'default') {
+		if ( page_state == 'default') {
 			return;
 		}
 		
-		state = ( state == "init" ? "default" : state );
+		page_state = ( page_state == "init" ? "default" : page_state );
 
 		$('#method li').removeClass("active");
 		$(this).addClass("active");
@@ -237,7 +243,7 @@ $(document).ready(function () {
 		}
 
 		// allow initiating the start menu 
-		state = (state == "default" ? "default" : p.method);
+		page_state = (page_state == "default" ? "default" : p.method);
 
 		// hide tooltip for start menu
 		// if ( p.method == "start" ) {
@@ -577,7 +583,7 @@ $(document).ready(function () {
  		tab = ( tab ? tab : true );
 
  		if ( tab ) {
- 			$('#map_options_popover').html(html);
+ 			$('#popover_text').html(html);
  		}
  	}
 
@@ -753,7 +759,7 @@ $(document).ready(function () {
 		markers, geojsonPoints, 
 		// addPolyData vars: geojsonPolyData, geojson, info, legend, featureList, lastClicked, layer_type
 		geojsonPolyData = {}, geojson = {}, info = {}, legend = {}, 
-		/*featureList,*/ lastClicked/*, layer_type*/, current_layer; 
+		/*featureList, lastClicked, layer_type,*/ current_layer; 
 
 	L.mapbox.accessToken = 'pk.eyJ1Ijoic2dvb2RtIiwiYSI6InotZ3EzZFkifQ.s306QpxfiAngAwxzRi2gWg';
 
@@ -777,7 +783,6 @@ $(document).ready(function () {
 			addPolyData(val)
 		}
 	})
-
 
 
 	// bounds objects
@@ -922,7 +927,7 @@ $(document).ready(function () {
 				legend['gapanalysis'].removeFrom(map);		
 			}
 
-			lastClicked = undefined;
+			// lastClicked = undefined;
 		}
 
 		if (method == "chart" || method == "all") {
@@ -1049,8 +1054,8 @@ $(document).ready(function () {
    	       			$('#map_layers_container').show();
                 }
 
-       			console.log(state)
-       			if (state != 'link-weights') {
+       			console.log(page_state)
+       			if (page_state != 'link-weights') {
        				console.log('adding weight layer')
 
    					addPolyData('weights');
@@ -1134,7 +1139,7 @@ $(document).ready(function () {
 	    	// gapanalysis: [-1.5, -1.0, -0.5, 0.5, 1.0, 1.5, 2]
 	    };
 	    var grade_names = {
-	    	weights: ['Most Vulnerable','','','','','Least Vulnerable'],
+	    	weights: ['Least Vulnerable','','','','','Most Vulnerable'],
 	    	aid: ['Least Aid','','','','Most Aid'],
 	    	gapanalysis: ['Underfunded','','','','','Overfunded']
 	    };
@@ -1195,13 +1200,13 @@ $(document).ready(function () {
 		function getColor(d) {
 			if (current_layer == 'weights') {
 
-			    return d <= 0.15 ? '#de2d26' :
-			           d <= 0.30 ? '#fc9272' :
-			           d <= 0.45 ? '#fee0d2' :
+			    return d <= 0.15 ? '#a1d99b' :
+			           d <= 0.30 ? '#e5f5e0' :
+			           d <= 0.45 ? '#fff7bc' :
 
-			           d <= 0.60 ? '#fff7bc' :
-			           d <= 0.85 ? '#e5f5e0' :
-	   		           			   '#a1d99b' ; 
+			           d <= 0.60 ? '#fee0d2' :
+			           d <= 0.85 ? '#fc9272' :
+	   		           			   '#de2d26' ; 
 
    		    } else if (current_layer == 'aid') {
    		    	// console.log(d, size)
@@ -1235,8 +1240,6 @@ $(document).ready(function () {
 	   		 //           			  '#31a354';
 
    		  //   }
-		
-
 
    		    }
 		}
@@ -1921,18 +1924,6 @@ $(document).ready(function () {
             	},
             	min:0	            
 	        }],
-	        // tooltip: {
-	        //     formatter: function () {
-	        //     	// var html =  '';
-	        //     	// html += '<b>' + this.point.adm + '</b><br>';
-	        //      //    html += 'Aid Rank: ' + this.point.y + '<br>';
-	        //      //    html += 'Aid Actual: ' + this.point.aid + '<br>';
-	        //      //    html += 'Weighted Index: ' + this.point.x + '<br>';
-	        //      //    return html;
-
-	        //         return '<b>' + this.point.adm + '</b><br> Aid Rank: ' + this.point.y + '<br> Aid Actual: ' + this.point.aid + '<br> Weighted Index: ' + this.point.x + '<br>';
-	        //     }
-	        // },
             plotOptions: {
 	            scatter: {
 	                marker: {
@@ -1956,8 +1947,6 @@ $(document).ready(function () {
                         pointFormat: '<b> {point.adm} </b> <br> Rank: {point.y} <br> Aid: {point.aid} <br> Weighted Index: {point.x} <br>',
                         hideDelay:0
                     },
-
-
 	            }
 	        },
 	        legend: {
@@ -2010,7 +1999,6 @@ $(document).ready(function () {
     	}
 
 		return ndata;
-    	
     }
 
 
@@ -2024,12 +2012,6 @@ $(document).ready(function () {
     	// save all analysis section content
     	keys = _.keys(chart_options);
 
-    	// for (var i=0, ix=keys.length; i<ix; i++) {
-        
-     //    	saveChart('analysis_chart_'+keys[i], active.files.gapanalysis + '_analysis_chart_' + keys[i]);
-
-    	// }
-    	console.log(chart_options)
     	json = JSON.parse(JSON.stringify(chart_options));
 
 		json.meta = {
@@ -2045,33 +2027,7 @@ $(document).ready(function () {
     	})
  
        	window.open('report.php#'+active.files.gapanalysis);
-
     });
-
-  //   // save a highchart to png
-  //   function saveChart(chart, name) {
-		// var svg = document.getElementById(chart).children[0].innerHTML;
-  //       var canvas = document.getElementById('canvas');
-  //       canvg(canvas,svg);
-  //       var img = canvas.toDataURL("image/png"); //img is data:image/png;base64
-  //       var img_data = {call:'saveimg', img: img, name:name};
-  //       console.log(img_data);
-  //       $.ajax({
-  //         	url: "process.php",
-  //         	data: img_data,
-  // 	        dataType: "json",
-	 //        type: "post",
-	 //        async: false,
-  //         	success: function(result){
-  //           	console.log(result);
-  //         	},    
-	 //    	error: function (request, status, error) {
-  //       		// console.log(request) 
-  //       		// console.log(status) 
-  //       		console.log(error);
-  //   		}
-  //       });
-  //   }
 
 
 	// --------------------------------------------------
@@ -2218,11 +2174,11 @@ $(document).ready(function () {
 	    validateOptions();
 
 	    $('#method_weights').click();
-	    state = 'link-weights';
+	    page_state = 'link-weights';
 	    $('#weights_submit').click();
 
 	    $('#method_gapanalysis').click();
-	    state = 'link-gapanalysis';
+	    page_state = 'link-gapanalysis';
 	    $('#gapanalysis_submit').click();
 
   		// $('#map_options_toggle').click();

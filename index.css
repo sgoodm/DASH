@@ -6,7 +6,7 @@ body{
     /*min-width: 1200px;*/
     background:  rgb(88,108,128);
     color: white;
-    margin-bottom: 100px;
+    /*margin-bottom: 100px;*/
 }
 a, a:hover, a:active, a:focus, a:visited,
 i, i:hover, i:active, i:focus, i:visited,
@@ -50,6 +50,41 @@ i, i:hover, i:active, i:focus, i:visited,
     border-bottom: 1px solid rgba(0,0,0,0.25);
     margin: 1px 2.5%;
 }
+
+#overlay {
+    display:none;
+    height: 100%; 
+    width: 100%;
+    float:left;
+    position:fixed;
+    top:0;
+    left:0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+}
+
+    #tutorial {
+        width: 400px;
+        height: 300px;
+        background: rgba(255,255,255,1);
+        position: absolute;
+        top:100px;
+        left:100px;
+    }
+        #tutorial_text {
+            height: 250px;
+            width:100%;
+            padding:10px;
+
+        }
+        #tutorial_button {
+            width:100%;
+            text-align: center;
+        }
+            #tutorial_button button {
+                width: 100px;
+                color:black;
+            }
 
 /*
  *
@@ -379,6 +414,7 @@ i, i:hover, i:active, i:focus, i:visited,
             display: none;
             width:225px;
             height:200px;
+            padding: 10px;
             position:absolute;
             left:0px;
             top:25px;
@@ -389,11 +425,23 @@ i, i:hover, i:active, i:focus, i:visited,
             border-bottom-left-radius: 10px;
             cursor:pointer;
             z-index: -122;
-            padding:10px;
-            color:black;
-            font-size: 12px;
-            overflow-y:auto; 
         }
+            #popover_text {
+                height: 75%;
+                color:black;
+                font-size: 12px;
+                overflow-y:auto; 
+            }
+            #tutorial_start {
+                width:205px;
+                position: absolute;
+                bottom: 10px;
+                text-align: center;
+            }
+            #tutorial_start button {
+                width:75px;
+            }
+
         #map_options_toggle {
             display: block;
             height: 25px;
