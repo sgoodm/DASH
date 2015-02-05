@@ -1,5 +1,8 @@
 <?php
 
+// source   : https://github.com/tegansnyder/Leaflet-Save-Map-to-PNG
+// original : https://github.com/adjdred/html2canvas-proxy-php
+
 header('Access-Control-Max-Age:' . 5 * 60 * 1000);
 header("Access-Control-Allow-Origin: *");
 header('Access-Control-Request-Method: *');

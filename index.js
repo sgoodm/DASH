@@ -8,6 +8,7 @@ $(document).ready(function () {
 	var page_state = 'init',
 		map_state = 100,
 		tutorial_state = 0,
+		link_state = false,
 		advanced = false;
 
 	// load data from defaults.json, stored selected theme value
@@ -86,7 +87,11 @@ $(document).ready(function () {
 	// data that will be saved to a json file for use in report.js
 	var chart_options;
 
+	var hash_change = true;
+	
+
 	// init ui on load
+    checkHash('init');
 	$('#country').val('-----');
 	$('#adm').val('-----');
 	$('#adm').prop('disabled', true);
@@ -96,6 +101,10 @@ $(document).ready(function () {
 	// --------------------------------------------------
 	// build options
 
+    // check hashtag on change and on page load
+    $(window).on('hashchange', function () {
+    	checkHash();
+    });
 
 	// toggle options
 	$('#map_options_toggle').click(function () {
@@ -300,8 +309,10 @@ $(document).ready(function () {
 		page_state = 'init';
 
 		// clean up any existing weight / gap analysis layer
-		cleanMap('all');
-		addCountry();
+		if (!map.hasLayer(countryLayer)) {
+			cleanMap('all');
+			addCountry();
+		}
 
 		var $blank = $('#blank_adm_option');
 		if ($blank.length) { 
@@ -331,13 +342,14 @@ $(document).ready(function () {
 	})
 
 	$('#start_submit button').click(function () {
-		console.log('themed default');
+		// console.log('themed default');
 		// will load a pre-generated link using the same hash processing function that loads normal links created by DASH
 		var item = $('#start_option').val();
 		theme_state = item;
 		var theme = (themes.available[p.country][p.adm][item])
 		var hash = theme.link.substr(theme.link.indexOf('#')+1)
-		window.location.hash = '';
+		// window.location.hash = '';
+		hash_change = true;
 		window.location.hash =  hash;
 	});
 
@@ -938,7 +950,7 @@ $(document).ready(function () {
 
 	$('#map_layers').on('change', 'input[name="map_layer"]:radio', function (){
 		var val = $(this).val()
-		console.log(val);
+		// console.log(val);
 		if (geojsonPolyData[val]) {
 			addPolyData(val)
 		}
@@ -1096,6 +1108,10 @@ $(document).ready(function () {
 	}
 
 	function addCountry() {
+		if (link_state == true) {
+			return;
+		}
+
 		var file = "/aiddata/DET/resources/"+p.continent.toLowerCase()+"/"+p.country.toLowerCase()+"/shapefiles/Leaflet.geojson";
 
 		var geojsonFeature, error
@@ -1211,8 +1227,7 @@ $(document).ready(function () {
    	       			$('#map_layers_container').show();
                 }
 
-       			console.log(page_state)
-       			if (page_state != 'link-weights') {
+       			if (link_state == false) {
        				console.log('adding weight layer')
 
    					addPolyData('weights');
@@ -1315,7 +1330,7 @@ $(document).ready(function () {
 
 		if (current_layer == 'gapanalysis') {
 
-			console.log( geojsonPolyData[layer_type].features )
+			// console.log( geojsonPolyData[layer_type].features )
 			for ( var i = 0, ix = size; i < ix; i++ ) {
 				var val = parseFloat(geojsonPolyData[layer_type].features[i].properties.ratio)
 				if ( val <= 0 ) {
@@ -1346,7 +1361,7 @@ $(document).ready(function () {
 			jenks.pos = ss.jenks(gap_array_pos, 3)
 
 			grades.gapanalysis = [ roundxy(jenks.neg[1] ,2), roundxy(jenks.neg[2] ,2), roundxy(jenks.neg[3] ,2), roundxy(jenks.pos[1] ,2), roundxy(jenks.pos[2] ,2), roundxy(jenks.pos[3] ,2) ]
-
+			active.grades = grades.gapanalysis;
 		}
 
 		function getColor(d) {
@@ -2118,7 +2133,7 @@ $(document).ready(function () {
 	        }]
 	    };
 
-	    console.log(ratio)
+	    // console.log(ratio)
 
 	    for (var i = 0, ix = _.keys(chart_options).length; i < ix; i++) {
 		    var key, html;
@@ -2175,7 +2190,8 @@ $(document).ready(function () {
 			adm: s.adm,
 			gapanalysis: active.gapanalysis.ga1,
 			weights: active.weights,
-			weight_vals: active.weight_vals
+			weight_vals: active.weight_vals,
+			grades: active.grades
 		};
 
     	process({call: 'write', hash: active.files.gapanalysis, json: JSON.stringify(json)}, function (result) {
@@ -2239,17 +2255,9 @@ $(document).ready(function () {
 	// link functions
 
 
-	var hash_change = 1;
-	
-    // check hashtag on change and on page load
-    $(window).on('hashchange', function () {
-    	checkHash();
-    });
-
 	function buildHash() {
-		console.log('buildHash');
+		// console.log('buildHash');
 
-		hash_change = 0;
 
 		var link_weight = [];
 
@@ -2275,11 +2283,14 @@ $(document).ready(function () {
         }
         var url_new = URI(document.URL).addSearch(url_search);
 
+		hash_change = false;
         window.location.hash = url_new.query();
+
       
 	}
 
   	function readHash () {
+  		link_state = true;
   		$('#map_layers').empty();
   		$('#map_layers_container').hide();
   		$('#map_options_popover').hide();
@@ -2326,27 +2337,28 @@ $(document).ready(function () {
 	    if (current.valid.weights ) {
 
 		    $('#method_weights').click();
-		    page_state = 'link-weights';
 		    $('#weights_submit').click();
 
 		    $('#method_gapanalysis').click();
-		    page_state = 'link-gapanalysis';
 		    $('#gapanalysis_submit').click();
 		}
 
 		$('#map_options_content').slideDown(500, function () {
 			$('#map_options_popover').show();
 		});
+		link_state = false;
 
   	};
 
   	// check hashtag (called on page load or on hashtag change)
   	function checkHash(type) {
-	    // check for hash_change variable to avoid reloads when hash change was generate by page
+  		// console.log('checkHash: '+ window.location.hash);
+
 	    if (window.location.hash == '#tutorial') {
 	    	runTutorial();
 
-	    } else if (window.location.hash !== '' && hash_change == 1) {
+	    // check for hash_change variable to avoid reloads when hash change was generated by buildHash
+	    } else if (window.location.hash !== '' && hash_change == true) {
 
 	    	// handle issue when using back/forward buttons from tutorial
 			$('#overlay').hide();
@@ -2360,9 +2372,8 @@ $(document).ready(function () {
     		});
 
     	}
-   		hash_change = 1;
+   		hash_change = true;
   	};
 
-    checkHash('init');
 
 })

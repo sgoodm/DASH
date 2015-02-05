@@ -221,23 +221,26 @@ $(document).ready(function () {
 			return 1;
 		}
 
-	    grades = [-1.5, -1.0, -0.5, 0.5, 1.0, 1.5, 2];
+    	
+	    var grades = json.meta.grades;
+
+	    var grade_names = ['Underfunded','','','','','Overfunded'];
+	
 
 		function getColor(d) {
 
-		    return d <= -1.5 ? '#de2d26' :
-		           d <= -1.0 ? '#fc9272' :
-		           d <= -0.5 ? '#fee0d2' :
-
-		           d <= 0.5 ? '#fff7bc' :
-		           d <= 1.0 ? '#e5f5e0' :
-   		           d <= 1.5 ? '#a1d99b' :
-   		           			  '#31a354';
-		};
+		    return d <= json.meta.grades[0] ? '#de2d26' :
+		           d <= json.meta.grades[1] ? '#fc9272' :
+		           d <= json.meta.grades[2] ? '#fee0d2' :
+		           d <= json.meta.grades[3] ? '#e5f5e0' :
+   		           d <= json.meta.grades[4] ? '#a1d99b' :
+   		           			  		          '#31a354';
+   		 }
+		
 
 		function style(feature) {
 		    return {
-		        fillColor: getColor(feature.properties.result),
+		        fillColor: getColor(feature.properties.ratio),
 		        weight: 1,
 		        opacity: 1,
 		        color: 'black',
@@ -253,29 +256,21 @@ $(document).ready(function () {
 
 		map.fitBounds( geojson.getBounds() );
 
-		// manage legend
 		legend = L.control({position: 'bottomright'});
 
 		legend.onAdd = function (map) {
 
 		    var div = L.DomUtil.create('div', 'info legend');
 		    div.innerHTML += '<div id="legend_title">Gap Analysis</div>'
-		    // loop through grades and generate a label with a colored square for each interval
 			for (var i = 0, ix=grades.length; i < ix; i++) {
 		        div.innerHTML += '<i style="background:' + getColor(grades[i]) + '"></i> ';
-		       
-		        if ( !grades[i+1] ) {
-		        	div.innerHTML += grades[i-1]  + '+<br>';
-		        } else {
-		        	div.innerHTML += "<= " + grades[i]  + '<br>';
-		        }
+	        	div.innerHTML += grade_names[i]  + '<br>';
 		    }
 
 		    return div;
 		};
 
 		legend.addTo(map);
-
 	};
 
 	function saveMap() {
