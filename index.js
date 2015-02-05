@@ -73,11 +73,11 @@ $(document).ready(function () {
 	var m = {
 		init:'<p>Welcome to AidData - - DASH - -</p><p>Utilize our data on international aid along with a range of external data to create power visualizations and analyze how aid is impacting the developing world.</p><p>To start, please select the country and the administrative level you would like to explore.</p><p style="font-size:10px;">(You can change these later.)</p>',
 		start:'<p>Select a predefined analysis to view or click on the advanced options icon to create a custom analysis.</p>',
-		tutorial:'<p>This is DASH help window. As you use the tool we will provide useful information about the section you are in.</p><p> If you are a new user we suggest following the tutorial. To start the tutorial click the "start" button below. ',
+		tutorial:'<p>This is DASH help window. If you are a new user we suggest following the tutorial. To start the tutorial click the "start" button below. ',
 		themed:'<p>You can now view / edit the options used for this themed raster by selecting the "Build Layer" or "Select Aid Data" tabs. You can also add point data to the map using the "Add Point Data" tab.</p>',
 		advanced:'<p>Advanced mode enabled.</p>',
-		weights:'<p>Select rasters from the drop down menus and assign weights to create a custom layer. Weights may be assigned from -10 to 10 where larger positive weights will contribute more to the index and negative weights will reduce the index.</p>',
-		gapanalysis:'<p>Select an aid layer to run a gap analysis against the weighted layer you generated. The gap analysis will compare the amount of aid and the index created based on the weighted data to determine whether an an area was over or underfunded. </p>',
+		weights:'<p>Select rasters from the drop down menus and assign weights to create a custom layer. Weights may be assigned from -10 to 10.</p>',
+		gapanalysis:'<p>Select an aid layer to run a gap analysis against the weighted layer you generated. </p>',
 		pointdata:'<p>Overlay project point data on the map.</p>',
 		toggle:'<p>You can toggle this tab by clicking anywhere on the tab.</p>',
 		map_chart:'<p id="map_chart_message">Click a feature on the map to generate a chart with data on that area.</p>'
@@ -133,7 +133,142 @@ $(document).ready(function () {
 	$("#tutorial_start button").click(function (event) {
 		event.stopPropagation();
 
-		$('#overlay').show();
+		window.location.hash = 'tutorial';
+
+		runTutorial();
+
+	});
+
+	$('#tutorial_button button').click(function () {
+		console.log(tutorial_state);
+
+		var html = '';
+
+		switch (tutorial_state) {
+			case 1:
+
+				html += '<p>After selecting the country and administrative level, we are brough to the "Select Method" tab.</p>';
+				html += '<p>From here you can select a predefined analysis to view or choose to create your own analysis by clicking the gear icon to go into the advanced user mode.</p>';
+				html += '<p>Let\'s go into advanced mode to explore the tool step by step. Click "next" when you are ready.</p>';
+				
+				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
+				
+				tutorial_state = 2;
+				
+				break;
+
+			case 2:
+
+				// set map options
+				$('#start_advanced').click();
+
+				// update tutorial text
+				html += '<p>Clicking on the advanced user icon will bring you to the "Build Layer" tab where you can create a custom layer to be used in your analysis.</p>';
+				html += '<p>After selecting up to 5 different layers of data you can assign weights to each of them to create a unique weighted layer that suits your needs.</p>';
+				html += '<p>This water security analysis has been designed based on existing research (riverthreat.net) which determined key indicators related to water security.</p>';
+				html += '<p><p>Click "next" to select the data and assign weights.</p>';
+
+				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
+				
+				// update state
+				tutorial_state = 3;
+				
+				break;
+			
+			case 3:
+
+				$('#ro1').val('agriculture__cropland__2014').change();
+				$('#ro1').next().val(10).change();
+				$('#ro2').val('natural_disasters__impervious_surfaces__2014').change();
+				$('#ro2').next().val(8).change();
+				$('#ro3').val('agriculture__livestock_density__2014').change();
+				$('#ro3').next().val(4).change();
+				$('#ro4').val('natural_disasters__wetland_disconnectivity__2014').change();
+				$('#ro4').next().val(2).change();
+
+				html += '<p>We have selected 4 data layers which are indicators of water security and assigned weights indicating their influence on the index we are creating.</p>';
+				html += '<p>Weights can be assigned from -10 to 10 with negative values reducing the final index based on that layer.</p>';
+				html += '<p>Click "next" to build the weights layer.</p>';
+
+				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
+				
+				tutorial_state = 4;
+				
+				break;
+
+			case 4:
+
+				$('#weights_submit button').click();
+
+				html += '<p> The weighted layer we just created is now visible on the map.</p>';
+				html += '<p>You can view the data for each feature of the map by hovering over or clicking on features. The data from this layer can also be downloaded as a CSV by clicking on the download icon in the bottom right of the tab.</p>';
+				html += '<p>Click "next" to continue.</p>';
+
+				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
+				
+				tutorial_state = 5;
+				
+				break;
+
+			case 5:
+
+				$('#method_gapanalysis').click();
+
+				html += '<p>This is the "Select Aid Data" tab. Here you can select what type of aid you are interested in comparing with the custom layer we just created. To edit the custom layer, just click on "Edit Your Custom Layer" and it will bring you back to the "Build Layer" tab.</p>';
+				html += '<p>Click "next" to continue.</p>';
+
+				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
+				
+				tutorial_state = 6;
+				
+				break;
+
+			case 6:
+
+				$('#ga1').val('aid__water_aid_all__2014').change();
+
+				html += '<p>We have selected the aid layer containing all water related aid in Nepal over all available years.</p>';
+				html += '<p>Click "next" to run the gap analysis.</p>';
+
+				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
+
+				tutorial_state = 7;
+
+				break;
+
+			case 7:
+
+				$('#gapanalysis_submit button').click();
+
+				html += '<p>Hover / click</p>';
+				html += '<p>Scroll for results</p>';
+
+				html += '<p>Link for sharing</p>';
+				html += '<p>Download</p>';
+				html += '<p>Aid layer and layer selector</p>';
+				html += '<p>Reload last</p>';
+				html += '<p>point data</p>';
+
+				html += '<p>Export</p>';
+
+				html += '<p>Click "next" to continue.</p>';
+
+				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
+
+				tutorial_state = 8;
+
+				break;
+
+			case 8:
+
+				// 
+
+				$('#tutorial_text').html('<div class="tutorial_text"><p>x</p><p>Click "next" to .</p></div>');
+
+				tutorial_state = 9;
+
+				break;
+		}
 	});
 
 	// change country
@@ -221,7 +356,7 @@ $(document).ready(function () {
 	$('#method li').click(function () {
 
 		// prevent changing tabs before selecting a themed default or clicking on advanced options
-		if ( page_state == 'default') {
+		if ( page_state == 'default' && advanced == false) {
 			return;
 		}
 		
@@ -240,21 +375,24 @@ $(document).ready(function () {
 		
 		if ( p.method == 'start' ) {
 			message(m.tutorial);
+			$('#tutorial_start').show();
+		} else {
+			$('#tutorial_start').hide();
 		}
 
 		// allow initiating the start menu 
 		page_state = (page_state == "default" ? "default" : p.method);
 
-		// hide tooltip for start menu
-		// if ( p.method == "start" ) {
-		// 	$('#map_options_popover').animate({
-		//       left: 0
-		//     });
-		// } else {
+		// hide tooltip during tutorial
+		if ( tutorial_state > 0 ) {
+			$('#map_options_popover').animate({
+		      left: 0
+		    });
+		} else {
 			$('#map_options_popover').animate({
 		      left: -225
 		    });
-		// }
+		}
 
 
 		// run validation check any time tab changes
@@ -396,7 +534,7 @@ $(document).ready(function () {
 		$('#ga1').change();
 		validateOptions();
 
-		if ( current.layer != 'gapanalysis' && current.valid.gapanalysis ) {
+		if ( current_layer != 'gapanalysis' && current.valid.gapanalysis ) {
 			$('#gapanalysis_submit').click();
 		}
 	});
@@ -445,6 +583,29 @@ $(document).ready(function () {
 
 		prepGapAnalysis();
 	});
+
+	function runTutorial() {
+		// init tutorial
+
+		$('#overlay').show();
+
+		$('#map_options_popover').hide();
+
+		$('#map_options_content').slideDown(500);
+
+    	$('#country').val('Nepal').change();
+    	$('#adm').val('ADM3').change();
+	    
+		var html = '';
+		html += '<p>Welcome to tutorial!</p>';
+		html += '<p>Information about what the purpose of the tool is.</p>';
+		html += '<p>This tutorial will walk you through replicating an analysis of water security in Nepal.</p>';
+		html += '><p>Click "next" below to get started.</p>';
+	
+		$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
+
+		tutorial_state = 1;
+	}
 
 	function buildRasterList() {
 		if (p.continent != "" && p.country != "" && p.adm != "") {
@@ -2128,25 +2289,23 @@ $(document).ready(function () {
   		$('#map_layers_container').hide();
   		$('#map_options_popover').hide();
   		$('#map_options_content').hide();
+
 	    var url = document.URL.replace("#", "?"),
 	        url_query = URI(url).query(true);
 
-		console.log('readHash');
-		console.log(url_query);
+		// console.log('readHash');
+		// console.log(url_query);
 
 	    if ( url_query.country && $('#country option[value="' + url_query.country + '"]').length) {
-	    	$('#country').val(url_query.country);
-	    	$('#country').change();
+	    	$('#country').val(url_query.country).change();
 	    } 
 
 	    if ( url_query.adm && $('#adm option[value="' + url_query.adm + '"]').length) {
-	    	$('#adm').val(url_query.adm);
-	    	$('#adm').change();
+	    	$('#adm').val(url_query.adm).change();
 	    } 
 
 	    if ( theme_state ) {
-	    	$('#start_option').val(url_query.theme);
-	    	$('#start_option').change();
+	    	$('#start_option').val(url_query.theme).change();
 	    }
 
 	    if ( url_query.weights && url_query.active_weights ) {
@@ -2157,31 +2316,29 @@ $(document).ready(function () {
 	  
 	    	for ( var i = 0, ix = url_query.weights.length; i < ix; i++ ) {
 	    		var weight_parts = url_query.weights[i].split('--');
-	    		$('#'+weight_parts[0]).val(weight_parts[1]);
-	    		$('#'+weight_parts[0]).change();
-	    		$('#'+weight_parts[0]).next().val(weight_parts[2]);
-	    		$('#'+weight_parts[0]).next().change();
+	    		$('#'+weight_parts[0]).val(weight_parts[1]).change();
+	    		$('#'+weight_parts[0]).next().val(weight_parts[2]).change();
 	    	}
-
 
 	    }
 
 		if ( url_query.gapanalysis && url_query.active_gapanalysis ) {
-    		$('#ga1').val(url_query.gapanalysis);
-    		$('#ga1').change();   
+    		$('#ga1').val(url_query.gapanalysis).change();   
 	    }
 
 	    validateOptions();
 
-	    $('#method_weights').click();
-	    page_state = 'link-weights';
-	    $('#weights_submit').click();
+	    if (current.valid.weights ) {
 
-	    $('#method_gapanalysis').click();
-	    page_state = 'link-gapanalysis';
-	    $('#gapanalysis_submit').click();
+		    $('#method_weights').click();
+		    page_state = 'link-weights';
+		    $('#weights_submit').click();
 
-  		// $('#map_options_toggle').click();
+		    $('#method_gapanalysis').click();
+		    page_state = 'link-gapanalysis';
+		    $('#gapanalysis_submit').click();
+		}
+
 		$('#map_options_content').slideDown(500, function () {
 			$('#map_options_popover').show();
 		});
@@ -2191,8 +2348,16 @@ $(document).ready(function () {
   	// check hashtag (called on page load or on hashtag change)
   	function checkHash(type) {
 	    // check for hash_change variable to avoid reloads when hash change was generate by page
-	    if (window.location.hash !== '' && hash_change == 1) {
+	    if (window.location.hash == '#tutorial') {
+	    	runTutorial();
+
+	    } else if (window.location.hash !== '' && hash_change == 1) {
+
+	    	// handle issue when using back/forward buttons from tutorial
+			$('#overlay').hide();
+
       		setTimeout(readHash, 200);
+
     	} else if (window.location.hash == '' && type == 'init') {
     		$('#map_options_content').slideDown(500, function () {
     			$('#map_options_popover').show();
