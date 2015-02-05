@@ -85,7 +85,8 @@ $(document).ready(function () {
 	};
 
 	// data that will be saved to a json file for use in report.js
-	var chart_options;
+	var chart_options = {}, 
+		chart_json = {};
 
 	var hash_change = true;
 	
@@ -401,7 +402,6 @@ $(document).ready(function () {
 		    });
 		}
 
-
 		// run validation check any time tab changes
 		validateOptions();
 
@@ -659,36 +659,34 @@ $(document).ready(function () {
 
 				}
 				$('#start_option').html(html);
-
 			}
-
 
 			// build weights and gapanalysis options
 			process({ call: "scan", path: "/"+p.continent.toLowerCase().toLowerCase()+"/"+p.country.toLowerCase()+"/cache" }, function (options) {
-					var op_count = 0;
-				    for (var op in options) {
-				    	if (options[op].indexOf(p.adm) != -1 || options[op].indexOf(p.adm_alt) != -1){
-				    			var option = filterOptionName(options[op], "__", 4, 4);
-				    			current.rasters[option] = options[op];
-				    			addOptionToGroup(option);
-				    			op_count ++;
-				    	}
-				    }
-				    if (op_count == 0) {
-   						$('.method_select').each(function () {
-   							$(this).prepend('<option class="no-data">No Data Available</option>');
-   							$(this).prop('disabled', true);
-   						});
+				var op_count = 0;
+			    for (var op in options) {
+			    	if (options[op].indexOf(p.adm) != -1 || options[op].indexOf(p.adm_alt) != -1){
+		    			var option = filterOptionName(options[op], "__", 4, 4);
+		    			current.rasters[option] = options[op];
+		    			addOptionToGroup(option);
+		    			op_count ++;
+			    	}
+			    }
+			    if (op_count == 0) {
+					$('.method_select').each(function () {
+						$(this).prepend('<option class="no-data">No Data Available</option>');
+						$(this).prop('disabled', true);
+					});
 
-				    } else {
-   						$('.method_select').each(function () {
-   							$(this).prepend('<option selected value="-----">-----</option>');
-							if ( $(this).hasClass('ro') ) {
-								$(this).next().prop('disabled', true);		
-				    		}
-				    		$(this).prop('disabled', false);
-				    	});
-				    }
+			    } else {
+					$('.method_select').each(function () {
+						$(this).prepend('<option selected value="-----">-----</option>');
+						if ( $(this).hasClass('ro') ) {
+							$(this).next().prop('disabled', true);		
+			    		}
+			    		$(this).prop('disabled', false);
+			    	});
+			    }
 		    });
 		}
 	}
@@ -708,9 +706,7 @@ $(document).ready(function () {
     		}
 
     		if ( !$(this).find(".optgroup_"+type).length ) {
-    
     			$(this).append('<optgroup class="optgroup_'+type+'" label="'+type+'"></optgroup>');
-    
     		}
 
 	        $(this).find(".optgroup_"+type).each(function () {
@@ -721,9 +717,8 @@ $(document).ready(function () {
 
 	// option = string, m = search char, n = nth occurence, p = offset from end of string
 	function filterOptionName(option, m, n, p) {
-		if (!p){
-			p = 0;
-		}
+		p = p ? p : 0;
+
 		var i = 0, index = null, offset = 0;
 
 		while (i < n && index != -1) {
@@ -1360,7 +1355,7 @@ $(document).ready(function () {
 			jenks.neg = ss.jenks(gap_array_neg, 3),
 			jenks.pos = ss.jenks(gap_array_pos, 3)
 
-			grades.gapanalysis = [ roundxy(jenks.neg[1] ,2), roundxy(jenks.neg[2] ,2), roundxy(jenks.neg[3] ,2), roundxy(jenks.pos[1] ,2), roundxy(jenks.pos[2] ,2), roundxy(jenks.pos[3] ,2) ]
+			grades.gapanalysis = [ jenks.neg[1], jenks.neg[2], jenks.neg[3], jenks.pos[1], jenks.pos[2], jenks.pos[3] ]
 			active.grades = grades.gapanalysis;
 		}
 
@@ -1787,12 +1782,6 @@ $(document).ready(function () {
 			subtitle: ''
 		};
 
-		chart_options = {
-			extremes: {},
-			funding: {},
-			ratio: {}
-		}
-
 		var funding = {
 			projects: {
 				underfunded:0,
@@ -2142,7 +2131,7 @@ $(document).ready(function () {
 
 		    html = '<div id="analysis_chart_'+key+'" class="analysis_chart"></div>';
 			$('#analysis_results').append(html);
-			chart_options[key] = JSON.parse(JSON.stringify(chart_options[key]));
+			chart_json[key] = JSON.parse(JSON.stringify(chart_options[key]));
 			$('#analysis_chart_'+key).highcharts( chart_options[key] );
 		}
 
@@ -2178,14 +2167,13 @@ $(document).ready(function () {
 
 
     $("#report").click(function(){
-    	var keys, json;
+    	var keys;
 
     	// save all analysis section content
-    	keys = _.keys(chart_options);
+    	keys = _.keys(chart_json);
 
-    	json = JSON.parse(JSON.stringify(chart_options));
 
-		json.meta = {
+		chart_json.meta = {
 			country: s.country,
 			adm: s.adm,
 			gapanalysis: active.gapanalysis.ga1,
@@ -2194,7 +2182,7 @@ $(document).ready(function () {
 			grades: active.grades
 		};
 
-    	process({call: 'write', hash: active.files.gapanalysis, json: JSON.stringify(json)}, function (result) {
+    	process({call: 'write', hash: active.files.gapanalysis, json: JSON.stringify(chart_json)}, function (result) {
     		console.log('chart options json write:' + result);
     	})
  
