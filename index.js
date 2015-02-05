@@ -97,7 +97,7 @@ $(document).ready(function () {
 	$('#adm').val('-----');
 	$('#adm').prop('disabled', true);
 	message(m.init, "static");
-
+	$('#tutorial').draggable();
 
 	// --------------------------------------------------
 	// build options
@@ -147,6 +147,17 @@ $(document).ready(function () {
 		runTutorial();
 	});
 
+	$("#tutorial_exit button").click(function (event) {
+		$('#overlay').hide();
+		$('#map_options_popover').show();
+		tutorial_state = 0;
+		if (window.location.hash == '#tutorial') {
+			window.location.hash = '';
+
+		}
+
+	});
+
 	$('#tutorial_button button').click(function () {
 		console.log(tutorial_state);
 
@@ -155,22 +166,30 @@ $(document).ready(function () {
 		switch (tutorial_state) {
 			case 1:
 
-				html += '<p>After selecting the country and administrative level, we are brough to the "Select Method" tab.</p>';
-				html += '<p>From here you can select a predefined analysis to view or choose to create your own analysis by clicking the gear icon to go into the advanced user mode.</p>';
+				// set map options
+		    	$('#country').val('Nepal').change();
+		    	$('#adm').val('ADM3').change();
+
+				// update tutorial text
+				html += '<p class="tutorial-header">Tutorial Step 1:</p>';
+
+				html += '<p>After selecting the country and administrative level, we are brought to the "Select Method" tab.</p>';
+				html += '<p>From here you can load a predefined analysis or create your own analysis by clicking the gear icon to go into the advanced user mode.</p>';
 				html += '<p>Let\'s go into advanced mode to explore the tool step by step. Click "next" when you are ready.</p>';
 				
 				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
 				
+				// update state
 				tutorial_state = 2;
 				
 				break;
 
 			case 2:
 
-				// set map options
 				$('#start_advanced').click();
 
-				// update tutorial text
+				html += '<p class="tutorial-header">Tutorial Step 2:</p>';
+
 				html += '<p>Clicking on the advanced user icon will bring you to the "Build Layer" tab where you can create a custom layer to be used in your analysis.</p>';
 				html += '<p>After selecting up to 5 different layers of data you can assign weights to each of them to create a unique weighted layer that suits your needs.</p>';
 				html += '<p>This water security analysis has been designed based on existing research (riverthreat.net) which determined key indicators related to water security.</p>';
@@ -178,7 +197,6 @@ $(document).ready(function () {
 
 				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
 				
-				// update state
 				tutorial_state = 3;
 				
 				break;
@@ -193,9 +211,11 @@ $(document).ready(function () {
 				$('#ro3').next().val(4).change();
 				$('#ro4').val('natural_disasters__wetland_disconnectivity__2014').change();
 				$('#ro4').next().val(2).change();
+				
+				html += '<p class="tutorial-header">Tutorial Step 3:</p>';
 
 				html += '<p>We have selected 4 data layers which are indicators of water security and assigned weights indicating their influence on the index we are creating.</p>';
-				html += '<p>Weights can be assigned from -10 to 10 with negative values reducing the final index based on that layer.</p>';
+				// html += '<p>Weights can be assigned from -10 to 10 with negative values reducing the final index based on that layer.</p>';
 				html += '<p>Click "next" to build the weights layer.</p>';
 
 				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
@@ -208,8 +228,10 @@ $(document).ready(function () {
 
 				$('#weights_submit button').click();
 
+				html += '<p class="tutorial-header">Tutorial Step 4:</p>';
+
 				html += '<p> The weighted layer we just created is now visible on the map.</p>';
-				html += '<p>You can view the data for each feature of the map by hovering over or clicking on features. The data from this layer can also be downloaded as a CSV by clicking on the download icon in the bottom right of the tab.</p>';
+				html += '<p>You can view the data for each feature by clicking on them to bring up a info window and chart on the left side of the map. The data from this layer can also be downloaded as a CSV by clicking on the download icon in the bottom right of the tab.</p>';
 				html += '<p>Click "next" to continue.</p>';
 
 				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
@@ -221,6 +243,8 @@ $(document).ready(function () {
 			case 5:
 
 				$('#method_gapanalysis').click();
+
+				html += '<p class="tutorial-header">Tutorial Step 5:</p>';
 
 				html += '<p>This is the "Select Aid Data" tab. Here you can select what type of aid you are interested in comparing with the custom layer we just created. To edit the custom layer, just click on "Edit Your Custom Layer" and it will bring you back to the "Build Layer" tab.</p>';
 				html += '<p>Click "next" to continue.</p>';
@@ -235,6 +259,8 @@ $(document).ready(function () {
 
 				$('#ga1').val('aid__water_aid_all__2014').change();
 
+				html += '<p class="tutorial-header">Tutorial Step 6:</p>';
+
 				html += '<p>We have selected the aid layer containing all water related aid in Nepal over all available years.</p>';
 				html += '<p>Click "next" to run the gap analysis.</p>';
 
@@ -248,18 +274,11 @@ $(document).ready(function () {
 
 				$('#gapanalysis_submit button').click();
 
-				html += '<p>Hover / click</p>';
-				html += '<p>Scroll for results</p>';
+				html += '<p class="tutorial-header">Tutorial Step 7:</p>';
 
-				html += '<p>Link for sharing</p>';
-				html += '<p>Download</p>';
-				html += '<p>Aid layer and layer selector</p>';
-				html += '<p>Reload last</p>';
-				html += '<p>point data</p>';
-
-				html += '<p>Export</p>';
-
-				html += '<p>Click "next" to continue.</p>';
+				html += '<p>The gap analysis adds a number of new features to the screen; let\'s take a look at them.</p>';
+				html += '<p>First, the URL has been updated so that you can share this analysis with others. Simply send them the link and DASH will automatically run the same analysis when they load the page.</p>';
+				html += '<p>Click "next" to see the rest of the features.</p>';
 
 				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
 
@@ -268,12 +287,58 @@ $(document).ready(function () {
 				break;
 
 			case 8:
+				html += '<p class="tutorial-header">Tutorial Step 8:</p>';
 
-				// 
+				html += '<p>The "Select Aid Data" tab has had 3 buttons added to it which allow you to:</p>';
+				html += '<p> <ul>';
+				html += '<li>export the results to a one page document</li>';
+				html += '<li>download a CSV of the data from this map layer</li>';
+				html += '<li>reset all options to what was used for the current gap analysis.</li>';
+				html += '</ul></p>'  
+				html += '<p>You can also select the "Add Point Data" tab to overlay project data on the map.</p>';
+				// html += '<p>Aid layer and layer selector</p>';
+				// html += '<p>Scroll for results</p>';
+				// html += '<p>map chart and info</p>';
 
-				$('#tutorial_text').html('<div class="tutorial_text"><p>x</p><p>Click "next" to .</p></div>');
+				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
 
 				tutorial_state = 9;
+
+				break;
+
+			case 9:
+				html += '<p class="tutorial-header">Tutorial Step 9:</p>';
+
+				html += '<p>Information about each feature in the gap analysis layer can be viewed by clicking on any feature to produce a chart and info window on the left side of the map.</p>';
+
+				html += '<p>Near the top left of the map you will see a layer selector which will allow you to toggle between the weight and gapanalysis layer on the map, along with an aid layer that displays the relative amount of aid in each area.</p>';
+
+				html += '<p>By clicking on the "Results Analysis" button at the bottom of the map, or scrolling down the page, you will find charts displaying results of the gap analysis.</p>';
+
+				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
+
+				tutorial_state = 10;
+
+				break;
+
+			case 10:
+
+				html += '<p class="tutorial-header">Tutorial Step 10:</p>';
+				html += '<p>You have reached the end of the tutorial!</p>';
+				html += '<p>To explore our other tools and data or to learn more about AidData, please visit <a href="http://labs.aiddata.org">labs.aiddata.org</a> and <a href="http://www.aiddata.org">aiddata.org</a>.</p>';
+
+				$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');	
+
+				$('#tutorial_button button').html('Exit');
+
+				tutorial_state = 11;
+
+				break;
+			case 11:
+
+				$('#overlay').hide();
+
+				tutorial_state = 0;
 
 				break;
 		}
@@ -601,19 +666,19 @@ $(document).ready(function () {
 		// init tutorial
 
 		$('#overlay').show();
+		$('#tutorial_button button').html('Next');
 
 		$('#map_options_popover').hide();
 
 		$('#map_options_content').slideDown(500);
-
-    	$('#country').val('Nepal').change();
-    	$('#adm').val('ADM3').change();
 	    
 		var html = '';
-		html += '<p>Welcome to tutorial!</p>';
-		html += '<p>Information about what the purpose of the tool is.</p>';
-		html += '<p>This tutorial will walk you through replicating an analysis of water security in Nepal.</p>';
-		html += '<p>Click "next" below to get started.</p>';
+
+		html += '<p class="tutorial-header">Tutorial Introduction:</p>';
+		html += '<p>Welcome to the tutorial!</p>';
+		html += '<p>DASH is a tool designed to utilize AidData\'s data on international aid along with a range of external data to create powerful visualizations and analyze how aid is impacting the developing world</p>';
+		html += '<p>The tutorial will walk you through an example of how this tool can be used by replicating an analysis of water security in Nepal. Click "next" below to get started.</p>';
+		html += '<p style="font-size:10px;text-align:center;">(This window is draggable)</p>';
 	
 		$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
 
@@ -2246,7 +2311,6 @@ $(document).ready(function () {
 	function buildHash() {
 		// console.log('buildHash');
 
-
 		var link_weight = [];
 
 		$('.ro').each(function () {
@@ -2273,12 +2337,11 @@ $(document).ready(function () {
 
 		hash_change = false;
         window.location.hash = url_new.query();
-
-      
 	}
 
   	function readHash () {
   		link_state = true;
+  		advanced = true;
   		$('#map_layers').empty();
   		$('#map_layers_container').hide();
   		$('#map_options_popover').hide();

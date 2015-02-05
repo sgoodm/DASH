@@ -28,9 +28,9 @@
             <div class="export">
                 <a tabindex="0" class="btn" id="export_pdf"><span>Export to PDF</span></a>
             </div>
-            <div class="export">
+        <!--     <div class="export">
                 <a tabindex="0" class="btn" id="export_docx"><span>Export to DOCX</span></a>
-            </div>
+            </div> -->
         </div>
     </div>
 

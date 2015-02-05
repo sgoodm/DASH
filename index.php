@@ -26,7 +26,7 @@
         <div id="tutorial">
             <div id="tutorial_text"></div>
             <div id="tutorial_button"><button>Next</button></div>
-            <!-- <div id="tutorial_exit"><button></button></div>   -->
+            <div id="tutorial_exit"><button>X</button></div>  
         </div>
     </div>
     <div id="map_container">
@@ -46,8 +46,8 @@
                     <div id="adm_options">
                         <select id="adm" disabled>
                             <option id="blank_adm_option" value="-----">Level</option>
-                            <option value="ADM1">ADM1</option>
-                            <option value="ADM2">ADM2</option>
+                            <!-- <option value="ADM1">ADM1</option> -->
+                            <!-- <option value="ADM2">ADM2</option> -->
                             <option value="ADM3">ADM3</option>
                         </select>
                     </div>   

@@ -68,16 +68,21 @@ i, i:hover, i:active, i:focus, i:visited,
         height: 300px;
         background: rgba(255,255,255,0.75);
         position: absolute;
-        top:100px;
-        left:100px;
+        top:25px;
+        right:450px;
     }
         #tutorial_text {
             height: 250px;
             width:100%;
             padding:10px;
             color: black;
+            font-size: 12px;
 
         }
+            .tutorial-header {
+                font-weight: bold;
+                font-size: 14px;
+            }
         #tutorial_button {
             width:100%;
             text-align: center;
@@ -85,6 +90,18 @@ i, i:hover, i:active, i:focus, i:visited,
             #tutorial_button button {
                 width: 100px;
                 color:black;
+            }
+        #tutorial_exit {
+            position: absolute;
+            top:5px;
+            right:5px;
+        }
+            #tutorial_exit button {
+                width: 25px;
+                height: 25px;
+                color: red;
+                text-align: center;
+                vertical-align: middle;
             }
 
 /*
@@ -609,7 +626,7 @@ i, i:hover, i:active, i:focus, i:visited,
     #map_layers_container {
         display:none;
         height:25px;
-        position:fixed;
+        position:absolute;
         top:0;
         left:75px;
         border:1px solid black;

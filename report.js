@@ -124,7 +124,9 @@ $(document).ready(function () {
 			html = '', meta_html = '', info_html = '';
 
 		// add title
-		$('#grid_container').prepend('<div class="grid_title">AidData DASH Gap Analysis Results</div>');
+		$('#grid_container').prepend('<div class="grid_subtitle">(Not actual report. Use above buttons to generate and download report.)</div>');
+
+		$('#grid_container').prepend('<div class="grid_title">Content Preview: DASH Gap Analysis Results</div>');
 
 		// add div for map
 		html += '<div class="grid_container"><div id="map" class="grid_content" data-source="map"></div><div id="meta"></div></div>'
@@ -157,27 +159,40 @@ $(document).ready(function () {
 		}
 
 		// add meta
-		meta_html += '<table>'
-		meta_html += '<thead><tr><th colspan=2>Meta Info</th></tr></thead><tbody>';
-		meta_html += '<tr><td>Country</td><td class="tright">'+json.meta.country+'</td></tr>';
-		meta_html += '<tr><td>ADM</td><td class="tright">'+json.meta.adm+'</td></tr>';
-		meta_html += '<tr><td>Aid Layer</td><td class="tright">'+json.meta.gapanalysis+'</td></tr>';
-		meta_html += '<tr><td colspan=2 style="text-align:center;">Weighted Layers</td></tr>';
+		// meta_html += '<table>'
+		// meta_html += '<thead><tr><th colspan=2>Meta Info</th></tr></thead><tbody>';
+		// meta_html += '<tr><td>Country</td><td class="tright">'+json.meta.country+'</td></tr>';
+		// meta_html += '<tr><td>ADM</td><td class="tright">'+json.meta.adm+'</td></tr>';
+		// meta_html += '<tr><td>Aid Layer</td><td class="tright">'+json.meta.gapanalysis+'</td></tr>';
+		// meta_html += '<tr><td colspan=2 style="text-align:center;">Weighted Layers</td></tr>';
+
+		// for (var i=0, ix=_.size(json.meta.weights); i<ix; i++) {
+		// 	var key, w_name, w_val;
+		// 	key = _.keys(json.meta.weights)[i];
+		// 	w_name = json.meta.weights[key];
+		// 	w_val = json.meta.weight_vals[key];
+		// 	meta_html += '<tr><td colspan=2>'+w_name+' ('+w_val+')</td></tr>';
+		// }
+
+		// meta_html += '</tbody></table';
+
+		meta_html += '<p>Using the '+json.meta.gapanalysis+' aid layer for the '+json.meta.adm+' level of '+json.meta.country+' and the weighted layer, a gap analysis was run to determine areas where projects were being relatively over or underfunded. The data layers used to generate the weighted layer and their assigned weights are: </p>';
+		meta_html += '<ul>';
 
 		for (var i=0, ix=_.size(json.meta.weights); i<ix; i++) {
 			var key, w_name, w_val;
 			key = _.keys(json.meta.weights)[i];
 			w_name = json.meta.weights[key];
 			w_val = json.meta.weight_vals[key];
-			meta_html += '<tr><td colspan=2>'+w_name+' ('+w_val+')</td></tr>';
+			meta_html += '<li>'+w_name+' ('+w_val+')</li>';
 		}
-
-		meta_html += '</tbody></table';
+		meta_html += '</ul>';
 
 		$('#meta').html(meta_html);
 		
 		// add info
-		info_html += '';
+		info_html += '<p id="funding_text">Breaking down all areas of '+json.meta.country+' at the '+json.meta.adm+' level based on the level of funding they received illustrates the disparity between underfunded and overfunded areas as well as the severity of over and underfunding at the '+json.meta.adm+' level in '+json.meta.country+'. </p>';
+
 		$('#info').html(info_html);
 		
 		// save map to image

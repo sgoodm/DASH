@@ -116,12 +116,17 @@ body {
         }
 
         .grid_title {
-            height:100px;
+            /*height:50px;*/
             width:100%;
             text-align:center;
             font-size:40px;
         }
-
+        .grid_subtitle {
+            /*height:100px;*/
+            width:100%;
+            text-align:center;
+            font-size:25px;
+        }
         .grid_container {
             height:350px;
             width:1200px;
@@ -144,7 +149,8 @@ body {
                 display: inline-block;
                 width:400px;
                 float: left;
-                background: rgba(0,0,0,0.1);
+                padding:10px;
+                /*background: rgba(0,0,0,0.1);*/
             }
             .large-chart {
                  width:100%;
@@ -158,7 +164,7 @@ body {
                 display: inline-block;
                 width:400px;               
                 float: left;
-                background: rgba(0,0,0,0.1);
+                /*background: rgba(0,0,0,0.1);*/
             }
 
             table {
