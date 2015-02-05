@@ -108,7 +108,6 @@ $(document).ready(function () {
 			 if ( vis ) {
 			 	$('#map_options_popover').show();
 			 }
-
 		});
 	});
 	$('#map_chart_toggle').click(function () {
@@ -136,7 +135,6 @@ $(document).ready(function () {
 		window.location.hash = 'tutorial';
 
 		runTutorial();
-
 	});
 
 	$('#tutorial_button button').click(function () {
@@ -295,7 +293,6 @@ $(document).ready(function () {
 		// }
 
 		buildRasterList();
-
 	});
 
 	// change adm
@@ -325,14 +322,12 @@ $(document).ready(function () {
 		}
 
 		buildRasterList();
-
 	});
 
 	$('#start_option').on('change', function () {
 		var val = ( $(this).val() != '-----' );
 		// console.log(val)
 		showState('#start_submit', val);
-
 	})
 
 	$('#start_submit button').click(function () {
@@ -449,7 +444,6 @@ $(document).ready(function () {
 		if (current.valid.weights) {
 			var id = $(this).prev().attr('id');
 			current.weight_vals[id] = $(this).val();
-
 		}
 	});
 
@@ -491,6 +485,12 @@ $(document).ready(function () {
 		// copy pending data object to submission data object
 		s = (JSON.parse(JSON.stringify(p)));
 
+		var height = 200 + ( 20 * ( _.size(temp.weights) + 1 ) );
+		$('#map_chart_container').css('height', height )
+		var new_height = height / 2 - 4;
+		// console.log(height, new_height);
+		$('#map_chart_toggle span').css('top', new_height );
+
 		prepWeights();
 	});
 
@@ -503,6 +503,7 @@ $(document).ready(function () {
 		if ( item == "" ) {
 			delete current.gapanalysis[id];
 			delete temp.gapanalysis[id];
+
 		} else {
 			current.gapanalysis[id] = item;
 			temp.gapanalysis[id] = item;
@@ -600,7 +601,7 @@ $(document).ready(function () {
 		html += '<p>Welcome to tutorial!</p>';
 		html += '<p>Information about what the purpose of the tool is.</p>';
 		html += '<p>This tutorial will walk you through replicating an analysis of water security in Nepal.</p>';
-		html += '><p>Click "next" below to get started.</p>';
+		html += '<p>Click "next" below to get started.</p>';
 	
 		$('#tutorial_text').html('<div class="tutorial_text">'+html+'</div>');
 
@@ -703,7 +704,6 @@ $(document).ready(function () {
 	        $(this).find(".optgroup_"+type).each(function () {
 	        	$(this).append('<option class="'+option+'" value="' + option + '">' + filterOptionName(option,"__",1,0) + '</option>');
 	        });
-
 		});
 	}
 
@@ -832,7 +832,6 @@ $(document).ready(function () {
 		// } else {
 		// 	$('#'+p.method+'_submit').hide();
 		// }
-
  	}
 
 
@@ -945,7 +944,6 @@ $(document).ready(function () {
 		}
 	})
 
-
 	// bounds objects
 	allCountryBounds = { global:{_northEast:{lat:90, lng:180}, _southWest:{lat:-90, lng:-180}} };
 
@@ -997,7 +995,7 @@ $(document).ready(function () {
 			html += '<b>' + props["NAME_"+s.adm.substr(3)] + '</b><br />';
 	        
 	        html += "<table id='map_table'><thead><tr><th>Raster</th><th>Raw</th><th>Weighted</th></tr></thead><tbody>";
-	        var vals = _.values(active.weights);
+	        var vals = _.values(temp.weights);
 	        for (var i=0, ix=vals.length; i<ix; i++) {
 
 			    html += '<tr><td>' + vals[i] + '</td><td>' + roundxy( props[vals[i]] ) + '</td><td>' + (props[vals[i]+"_weighted"] ? roundxy(props[vals[i]+"_weighted"]) : "" ) + '</td></tr>';
@@ -1008,7 +1006,7 @@ $(document).ready(function () {
 	        html += 'Result: ' + roundxy(props.result); 
 		
 		} else {
-			html = 'Hover over an area';
+			html = 'Click on a feature';
 		}
 
 	    this._div.innerHTML = html;
@@ -1033,7 +1031,7 @@ $(document).ready(function () {
 	        html += 'Result: ' + roundxy(props.result);
 		
 		} else {
-			html = 'Hover over an area';
+			html = 'Click on a feature';
 		}
 
 	    this._div.innerHTML = html;
@@ -1051,7 +1049,7 @@ $(document).ready(function () {
 	        html += 'Aid: ' + roundxy(props[active.gapanalysis.ga1]);
 		
 		} else {
-			html = 'Hover over an area';
+			html = 'Click on a feature';
 		}
 
 	    this._div.innerHTML = html;
@@ -1163,10 +1161,8 @@ $(document).ready(function () {
 				markers.addLayer(geojsonLayer);
 				map.addLayer(markers);
 				map.spin(false);
-
 	        }
 	    });
-
 	}
 
 	// ajax to run Rscript which builds weighted geojson
@@ -1282,7 +1278,6 @@ $(document).ready(function () {
                 }
        	       	map.spin(false);
         	    runAnalysis();	
-
 	        }
 	    });
 	}
@@ -1323,17 +1318,14 @@ $(document).ready(function () {
 			console.log( geojsonPolyData[layer_type].features )
 			for ( var i = 0, ix = size; i < ix; i++ ) {
 				var val = parseFloat(geojsonPolyData[layer_type].features[i].properties.ratio)
-				console.log(val)
 				if ( val <= 0 ) {
 					gap_array_neg.push( val );
 				} else {
 					gap_array_pos.push( val )
 				}
-
 			}
-			console.log(gap_array_neg);
-			console.log(gap_array_pos);
 
+			// populate jenks breaks with fake values if not enough points below/above zero
 			if (gap_array_neg.length < 4){
 				var len = gap_array_neg.length;
 				for ( var i = 0, ix = 4-len; i < ix; i++ ) {
@@ -1352,7 +1344,6 @@ $(document).ready(function () {
 
 			jenks.neg = ss.jenks(gap_array_neg, 3),
 			jenks.pos = ss.jenks(gap_array_pos, 3)
-			console.log(jenks)
 
 			grades.gapanalysis = [ roundxy(jenks.neg[1] ,2), roundxy(jenks.neg[2] ,2), roundxy(jenks.neg[3] ,2), roundxy(jenks.pos[1] ,2), roundxy(jenks.pos[2] ,2), roundxy(jenks.pos[3] ,2) ]
 
@@ -1370,7 +1361,6 @@ $(document).ready(function () {
 	   		           			   '#de2d26' ; 
 
    		    } else if (current_layer == 'aid') {
-   		    	// console.log(d, size)
 			    return d <= Math.floor(size*1/5) ? '#de2d26' :
 			           d <= Math.floor(size*2/5) ? '#fc9272' :
 
@@ -1416,8 +1406,7 @@ $(document).ready(function () {
 		        layer.bringToFront();
 		    }
 
-   		    info[current_layer].update(e.target.feature.properties);
-
+   		    // info[current_layer].update(e.target.feature.properties);
 		}
 
 		function mouseoutFeature(e) {
@@ -1428,12 +1417,6 @@ $(document).ready(function () {
 		        weight: 1
 		    });
 
-		    if (!L.Browser.ie && !L.Browser.opera) {
-		        layer.bringToFront();
-		    }
-
-   		    info[current_layer].update(e.target.feature.properties);
-
 		    // geojson.resetStyle(layer);
 		    // info.update();
 		}
@@ -1441,6 +1424,8 @@ $(document).ready(function () {
 		function clickFeature(e) {
 
 			var layer = e.target;
+
+   		    info[current_layer].update(e.target.feature.properties);
 
 			// if (lastClicked && lastClicked == layer._leaflet_id ) {
 			// 	return;
@@ -1467,8 +1452,11 @@ $(document).ready(function () {
 
 	    	var total = 'result';
 
+	    	var weight_data = temp.weights;
+
 	    	// aid series (only for gapanalysis)
 	    	if (current_layer == "gapanalysis") {
+	    		weight_data = active.weights
 		    	map_chart_data.series.push({
 		    		name: active.gapanalysis.ga1,
 		    		data: [ roundxy(parseFloat(layer.feature.properties[active.gapanalysis.ga1+"_percent"])) ],
@@ -1478,8 +1466,8 @@ $(document).ready(function () {
 		    }
 
 	    	// raw weighted vals
-	    	for ( var i = 0, ix = _.size(active.weights); i < ix; i++ ) {
-	    		var val = parseFloat( layer.feature.properties[_.values(active.weights)[i]+"_weighted"] );
+	    	for ( var i = 0, ix = _.size(weight_data); i < ix; i++ ) {
+	    		var val = parseFloat( layer.feature.properties[_.values(weight_data)[i]+"_weighted"] );
 	    		map_chart_data.raw.push(val);
 	    	}
 
@@ -1499,7 +1487,7 @@ $(document).ready(function () {
 	    	for ( var i = 0, ix = map_chart_data.count; i < ix; i++ ) {
 	    		var val = roundxy( parseFloat(layer.feature.properties[total]) * map_chart_data.raw[i] / map_chart_data.sum );
 	    		map_chart_data.series.push({
-	    			name: _.values(active.weights)[i],
+	    			name: _.values(weight_data)[i],
 	    			data: [ val ],
 	    			stack: 1
 	    		});
@@ -1536,7 +1524,14 @@ $(document).ready(function () {
 		        	shared:false,
    		            hideDelay:0,
 		            formatter: function () {
-		            	var html = '<b>' + this.y + '</b>';
+		            	var html = '';
+		            	if ( this.y == this.point.stackTotal ) {
+		            		html += '<b>' + this.point.stackTotal + '</b>';
+
+		            	} else {
+		            		html += '<b>' + roundxy(100 * this.y / this.point.stackTotal, 2) + '% of '+ this.point.stackTotal + '</b>';
+
+		            	}
 		                return html;
 		            }
 		        },
@@ -2355,6 +2350,7 @@ $(document).ready(function () {
 
 	    	// handle issue when using back/forward buttons from tutorial
 			$('#overlay').hide();
+			tutorial_state = 0;
 
       		setTimeout(readHash, 200);
 
