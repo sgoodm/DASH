@@ -159,7 +159,10 @@ $(document).ready(function () {
 	});
 
 	$('#tutorial_button button').click(function () {
-		console.log(tutorial_state);
+		// console.log(tutorial_state);
+
+        $('html, body').animate({ scrollTop: 0 }, 0);
+
 
 		var html = '';
 
