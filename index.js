@@ -1389,7 +1389,13 @@ $(document).ready(function () {
    		cleanMap("chart");
 
    		// jenks breaks for gapanalysis
-    	var gap_array_neg = [], gap_array_pos = [], jenks = {};
+    	var gap_array_neg = [], gap_array_pos = [], jenks = { pos:[], neg:[] };
+		
+		console.log('preinit')
+		console.log(gap_array_pos)
+		console.log(gap_array_neg)
+		console.log(jenks)
+		console.log('postinit')
 
 		if (current_layer == 'gapanalysis') {
 
@@ -1405,6 +1411,7 @@ $(document).ready(function () {
 
 			// populate jenks breaks with fake values if not enough points below/above zero
 			if (gap_array_neg.length < 4){
+				gap_array_neg[0] =  gap_array_neg.length == 0 ? 0 : gap_array_neg[0];
 				var len = gap_array_neg.length;
 				for ( var i = 0, ix = 4-len; i < ix; i++ ) {
 
@@ -1413,6 +1420,7 @@ $(document).ready(function () {
 			}
 
 			if (gap_array_pos.length < 4){
+				gap_array_pos[0] =  gap_array_pos.length == 0 ? 0 : gap_array_pos[0];
 				var len = gap_array_pos.length;
 				for ( var i = 0, ix = 4-len; i < ix; i++ ) {
 
@@ -1420,11 +1428,21 @@ $(document).ready(function () {
 				}
 			}
 
+			console.log(gap_array_pos)
+			console.log(gap_array_neg)
+			// console.log(jenks)
+
+			console.log('prejenks')
 			jenks.neg = ss.jenks(gap_array_neg, 3),
 			jenks.pos = ss.jenks(gap_array_pos, 3)
-
+			console.log('postjenks')
 			grades.gapanalysis = [ jenks.neg[1], jenks.neg[2], jenks.neg[3], jenks.pos[1], jenks.pos[2], jenks.pos[3] ]
+			console.log('postgrades')
 			active.grades = grades.gapanalysis;
+
+
+
+			console.log(grades.gapanalysis)
 		}
 
 		function getColor(d) {
