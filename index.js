@@ -706,28 +706,29 @@ $(document).ready(function () {
 			if (error) {
 				console.log(error);
 				return 1;
-			} else {
-				// console.log(themes)
-				var html = '';
+			} 
 
-				if (themes.available[p.country] && _.keys(themes.available[p.country][p.adm]).length > 0) {
-					
-					var list = themes.available[p.country][p.adm];
-					var keys = _.keys(list);
-					
-					html += '<option value="-----">Select an Option</option>';
+			// console.log(themes)
+			var html = '';
 
-					for ( var i = 0, ix = keys.length; i < ix; i++ ) {
-						var key = keys[i];
-						html += '<option value="'+key+'">'+key+'</option>'
-					}
+			if (themes.available[p.country] && _.keys(themes.available[p.country][p.adm]).length > 0) {
+				
+				var list = themes.available[p.country][p.adm];
+				var keys = _.keys(list);
+				
+				html += '<option value="-----">Select an Option</option>';
 
-				} else {
-					html += '<option value="-----">No Options Available</option>';
-
+				for ( var i = 0, ix = keys.length; i < ix; i++ ) {
+					var key = keys[i];
+					html += '<option value="'+key+'">'+key+'</option>'
 				}
-				$('#start_option').html(html);
+
+			} else {
+				html += '<option value="-----">No Options Available</option>';
+
 			}
+			$('#start_option').html(html);
+		
 
 			// build weights and gapanalysis options
 			process({ call: "scan", path: "/"+p.continent.toLowerCase().toLowerCase()+"/"+p.country.toLowerCase()+"/cache" }, function (options) {
