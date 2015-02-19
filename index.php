@@ -36,19 +36,21 @@
                 <div id="boundary_options"> 
                     <div id="country_options">
                         <select id="country" >
-                            <option id="blank_country_option" value="-----">Country</option>
-                            <option value="Nepal">Nepal</option>
-                            <!-- <option value="Uganda">Uganda</option> -->
-                            <!-- <option value="Malawi">Malawi</option>   -->
+                            <!-- add countries based on builder_data.json -->
+
+                            <!-- <option id="blank_country_option" value="-----">Country</option> -->
+                            <!-- <option value="Nepal">Nepal</option> -->
+
                         </select>
                     </div>       
 
                     <div id="adm_options">
                         <select id="adm" disabled>
-                            <option id="blank_adm_option" value="-----">Level</option>
-                            <!-- <option value="ADM1">ADM1</option> -->
-                            <!-- <option value="ADM2">ADM2</option> -->
-                            <option value="ADM3">ADM3</option>
+                            <!-- add adm options based on DET>resources scan for each country -->
+
+                            <!-- <option id="blank_adm_option" value="-----">Level</option> -->
+                            <!-- <option value="ADM3">ADM3</option> -->
+
                         </select>
                     </div>   
 
@@ -138,7 +140,8 @@
                             <li id="Agriculture" class="menu_item">Agriculture</li><!--
                          --><li id="Health" class="menu_item">Health</li><!--
                          --><li id="Education" class="menu_item">Education</li><!--
-                         --><li id="Industry" class="menu_item">Industry</li>      
+                         --><li id="Water" class="menu_item">Water</li><!--
+                         --><li id="Energy" class="menu_item">Energy</li>      
                         </ul>
                     </div>
 

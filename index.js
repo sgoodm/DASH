@@ -63,13 +63,6 @@ $(document).ready(function () {
 		gapanalysis:'ga'
 	};
 
-	// continent lookup list
-	var continent_list = {
-		'Nepal':'Asia',
-		'Uganda':'Africa',
-		'Malawi':'Africa'
-	};
-
 	// messages
 	var m = {
 		init:'<p>Welcome to AidData - - DASH - -</p><p>Utilize our data on international aid along with a range of external data to create power visualizations and analyze how aid is impacting the developing world.</p><p>To start, please select the country and the administrative level you would like to explore.</p><p style="font-size:10px;">(You can change these later.)</p>',
@@ -90,6 +83,22 @@ $(document).ready(function () {
 
 	var hash_change = true;
 	
+	var builder_data;
+ 	readJSON("../data/form/builder_data.json", function (request, status, error){
+ 		if (error){
+ 			console.log(error);
+ 			return 1;
+ 		}
+ 		builder_data = request;
+
+ 		var html = '<option id="blank_country_option" value="-----">Country</option>';
+ 		var keys = _.keys(builder_data.country_data);
+		for (var i=0, ix=keys.length; i<ix; i++) {
+			html += '<option value="'+keys[i]+'" >'+keys[i]+'</option>'
+		}
+		$('#country').html(html);
+ 
+ 	})
 
 	// init ui on load
     checkHash('init');
@@ -351,6 +360,7 @@ $(document).ready(function () {
 	$('#country').on('change', function () {
 		page_state = 'init';
 
+
 		var $blank = $('#blank_country_option');
 		if ($blank.length) { 
 			$blank.remove() ;
@@ -358,9 +368,22 @@ $(document).ready(function () {
 		}
 
 		p.country = $(this).val();
-
 		// continent needed to access data using current DET file structure
-		p.continent = continent_list[p.country];
+		p.continent = builder_data.country_data[p.country].continent;
+
+		// build adm selector
+		$('#adm').empty();
+		var html = '';
+		html += '<option id="blank_adm_option" value="-----">Level</option>';
+
+		// UPDATE TO SCAN DIRECTORY / META FILE ONCE DET IS REBUILT
+		html += '<option value="ADM1">ADM1</option>';
+		html += '<option value="ADM2">ADM2</option>';
+
+		if (p.country == "Nepal") {
+			html += '<option value="ADM3">ADM3</option>';
+		}
+		$('#adm').html(html);
 
 		// add country polygon to map
 		addCountry();
