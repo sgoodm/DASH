@@ -145,7 +145,7 @@
                         </ul>
                     </div>
 
-                    <div id="slider_container">
+               <!--      <div id="slider_container">
                         <div id="slider_top" class="slider_sub">
                             <div id="slider"></div>
                         </div> 
@@ -154,7 +154,7 @@
                             <span id="slider_value"></span>
                             <span id="slider_max"></span>
                         </div>
-                    </div>
+                    </div> -->
 
                 </div>
 

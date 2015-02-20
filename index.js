@@ -1238,34 +1238,80 @@ $(document).ready(function () {
 		cleanMap("point");
 
 		map.spin(true);
-		$.ajax ({
-	        url: "process.php",
-	        data: {call: "pointdata", country:p.country, pointType: d.type, start_year:d.start_year, end_year:d.end_year},
-	        dataType: "json",
-	        type: "post",
-	        async: false,
-	        success: function (geojsonContents) {
+
+
+		readJSON('../data/form/sector_data/'+p.country+'_'+d.type+'.geojson', function (request, status, error) {
+			if (error) {
+				console.log(error);
+				return 1;
+			} 
+			geojsonPoints = request;
+
+			markers = new L.MarkerClusterGroup({
+				disableClusteringAtZoom: 10//8
+			});
+
+			var geojsonLayer = L.geoJson(geojsonPoints, {
+				onEachFeature: function (feature, layer) {
+					var a = feature.properties;
+
+					var popup = '';
+					// var commitments_field = ( countryData[grid_country].type == 'old' ? 'total_commitments' : 'transaction_sum' );
+
+					popup += '<i><b>' + a.place_name + '<b></i>'
+					popup += "</br><b>Project ID:</b> " + a.project_id;
+					popup += "</br><b>Geoname ID:</b> " + a.geoname_id;
+
+					// popup += "</br><b>Commitments:</b> " + parseInt(a[commitments_field]).toLocaleString();
+
+					popup += "</br><b>Donors:</b> " + a.donors;
+
+					layer.bindPopup(popup);
+				},
+				pointToLayer: function(feature, latlng) {
+			        return L.marker(latlng, {
+			            // radius: 5
+			        })
+			    }
+			});
+
+			markers.addLayer(geojsonLayer);
+			map.addLayer(markers);
+			map.spin(false);
+
+	 		map.invalidateSize()
+		 	window.dispatchEvent(new Event('resize'))
+
+		})
+
+		// $.ajax ({
+	 //        url: "process.php",
+	 //        data: {call: "pointdata", country:p.country, pointType: d.type, start_year:d.start_year, end_year:d.end_year},
+	 //        dataType: "json",
+	 //        type: "post",
+	 //        async: false,
+	 //        success: function (geojsonContents) {
 				
-				geojsonPoints = geojsonContents
+		// 		geojsonPoints = geojsonContents
 
-				markers = new L.MarkerClusterGroup({
-					disableClusteringAtZoom: 12
-				});
+		// 		markers = new L.MarkerClusterGroup({
+		// 			disableClusteringAtZoom: 12
+		// 		});
 
-				var geojsonLayer = L.geoJson(geojsonContents, {
-					onEachFeature: mapinfo.pointdata,
-					pointToLayer: function (feature, latlng) {
-				        return L.marker(latlng, {
-				            // radius: 5
-				        });
-				    }
-				});
+		// 		var geojsonLayer = L.geoJson(geojsonContents, {
+		// 			onEachFeature: mapinfo.pointdata,
+		// 			pointToLayer: function (feature, latlng) {
+		// 		        return L.marker(latlng, {
+		// 		            // radius: 5
+		// 		        });
+		// 		    }
+		// 		});
 
-				markers.addLayer(geojsonLayer);
-				map.addLayer(markers);
-				map.spin(false);
-	        }
-	    });
+		// 		markers.addLayer(geojsonLayer);
+		// 		map.addLayer(markers);
+		// 		map.spin(false);
+	 //        }
+	 //    });
 	}
 
 	// ajax to run Rscript which builds weighted geojson
