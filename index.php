@@ -18,6 +18,8 @@
     <link rel="stylesheet" href="/aiddata/libs/MarkerCluster/MarkerCluster.css" />
     <link rel="stylesheet" href="/aiddata/libs/MarkerCluster/MarkerCluster.Default.css" />
 
+    <link href="/aiddata/libs/Leaflet.draw-master/dist/leaflet.draw.css" rel="stylesheet"  />
+
     <link rel="stylesheet" href="index.css?<?php echo filectime('index.css') ?>" />    
 </head>
 
@@ -226,7 +228,33 @@
 
     <script src="/aiddata/libs/canvas/html2canvas.min.js"></script>
     <script src="/aiddata/libs/canvas/jquery.plugin.html2canvas.js"></script>
-    
+
+    <script src="/aiddata/libs/Leaflet.draw-master/src/Leaflet.draw.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/Toolbar.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/Tooltip.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/ext/GeometryUtil.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/ext/LatLngUtil.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/ext/LineUtil.Intersect.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/ext/Polygon.Intersect.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/ext/Polyline.Intersect.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/draw/DrawToolbar.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/draw/handler/Draw.Feature.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/draw/handler/Draw.SimpleShape.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/draw/handler/Draw.Polyline.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/draw/handler/Draw.Circle.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/draw/handler/Draw.Marker.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/draw/handler/Draw.Polygon.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/draw/handler/Draw.Rectangle.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/edit/EditToolbar.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/edit/handler/EditToolbar.Edit.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/edit/handler/EditToolbar.Delete.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/Control.Draw.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/edit/handler/Edit.Poly.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/edit/handler/Edit.SimpleShape.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/edit/handler/Edit.Circle.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/edit/handler/Edit.Rectangle.js"></script>
+    <script src="/aiddata/libs/Leaflet.draw-master/src/edit/handler/Edit.Marker.js"></script>
+
 
     <script src="index.js"></script>
 

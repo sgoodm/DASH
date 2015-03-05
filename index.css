@@ -563,7 +563,7 @@ i, i:hover, i:active, i:focus, i:visited,
         height: 200px;
         position: absolute;
         left: 0px;
-        top:100px;
+        bottom:250px;
         /*top:50%;*/
         /*margin-top: -100px;*/
     }

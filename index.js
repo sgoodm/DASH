@@ -1033,6 +1033,31 @@ $(document).ready(function () {
 	map.options.maxZoom = 11;
 	map.options.minZoom = 2;
 
+
+	// handle map drawing tools
+	var drawnItems = L.featureGroup().addTo(map);
+
+	var drawControl = new L.Control.Draw({
+	    draw: {
+			polygon: false,
+			circle: false,
+			rectangle: false,
+			polyline: false
+	    },
+	    edit: {
+	      	featureGroup: drawnItems
+	  	}
+	});
+
+	map.addControl(drawControl);
+
+
+	map.on('draw:created', function(event) {
+		var layer = event.layer;
+		drawnItems.addLayer(layer);
+	});
+
+
 	$('.leaflet-control-attribution').hide();
 
 	$('#map_layers').on('change', 'input[name="map_layer"]:radio', function (){

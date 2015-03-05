@@ -266,10 +266,10 @@ $raw .= '</div>';
 		
 // convert markdownextra to html
 require_once '/var/www/html/aiddata/libs/Michelf/MarkdownExtra.inc.php';
-use \Michelf\MarkdownExtra;
+// use \Michelf\MarkdownExtra;
 $parser = new MarkdownExtra();
 $html = $parser->transform($raw);
-file_put_contents($path."/report.html", $html);
+file_put_contents("/var/www/html/aiddata/tmp/report.html", $html);
 
 // convert html to pdf
 include '/var/www/html/aiddata/libs/mpdf/mpdf.php';
