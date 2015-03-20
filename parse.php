@@ -205,11 +205,12 @@ $raw .= '</div>';
 // 	}
 // }
 
+
 for ($i=0; $i<$count; $i++){
 
 	// process actual image
 	$imgs[$i] = "/var/www/html/aiddata/data/images/" . $imgs[$i];
-	
+
 	$new_image = substr($imgs[$i],0,-4) . ".jpeg";
 	
 	$im = new Imagick(); 
@@ -217,6 +218,7 @@ for ($i=0; $i<$count; $i++){
 	$im->writeImage($new_image);
 
 	$imgs[$i] = $new_image;
+
 }
 
 // map and meta
@@ -264,12 +266,17 @@ $raw .= '</div>';
 
 $raw .= '</div>';
 		
+
 // convert markdownextra to html
 require_once '/var/www/html/aiddata/libs/Michelf/MarkdownExtra.inc.php';
 // use \Michelf\MarkdownExtra;
-$parser = new MarkdownExtra();
-$html = $parser->transform($raw);
-file_put_contents("/var/www/html/aiddata/tmp/report.html", $html);
+
+// $parser = new MarkdownExtra();
+// $html = $parser->transform($raw);
+// file_put_contents("/var/www/html/aiddata/tmp/report.html", $html);
+
+$html = \Michelf\MarkdownExtra::defaultTransform($raw);
+
 
 // convert html to pdf
 include '/var/www/html/aiddata/libs/mpdf/mpdf.php';
@@ -282,6 +289,6 @@ $out = '../data/reports/'.$hash.'/report.pdf';
 
 echo json_encode($out);
 
-return;
+// return;
 
 ?>
