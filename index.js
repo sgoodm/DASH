@@ -91,6 +91,10 @@ $(document).ready(function () {
  		}
  		builder_data = request;
 
+ 		builder_data["country_data"]["Mumbai"] = {
+ 			"continent": "Asia"
+ 		}
+
  		var html = '<option id="blank_country_option" value="-----">Country</option>';
  		var keys = _.keys(builder_data.country_data);
 		for (var i=0, ix=keys.length; i<ix; i++) {
@@ -1343,6 +1347,7 @@ $(document).ready(function () {
 	function prepWeights() {
 		console.log(s)
 		map.spin(true)
+		console.log( {call: "weights", continent: s.continent, country: s.country, adm: s.adm, /*name: s.name,*/ rasters: s.rasters, weights: s.weights, files: s.files})
 		$.ajax ({
 	        url: "process.php",
 	        data: {call: "weights", continent: s.continent, country: s.country, adm: s.adm, /*name: s.name,*/ rasters: s.rasters, weights: s.weights, files: s.files},

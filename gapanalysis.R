@@ -20,7 +20,7 @@ for (i in 1:in_count){
 base <- paste("/var/www/html/aiddata/DET/resources",in_continent,in_country,sep="/")
 setwd(base)
 
-geojson <- readOGR(paste("shapefiles",in_adm,"Leaflet.geojson",sep="/"), "OGRGeoJSON")
+geojson <- readOGR(paste("shapefiles",in_adm,"Leaflet.geojson",sep="/"), "OGRGeoJSON", disambiguate=TRUE)
 
 
 # get primary data

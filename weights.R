@@ -21,9 +21,10 @@ for (i in 1:in_count){
 
 base <- paste("/var/www/html/aiddata/DET/resources",in_continent,in_country,sep="/")
 setwd(base)
+write(paste(base,"shapefiles",in_adm,"Leaflet.geojson",sep="/"),"/var/www/html/aiddata/t1.txt")
 
-geojson <- readOGR(paste("shapefiles",in_adm,"Leaflet.geojson",sep="/"), "OGRGeoJSON")
-
+geojson <- readOGR(paste("shapefiles",in_adm,"Leaflet.geojson",sep="/"), "OGRGeoJSON", disambiguate=TRUE)
+write("5","/var/www/html/aiddata/t1.txt")
 for (i in 1:in_count){
 	csv <-  read.csv(paste("cache",in_files[i], sep="/"))
 
